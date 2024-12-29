@@ -1,0 +1,8 @@
+database/
+
+docker-compose.yml
+
+# Local env files
+.env
+.env.*
+!.env.example
