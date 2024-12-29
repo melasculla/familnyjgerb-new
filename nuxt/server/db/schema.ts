@@ -8,14 +8,38 @@ export const usersTable = pgTable('users', {
    email: varchar('email', { length: 256 }).notNull(),
    role: varchar('role', { length: 20 }).$type<Roles>().notNull().default('user'),
    uid: varchar('uid').notNull().unique(),
-   nickname: varchar('nickname', { length: 256 }),
-   location: text('location'),
-   website: varchar('website', { length: 256 }),
 })
 
 export type Roles = 'user' | 'client' | 'admin'
 export const rolesList: Roles[] = ['user', 'client']
 export type User = typeof usersTable.$inferSelect
 export type NewUser = typeof usersTable.$inferInsert
-export type UserColumns = typeof usersTable._.columns
-export type UserSession = Omit<User, 'password'>
+
+// ### Блог
+// Заголовок
+// Редактор
+// Галерея
+// Превью
+// Кнопки (возможно) (в конце)
+// Категории
+// Поиск
+// Дата создания (редактируемая)
+// Мета теги отдельные
+// Похожие
+
+// ### Галерея 
+// Гербы 3 категории 
+// Монограммы 4 категории
+
+// ### Проекты
+// Заголовок
+// Превью
+// Применение
+// Эскизы 
+// Видео отдельно
+// След предыдущие
+// Похожие
+
+
+// ### Видео
+// Отдельная страница с видео

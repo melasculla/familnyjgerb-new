@@ -1,5 +1,5 @@
 import { BaseEmailFormType } from "~~/server/handlers/notification";
-import { EmailNotificationDTO } from "../interfaces";
+import { EmailNotificationDTO } from "~~/server/utils/interfaces";
 
 const config = useRuntimeConfig()
 
@@ -42,31 +42,6 @@ export class FormMessageDTO extends EmailNotificationDTO {
                   <p><b>Email: </b>{{email}}</p>
                   {{#if message}}
                   <p><b>message: </b>{{message}}</p>
-                  {{/if}}
-                  {{#if services}}
-                  <div>
-                     <p><b style="color: blue; font-weight: bold;">Additional services</b></p>
-                     {{#if services.dev}}
-                     <p>Website development</p>
-                     {{/if}}
-                     {{#if services.logoDesign}}
-                     <p>Logo/Design</p>
-                     {{/if}}
-                     {{#if services.gerbs}}
-                     <p>Family Coat of Arms</p>
-                     {{/if}}
-                     {{#if services.monograms}}
-                     <p>Monograms</p>
-                     {{/if}}
-                  </div>
-                  {{/if}}
-                  {{#if favourites}}
-                  <div>
-                     <p><b style="color: blue; font-weight: bold;">Favourites</b></p>
-                     {{#each favourites}}
-                        <a href="{{this.link}}" target="_blank">{{this.title}}</a>
-                     {{/each}}
-                  </div>
                   {{/if}}
                </div>
                <div class="email-footer">
