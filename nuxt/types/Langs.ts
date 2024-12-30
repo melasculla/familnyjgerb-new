@@ -1,3 +1,2 @@
-export type Langs = 'en' | 'ru'
-
-export const langsList: Langs[] = ['en', 'ru']
+export const langsList = ['en', 'ru'] as const
+export type Langs = typeof langsList[number]

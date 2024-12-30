@@ -172,7 +172,7 @@ defineExpose({ handleForm })
 <style scoped lang="postcss">
 .form {
    &__short {
-      @apply w-11/12 xl:w-[70%] max-h-[92svh] bg-[url('/bg-subscribe.webp')] bg-no-repeat bg-cover bg-top px-6 md:px-20 pt-10 pb-14 rounded-theme max-md:rounded-t-none text-white overflow-y-auto;
+      @apply w-11/12 xl:w-[70%] max-h-[92svh] bg-[url('/bg-subscribe.webp')] bg-no-repeat bg-cover bg-top px-6 md:px-20 pt-10 pb-14 text-white overflow-y-auto;
       box-shadow: inset 5px 7px 4.5px rgba(32, 67, 183, 0.8);
       filter: drop-shadow(0px 4px 4px rgba(0, 18, 76, 0.25));
 

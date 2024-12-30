@@ -75,7 +75,6 @@ export class UserRepository implements IUserRepository {
       limit: pagination.perPage || 30,
       where: and(
         or(
-          ilike(usersTable.nickname, `%${searchString}%`),
           ilike(usersTable.name, `%${searchString}%`),
           ilike(usersTable.email, `%${searchString}%`),
         ),
@@ -90,7 +89,6 @@ export class UserRepository implements IUserRepository {
     const [total] = await db.select({ count: count() }).from(usersTable).where(
       and(
         searchParam ? or(
-          ilike(usersTable.nickname, `%${searchParam}%`),
           ilike(usersTable.name, `%${searchParam}%`),
           ilike(usersTable.email, `%${searchParam}%`),
         ) : undefined,
@@ -104,10 +102,7 @@ export class UserRepository implements IUserRepository {
     if (userEntity.id) {
       await db.update(usersTable)
         .set({
-          role: userEntity.role,
-          nickname: userEntity.nickname,
-          location: userEntity.location,
-          website: userEntity.website,
+          role: userEntity.role
         })
         .where(eq(usersTable.id, userEntity.id));
     } else {
@@ -116,9 +111,6 @@ export class UserRepository implements IUserRepository {
         email: userEntity.email,
         uid: userEntity.uid,
         role: userEntity.role,
-        nickname: userEntity.nickname,
-        location: userEntity.location,
-        website: userEntity.website,
       }).returning({ id: usersTable.id })
 
       userEntity.id = inserted.id
