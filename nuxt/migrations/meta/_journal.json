@@ -8,6 +8,27 @@
       "when": 1735497277269,
       "tag": "0000_bent_thunderbird",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1735597675901,
+      "tag": "0001_sloppy_captain_marvel",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1735600222220,
+      "tag": "0002_dapper_speed",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1735600337340,
+      "tag": "0003_strange_rhino",
+      "breakpoints": true
     }
   ]
 }

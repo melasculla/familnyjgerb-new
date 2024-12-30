@@ -24,12 +24,16 @@ export const langsTable = pgTable('langs', {
    lang: varchar('lang', { length: 256 }).notNull().unique(),
 })
 
+export type Lang = typeof langsTable.$inferSelect
+export type NewLang = typeof langsTable.$inferInsert
+
 
 
 export const postsTable = pgTable('posts', {
    id: serial('id').primaryKey(),
    slug: varchar('slug', { length: 256 }).notNull().unique(),
    title: varchar('title', { length: 256 }).notNull(),
+   description: varchar('description', { length: 256 }),
    content: json('content').$type<OutputData>(),
    gallery: json('gallery').$type<ImageJSON[]>(),
    thumbnail: json('thumbnail').$type<ImageJSON>(),
@@ -37,13 +41,28 @@ export const postsTable = pgTable('posts', {
    plannedAt: timestamp('planned_at'),
    editedAt: timestamp('edited_at').defaultNow().notNull(),
    createdAt: timestamp('created_at').defaultNow().notNull(),
-   seoTitle: varchar('seo_title', { length: 256 }).notNull(),
-   seoDescription: varchar('seo_description', { length: 256 }),
    seoKeys: varchar('seo_keys', { length: 256 }),
+   categoryId: integer('category_id').references(() => categoriesTable.id),
+   langId: integer('lang_id').references(() => langsTable.id),
 })
+// Поиск
+// Похожие
 
-export const postStatusList = ['hidden', 'deleted', 'published'] as const
-export type PostStatus = typeof postStatusList[number]
+export const postsStatusList = ['hidden', 'deleted', 'published'] as const
+export type PostStatus = typeof postsStatusList[number]
+export type Post = typeof postsTable.$inferSelect
+export type NewPost = typeof postsTable.$inferInsert
+
+export const postsRelations = relations(postsTable, ({ one }) => ({
+   lang: one(langsTable, {
+      fields: [postsTable.langId],
+      references: [langsTable.id]
+   }),
+   category: one(categoriesTable, {
+      fields: [postsTable.categoryId],
+      references: [categoriesTable.id]
+   })
+}))
 
 
 
@@ -52,31 +71,81 @@ export const categoriesTable = pgTable('categories', {
    name: varchar('name', { length: 256 }).notNull().unique(),
 })
 
+export type Category = typeof categoriesTable.$inferSelect
+export type NewCategory = typeof categoriesTable.$inferInsert
 
-// ### Блог
-// Заголовок
-// Редактор = Кнопки (возможно) (в конце)
-// Галерея
-// Превью
-// Категории
-// Дата создания (редактируемая)
-// Мета теги отдельные
+export const categoriesRelations = relations(categoriesTable, ({ many }) => ({
+   posts: many(postsTable),
+}))
 
-// Поиск
-// Похожие
 
-// ### Галерея 
-// Гербы 3 категории 
-// Монограммы 4 категории
 
-// ### Проекты
-// Заголовок
-// Превью
-// Применение
-// Эскизы 
-// Видео отдельно
+export const projectsTable = pgTable('projects', {
+   id: serial('id').primaryKey(),
+   slug: varchar('slug', { length: 256 }).notNull().unique(),
+   title: varchar('title', { length: 256 }).notNull(),
+   description: varchar('description', { length: 256 }),
+   content: json('content').$type<OutputData>(),
+   usuage: json('usuage').$type<ImageJSON[]>(),
+   sketches: json('sketches').$type<ImageJSON[]>(),
+   thumbnail: json('thumbnail').$type<ImageJSON>(),
+   video: varchar('video', { length: 256 }),
+   status: varchar('status', { length: 256 }).$type<ProjectStatus>().notNull().default('published'),
+   editedAt: timestamp('edited_at').defaultNow().notNull(),
+   createdAt: timestamp('created_at').defaultNow().notNull(),
+   seoKeys: varchar('seo_keys', { length: 256 }),
+   langId: integer('lang_id').references(() => langsTable.id),
+})
 // След предыдущие
 // Похожие
+
+export const projectsStatusList = ['hidden', 'deleted', 'published'] as const
+export type ProjectStatus = typeof projectsStatusList[number]
+export type Project = typeof projectsTable.$inferSelect
+export type NewProject = typeof projectsTable.$inferInsert
+
+export const projectsRelations = relations(projectsTable, ({ one }) => ({
+   lang: one(langsTable, {
+      fields: [projectsTable.langId],
+      references: [langsTable.id]
+   }),
+}))
+
+
+
+export const galleriesTable = pgTable('galleries', {
+   id: serial('id').primaryKey(),
+   name: varchar('name', { length: 256 }).notNull().unique(),
+})
+
+export type Gallery = typeof galleriesTable.$inferSelect
+
+export const galleryCategoriesTable = pgTable('gallery_categories', {
+   id: serial('id').primaryKey(),
+   name: varchar('name', { length: 256 }).notNull(),
+   galleryId: serial('gallery_id').references(() => galleriesTable.id),
+})
+
+export type GalleryCategory = typeof galleryCategoriesTable.$inferSelect
+
+export const galleryItemsTable = pgTable('gallery_items', {
+   id: serial('id').primaryKey(),
+   title: varchar('title', { length: 256 }),
+   image: varchar('image', { length: 256 }),
+   altEn: varchar('alt_en', { length: 256 }),
+   altRu: varchar('alt_ru', { length: 256 }),
+   categoryId: serial('category_id').references(() => galleryCategoriesTable.id),
+})
+
+export type GalleryItem = typeof galleryItemsTable.$inferSelect
+export type NewGalleryItem = typeof galleryItemsTable.$inferInsert
+
+export const galleryItemsRelations = relations(galleryItemsTable, ({ one }) => ({
+   lang: one(galleryCategoriesTable, {
+      fields: [galleryItemsTable.categoryId],
+      references: [galleryCategoriesTable.id]
+   }),
+}))
 
 // ### Видео
 // Отдельная страница с видео

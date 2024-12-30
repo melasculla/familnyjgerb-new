@@ -9,7 +9,8 @@
     "preview": "nuxt preview",
     "postinstall": "nuxt prepare",
     "db:migrate": "drizzle-kit generate && drizzle-kit push",
-    "db:push": "drizzle-kit push"
+    "db:push": "drizzle-kit push",
+    "seed": "node --loader ts-node/esm ./server/db/seed.ts"
   },
   "dependencies": {
     "@calumk/editorjs-columns": "^0.3.2",
@@ -49,5 +50,8 @@
     "vue": "latest",
     "vue-draggable-next": "^2.2.1",
     "vue-router": "latest"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.2"
   }
 }
