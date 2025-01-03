@@ -1,6 +1,6 @@
 {
-  "id": "3c7879e0-1ce9-4fcb-b550-20a3a7361f9e",
-  "prevId": "b98b6b98-efd3-4a3a-adfe-8dc0d917d1d6",
+  "id": "93c3c2a5-793b-4cff-b5c9-4f37329d37fc",
+  "prevId": "d6601e43-44ee-4e02-ab35-3b15688e807e",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -14,25 +14,29 @@
           "primaryKey": true,
           "notNull": true
         },
-        "name": {
-          "name": "name",
+        "slug": {
+          "name": "slug",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
+        },
+        "name_ru": {
+          "name": "name_ru",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name_en": {
+          "name": "name_en",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "categories_name_unique": {
-          "name": "categories_name_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -110,15 +114,7 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "gallery_categories_name_unique": {
-          "name": "gallery_categories_name_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -133,14 +129,14 @@
           "primaryKey": true,
           "notNull": true
         },
-        "title": {
-          "name": "title",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "image": {
           "name": "image",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": false
@@ -156,6 +152,12 @@
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": false
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         },
         "category_id": {
           "name": "category_id",
@@ -241,6 +243,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "description": {
+          "name": "description",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
         "content": {
           "name": "content",
           "type": "json",
@@ -286,21 +294,9 @@
           "notNull": true,
           "default": "now()"
         },
-        "seo_title": {
-          "name": "seo_title",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "seo_description": {
-          "name": "seo_description",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "seo_keys": {
           "name": "seo_keys",
-          "type": "varchar(256)",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -315,6 +311,12 @@
           "type": "integer",
           "primaryKey": false,
           "notNull": false
+        },
+        "lang_group": {
+          "name": "lang_group",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         }
       },
       "indexes": {},
@@ -344,15 +346,29 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "posts_lang_group_posts_id_fk": {
+          "name": "posts_lang_group_posts_id_fk",
+          "tableFrom": "posts",
+          "tableTo": "posts",
+          "columnsFrom": [
+            "lang_group"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "posts_slug_unique": {
-          "name": "posts_slug_unique",
+        "posts_slug_lang_id_unique": {
+          "name": "posts_slug_lang_id_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "slug"
+            "slug",
+            "lang_id"
           ]
         }
       },
@@ -381,6 +397,12 @@
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
+        },
+        "description": {
+          "name": "description",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
         },
         "content": {
           "name": "content",
@@ -433,20 +455,14 @@
           "notNull": true,
           "default": "now()"
         },
-        "seo_title": {
-          "name": "seo_title",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "seo_description": {
-          "name": "seo_description",
+        "seo_keys": {
+          "name": "seo_keys",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": false
         },
-        "seo_keys": {
-          "name": "seo_keys",
+        "og_image": {
+          "name": "og_image",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": false

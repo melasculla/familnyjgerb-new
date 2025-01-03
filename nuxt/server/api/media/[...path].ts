@@ -10,7 +10,10 @@ export default defineEventHandler({
       if (event.method === 'GET') {
          if (event.context.requestDTO.filename) {
             const { data, meta } = await new MediaService(event.context.requestDTO.storageKey).getByKey(event.context.requestDTO.filename)
-            setHeader(event, 'content-type', meta.mime)
+
+            if (meta.mime)
+               setHeader(event, 'content-type', meta.mime)
+
             return data
          }
 

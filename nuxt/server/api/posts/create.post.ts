@@ -1,0 +1,31 @@
+export default defineEventHandler({
+   onRequest: [
+      LocaleHandler.validateLocale,
+      PostHandler.validateBody,
+      // AdminAuthHandler.checkAccess
+   ],
+   handler: async event => {
+      const postService = new PostService()
+      const body = event.context.requestDTO.body as Omit<NewPost, 'langId' | 'langGroup' | 'categoryId'>
+
+      let categoryId; // TODO: make handler for category
+      try {
+         const category = await new CategoryService().getCategoryBy('slug', 'zapisi-geraldista')
+         categoryId = category.id
+      } catch (err: any) { }
+
+      try {
+         const post = await postService.upsertPost({
+            ...body,
+            categoryId,
+            langId: event.context.requestDTO.langId
+         })
+         return { post }
+      } catch (err: any) {
+         if (err.message.includes('duplicate'))
+            throw createError({ statusCode: 409, message: `Post with this slug and lang already exists` })
+
+         throw createError({ statusCode: err.status, message: err.message })
+      }
+   }
+})

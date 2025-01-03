@@ -32,9 +32,22 @@ export class SearchHandler {
 }
 
 export class LocaleHandler {
-   public static validateLocale(event: H3Event<EventHandlerRequest>) {
+   public static async validateLocale(event: H3Event<EventHandlerRequest>) {
       const { locale } = getQuery(event) as { locale: Langs }
-      if (!locale || !langsList.includes(locale.toLowerCase() as Langs))
+
+      if (['POST', 'PATCH', 'PUT'].includes(event.method)) {
+         if (!locale || !langsList.includes(locale.toLowerCase() as Langs))
+            throw createError(errorsList.badRequest)
+
+         const lang = await new LangService().getLangBy('lang', locale)
+         event.context.requestDTO.langId = lang.id
+         return
+      }
+
+      if (!locale)
+         return
+
+      if (!langsList.includes(locale.toLowerCase() as Langs))
          throw createError(errorsList.badRequest)
 
       event.context.requestDTO.locale = locale

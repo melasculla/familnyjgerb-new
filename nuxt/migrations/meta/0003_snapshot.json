@@ -1,6 +1,6 @@
 {
-  "id": "c476d59e-d418-4fb0-a328-065b0ed12a0d",
-  "prevId": "a2750653-cf09-4117-9017-b41366759099",
+  "id": "ccf9c98c-0fe0-4fee-bd68-69a3b6337e0c",
+  "prevId": "6673959f-b731-4a9c-8399-a66b1c5e7832",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -14,25 +14,29 @@
           "primaryKey": true,
           "notNull": true
         },
-        "name": {
-          "name": "name",
+        "slug": {
+          "name": "slug",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
+        },
+        "name_ru": {
+          "name": "name_ru",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name_en": {
+          "name": "name_en",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "categories_name_unique": {
-          "name": "categories_name_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "name"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -125,14 +129,14 @@
           "primaryKey": true,
           "notNull": true
         },
-        "title": {
-          "name": "title",
-          "type": "varchar(256)",
-          "primaryKey": false,
-          "notNull": false
-        },
         "image": {
           "name": "image",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "title": {
+          "name": "title",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": false
@@ -148,6 +152,12 @@
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": false
+        },
+        "order": {
+          "name": "order",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
         },
         "category_id": {
           "name": "category_id",
@@ -235,7 +245,7 @@
         },
         "description": {
           "name": "description",
-          "type": "varchar(256)",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -286,7 +296,7 @@
         },
         "seo_keys": {
           "name": "seo_keys",
-          "type": "varchar(256)",
+          "type": "text",
           "primaryKey": false,
           "notNull": false
         },
@@ -298,6 +308,13 @@
         },
         "lang_id": {
           "name": "lang_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "lang_group": {
+          "name": "lang_group",
           "type": "integer",
           "primaryKey": false,
           "notNull": false
@@ -330,15 +347,29 @@
           ],
           "onDelete": "no action",
           "onUpdate": "no action"
+        },
+        "posts_lang_group_posts_id_fk": {
+          "name": "posts_lang_group_posts_id_fk",
+          "tableFrom": "posts",
+          "tableTo": "posts",
+          "columnsFrom": [
+            "lang_group"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
+          "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "posts_slug_unique": {
-          "name": "posts_slug_unique",
+        "posts_slug_lang_id_unique": {
+          "name": "posts_slug_lang_id_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "slug"
+            "slug",
+            "lang_id"
           ]
         }
       },
@@ -427,6 +458,12 @@
         },
         "seo_keys": {
           "name": "seo_keys",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "og_image": {
+          "name": "og_image",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": false

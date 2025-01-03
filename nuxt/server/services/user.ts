@@ -1,5 +1,3 @@
-import { UserEntity } from "#imports";
-
 export interface IUserService {
    getTotalUsers(searchParam?: string | undefined): Promise<number>
 

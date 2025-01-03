@@ -1,4 +1,4 @@
-import { pgTable, text, varchar, integer, timestamp, serial, json, primaryKey, boolean } from 'drizzle-orm/pg-core';
+import { pgTable, text, varchar, integer, timestamp, serial, json, primaryKey, boolean, unique, type AnyPgColumn } from 'drizzle-orm/pg-core';
 import { relations } from 'drizzle-orm';
 import type { OutputData } from '@editorjs/editorjs';
 
@@ -31,9 +31,9 @@ export type NewLang = typeof langsTable.$inferInsert
 
 export const postsTable = pgTable('posts', {
    id: serial('id').primaryKey(),
-   slug: varchar('slug', { length: 256 }).notNull().unique(),
+   slug: varchar('slug', { length: 256 }).notNull(),
    title: varchar('title', { length: 256 }).notNull(),
-   description: varchar('description', { length: 256 }),
+   description: text('description'),
    content: json('content').$type<OutputData>(),
    gallery: json('gallery').$type<ImageJSON[]>(),
    thumbnail: json('thumbnail').$type<ImageJSON>(),
@@ -41,16 +41,25 @@ export const postsTable = pgTable('posts', {
    plannedAt: timestamp('planned_at'),
    editedAt: timestamp('edited_at').defaultNow().notNull(),
    createdAt: timestamp('created_at').defaultNow().notNull(),
-   seoKeys: varchar('seo_keys', { length: 256 }),
+   seoKeys: text('seo_keys'),
    categoryId: integer('category_id').references(() => categoriesTable.id),
-   langId: integer('lang_id').references(() => langsTable.id),
-})
+   langId: integer('lang_id').references(() => langsTable.id).notNull().default(1),
+   langGroup: integer('lang_group').references((): AnyPgColumn => postsTable.id, { onDelete: 'restrict' }),
+}, (table) => [
+   unique().on(table.slug, table.langId)
+])
 // Поиск
 // Похожие
 
 export const postsStatusList = ['hidden', 'deleted', 'published'] as const
 export type PostStatus = typeof postsStatusList[number]
 export type Post = typeof postsTable.$inferSelect
+export type PostList = Array<
+   Pick<Post, 'slug' | 'title' | 'thumbnail' | 'createdAt'> & {
+      lang: Lang | null
+      category: Category | null
+   }
+>
 export type NewPost = typeof postsTable.$inferInsert
 
 export const postsRelations = relations(postsTable, ({ one }) => ({
@@ -68,7 +77,9 @@ export const postsRelations = relations(postsTable, ({ one }) => ({
 
 export const categoriesTable = pgTable('categories', {
    id: serial('id').primaryKey(),
-   name: varchar('name', { length: 256 }).notNull().unique(),
+   slug: varchar('slug', { length: 256 }).notNull(),
+   nameRu: varchar('name_ru', { length: 256 }).notNull(),
+   nameEn: varchar('name_en', { length: 256 }),
 })
 
 export type Category = typeof categoriesTable.$inferSelect
@@ -94,6 +105,7 @@ export const projectsTable = pgTable('projects', {
    editedAt: timestamp('edited_at').defaultNow().notNull(),
    createdAt: timestamp('created_at').defaultNow().notNull(),
    seoKeys: varchar('seo_keys', { length: 256 }),
+   ogImage: varchar('og_image', { length: 256 }),
    langId: integer('lang_id').references(() => langsTable.id),
 })
 // След предыдущие
@@ -130,11 +142,12 @@ export type GalleryCategory = typeof galleryCategoriesTable.$inferSelect
 
 export const galleryItemsTable = pgTable('gallery_items', {
    id: serial('id').primaryKey(),
+   image: varchar('image', { length: 256 }).notNull(),
    title: varchar('title', { length: 256 }),
-   image: varchar('image', { length: 256 }),
    altEn: varchar('alt_en', { length: 256 }),
    altRu: varchar('alt_ru', { length: 256 }),
-   categoryId: serial('category_id').references(() => galleryCategoriesTable.id),
+   order: integer('order').notNull(),
+   categoryId: serial('category_id').references(() => galleryCategoriesTable.id).notNull(),
 })
 
 export type GalleryItem = typeof galleryItemsTable.$inferSelect

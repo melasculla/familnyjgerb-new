@@ -1,1 +1,0 @@
-ALTER TABLE "gallery_categories" DROP CONSTRAINT "gallery_categories_name_unique";

@@ -1,0 +1,1 @@
+ALTER TABLE "posts" ALTER COLUMN "lang_group" DROP NOT NULL;
