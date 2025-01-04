@@ -8,7 +8,7 @@ const { block, tunes } = defineProps<{
 
 const align = ref<'text-left' | 'text-center' | 'text-right'>('text-left')
 
-switch (tunes.AligmentTune.alignment) {
+switch (tunes?.AligmentTune?.alignment) {
    case 'center': align.value = 'text-center'
       break;
    case 'right': align.value = 'text-right'

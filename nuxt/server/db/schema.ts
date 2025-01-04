@@ -55,7 +55,7 @@ export const postsStatusList = ['hidden', 'deleted', 'published'] as const
 export type PostStatus = typeof postsStatusList[number]
 export type Post = typeof postsTable.$inferSelect
 export type PostList = Array<
-   Pick<Post, 'slug' | 'title' | 'thumbnail' | 'createdAt'> & {
+   Pick<Post, 'id' | 'slug' | 'title' | 'thumbnail' | 'createdAt'> & {
       lang: Lang | null
       category: Category | null
    }

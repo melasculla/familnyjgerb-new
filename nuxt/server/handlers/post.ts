@@ -1,6 +1,10 @@
 import { type H3Event, type EventHandlerRequest } from 'h3'
-import { useSafeValidatedQuery, useSafeValidatedBody } from 'h3-zod'
+import { useSafeValidatedQuery, useSafeValidatedBody, useSafeValidatedParams } from 'h3-zod'
 import { z } from 'zod'
+
+const SlugSchema = z.object({
+   slug: z.string().min(3, 'Slug must be at least 3 characters long'),
+})
 
 const CategorySchema = z.object({
    category: z.string().min(3, 'Category must be at least 3 characters long').optional(),
@@ -35,9 +39,13 @@ const PostSchema = z.object({
    seoKeys: z.string().nullable().optional(),
 }).strict()
 
+const PatchPostSchema = PostSchema.partial().extend({
+   id: z.number().int(),
+})
+
 export class PostHandler {
-   public static async validateBody(event: H3Event<EventHandlerRequest>) {
-      const body = await useSafeValidatedBody(event, PostSchema)
+   public static async validateBody(event: H3Event<EventHandlerRequest>, isPatch: boolean = false) {
+      const body = await useSafeValidatedBody(event, isPatch ? PatchPostSchema : PostSchema)
       if (!body.data || body.error)
          throw createError({
             statusCode: 400,
@@ -46,6 +54,21 @@ export class PostHandler {
          })
 
       event.context.requestDTO.body = body.data
+   }
+
+   public static async validateSlug(event: H3Event<EventHandlerRequest>) {
+      const params = await useSafeValidatedParams(event, SlugSchema)
+      if (!params.data || params.error) {
+         const error = JSON.parse(params.error.message)[0]
+         console.log(error)
+         throw createError({
+            statusCode: 400,
+            message: `${error.message}`,
+            data: params.error
+         })
+      }
+
+      event.context.requestDTO.slug = params.data.slug
    }
 
    public static async validateCategory(event: H3Event<EventHandlerRequest>) {

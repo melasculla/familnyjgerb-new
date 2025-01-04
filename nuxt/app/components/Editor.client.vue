@@ -12,6 +12,7 @@ import DragAndDrop from 'editorjs-drag-drop'
 import Columns from '@calumk/editorjs-columns'
 import ColorPlugin from 'editorjs-text-color-plugin'
 import Alert from 'editorjs-alert'
+import CustomButtonTool from '~/assets/js/editorJS/modules'
 
 const uniqueID = useId()
 
@@ -70,6 +71,7 @@ const uploadByFile = async (file: File) => {
 
 const editor = ref<EditorJS>()
 const tools = {
+   customButton: CustomButtonTool,
    header: {
       class: Header,
       inlineToolbar: true,
@@ -175,8 +177,10 @@ defineExpose({ save })
 </script>
 
 <template>
-   <div class="w-full">
-      <div :id="`${uniqueID}_editorjs`" class="border-4 border-blue-500 bg-white min-h-[500px]"></div>
+   <div>
+      <div class="w-full">
+         <div :id="`${uniqueID}_editorjs`" class="border-4 border-blue-500 bg-white min-h-[500px]"></div>
+      </div>
    </div>
 </template>
 

@@ -39,6 +39,11 @@ export class PostEntity {
 
       return typeof date === 'string' ? new Date(date) : date
    }
+
+   async assignLangGroup(repository: IPostRepository) {
+      const existingPost = await repository.findBy('slug', this.slug)
+      this.langGroup = existingPost ? existingPost.langGroup : null
+   }
 }
 
 export class CategoryEntity {

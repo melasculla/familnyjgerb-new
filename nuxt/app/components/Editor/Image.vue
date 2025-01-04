@@ -10,14 +10,15 @@ const imageProps = computed(() => {
    classList.value += block.withBorder ? ' border-2' : ''
    classList.value += block.stretched ? ' w-full' : ''
    classList.value += block.withBackground ? ' bg-red-600' : ''
-   return classList.value
+   return classList.value ? classList.value : 'w-full sm:w-4/6 2xl:w-2/5 mx-auto'
 })
 </script>
 
 <template>
    <div>
-      <NuxtImg :src="'/fs/' + block.file.url" :alt="block.caption" :title="block.caption" class="border-orange-400"
-         :class="imageProps" placeholder="/loader.svg" placeholder-class="nuxtImage-loading" />
+      <NuxtImg v-if="!block.file?.url?.includes('http')" :src="'/fs/' + block.file.url" :alt="block.caption"
+         :title="block.caption" :class="imageProps" placeholder="/loader.svg" placeholder-class="nuxtImage-loading" />
+      <img v-else :src="block.file?.url" :alt="block.caption" :class="imageProps">
    </div>
 </template>
 

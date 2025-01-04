@@ -10,7 +10,7 @@ const { block } = defineProps<{
    <div>
       <ul :class="block.style === 'ordered' ? 'list-decimal' : 'list-disc'" class="pl-8">
          <li v-for="item in block.items" :key="item">
-            <p class="text-base" v-html="item"></p>
+            <p class="text-base" v-html="item.content"></p>
          </li>
       </ul>
    </div>

@@ -3,8 +3,14 @@ import mysql from 'mysql2/promise';
 import { JSDOM } from 'jsdom';
 import { count } from 'drizzle-orm/sql'
 
+let postID: any;
+let test: any;
+let patrik: any;
 
 export default defineEventHandler(async event => {
+   postID = null
+   test = []
+   patrik = null
    // Connect to WordPress DB
    const wpDb = await mysql.createConnection({
       host: 'familnyjgerb-db-1',
@@ -39,26 +45,22 @@ export default defineEventHandler(async event => {
       GROUP BY p.ID, p.post_name, p.post_title, p.post_content, p.post_date, p.post_modified, p.post_date_gmt;
    `)
 
-   let test;
-
    for (const post of result[0] as any[]) {
-      const slug = `${post.post_name}.html`;
+      postID = post.ID
 
-      const content = convertHtmlToOutputData(post.post_content, post.post_name)
+      // if (post.ID !== 15110)
+      //    continue
 
-      if (post.post_name === 'heraldic-description-blazon') {
-         test = {
-            old: post.post_content,
-            new: content
-         }
-      }
+      const slug = `${post.post_name}.html`
+
+      const content = convertHtmlToOutputData(post.post_content, post.post_title)
 
       const thumbnail = {
          path: post.thumbnail_url?.replaceAll('https://familnyjgerb.com', '').replaceAll('http://familnyjgerb.com', '') || '',
          alt: `Thumbnail for ${post.post_title}`,
       }
 
-      const category = {
+      const category: Record<string, number | null> = {
          'Новости': 5,
          'Компетентное мнение': 4,
          'Записи геральдиста': 3,
@@ -77,19 +79,12 @@ export default defineEventHandler(async event => {
          'Акции, Геральдика в жизни, Новости': 2,
       } as const
 
-      const status = (inital: string): PostStatus => {
-         if (inital === 'publish')
-            return 'published'
-         if (inital === 'private')
-            return 'hidden'
-         if (inital === 'draft')
-            return 'hidden'
-         if (inital === 'future')
-            return 'published'
-         if (inital === 'auto-draft')
-            return 'hidden'
-
-         return 'hidden'
+      const statuses: Record<string, PostStatus> = {
+         'publish': 'published',
+         'private': 'hidden',
+         'draft': 'hidden',
+         'future': 'published',
+         'auto-draft': 'hidden',
       }
 
       // await db.insert(postsTable).values({
@@ -98,7 +93,7 @@ export default defineEventHandler(async event => {
       //    description: post.seo_description || null,
       //    content,
       //    thumbnail,
-      //    status: status(post.post_status),
+      //    status: statuses[post.post_status],
       //    createdAt: new Date(post.post_date),
       //    editedAt: new Date(post.post_modified),
       //    plannedAt: post.post_date_gmt ? new Date(post.post_date_gmt) : null,
@@ -110,32 +105,92 @@ export default defineEventHandler(async event => {
 
    return {
       result: await db.select({ count: count() }).from(postsTable),
-      test
+      test,
+      patrik
    }
 })
 
-function convertHtmlToOutputData(html: string, slug?: string) {
-   const dom = new JSDOM(html);
-   const document = dom.window.document;
+function convertHtmlToOutputData(html: string, title: string) {
+   html = html.replaceAll('gm.RVek@yandex.ru', 'Times.family77@gmail.com').replaceAll('[php snippet=3]', '+971 54 439 1710')
+   const dom = new JSDOM(html)
+   const document = dom.window.document
 
-   const blocks: any = [];
+   const blocks: any = []
+
+   const processShortcodes = (content: string): string => {
+      return content.replace(
+         /\[(\w+)([^\]]*)\](?:(.*?)\[\/\1\])?/gs,
+         (match, shortcode, attributes, innerContent = "") => {
+            const attrObj: any = {};
+            attributes
+               .trim()
+               .split(/\s+/)
+               .forEach((attr: any) => {
+                  const [key, value] = attr.split("=")
+                  attrObj[key] = value?.replace(/"/g, "")
+               })
+
+            if (shortcode === "button") {
+               if (
+                  attrObj?.link === "/anketa-dlya-razrabotki-monogrammy" ||
+                  attrObj?.link === "/anketa"
+               )
+                  return '';
+
+               // test.push({
+               //    type: 'button',
+               //    data: {
+               //       href: attrObj?.link === '/category/geraldika-v-zhizni' ? '/geraldika-v-zhizni' : attrObj?.link,
+               //       icon: attrObj?.icon,
+               //       iconPosition: attrObj?.icon_position,
+               //       content: innerContent,
+               //    },
+               // })
+            } else if (shortcode === "contact") {
+               // TODO: make form in editorJS
+               // [contact-form-7 id=»14463″ title=»Контактная форма 3″]
+            } else if (shortcode === "fullwidth") {
+               return ''
+            }
+
+            return ''
+         }
+      )
+   }
 
    const convertNodeToEditorJsBlock = (node: any) => {
       if (node.tagName?.startsWith('H') && ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(node.tagName)) {
-         blocks.push({
-            type: 'header',
-            data: {
-               text: node.textContent,
-               level: parseInt(node.tagName[1]),
-            }
-         })
+         if (node.textContent !== title) {
+            blocks.push({
+               type: 'header',
+               data: {
+                  text: node.textContent,
+                  level: parseInt(node.tagName[1]),
+               },
+            })
+         }
       } else if (node.tagName === 'P') {
-         blocks.push({
-            type: 'paragraph',
-            data: {
-               text: node.innerHTML,
+         const childBlocks: any[] = []
+
+         for (const child of node.childNodes) {
+            if (child.nodeType === 1) {
+               convertNodeToEditorJsBlock(child)
+            } else if (child.nodeType === 3) {
+               const textContent = child.textContent.trim()
+               if (textContent) {
+                  childBlocks.push(processShortcodes(textContent))
+               }
             }
-         })
+         }
+
+         if (childBlocks.length) {
+            blocks.push({
+               type: 'paragraph',
+               data: {
+                  text: childBlocks.join(' '),
+               },
+            })
+         }
       } else if (node.tagName === 'IMG') {
          blocks.push({
             type: 'image',
@@ -147,14 +202,14 @@ function convertHtmlToOutputData(html: string, slug?: string) {
                withBorder: false,
                withBackground: false,
                stretched: false,
-            }
+            },
          })
       } else if (node.tagName === 'UL' || node.tagName === 'OL') {
-         const style = node.tagName === 'UL' ? 'unordered' : 'ordered';
-         const items: string[] = [];
+         const style = node.tagName === 'UL' ? 'unordered' : 'ordered'
+         const items: any[] = []
 
          node.querySelectorAll('li').forEach((li: any) => {
-            items.push(li.textContent || '');
+            items.push({ content: li.textContent || '', meta: {}, items: [] })
          })
 
          blocks.push({
@@ -162,30 +217,51 @@ function convertHtmlToOutputData(html: string, slug?: string) {
             data: {
                style,
                items,
-            }
+            },
          })
-      } else if (node.tagName === 'DIV') {
+      } else if (node.nodeType === 3) {
+         const textContent = node.textContent.trim();
+
+         if (textContent) {
+            const paragraphs = textContent.split(/\n+/).map((line: string) => line.trim());
+
+            paragraphs.forEach((paragraph: string) => {
+               if (paragraph) {
+                  blocks.push({
+                     type: 'paragraph',
+                     data: {
+                        text: processShortcodes(paragraph),
+                     },
+                  });
+               }
+            });
+         }
+      } else if (node.tagName === 'DIV' || node.tagName === 'EM') {
          for (const element of node.childNodes) {
-            convertNodeToEditorJsBlock(element)
+            convertNodeToEditorJsBlock(element);
          }
       }
-   }
+   };
 
    for (const node of document.body.childNodes) {
       convertNodeToEditorJsBlock(node)
    }
 
-   return blocks.length ?
-      {
+   if (postID === 14188) {
+      test = blocks
+   }
+
+   return blocks.length
+      ? {
          time: 1,
          blocks,
          version: '2.30.7',
-      } :
-      {
+      }
+      : {
          blocks: [
             { type: 'paragraph', data: { text: html } },
          ],
          version: '2.30.7',
-         time: 2
+         time: 2,
       }
 }

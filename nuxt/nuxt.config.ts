@@ -171,7 +171,7 @@ export default defineNuxtConfig({
   routeRules: {
     '/admin/**': {
       ssr: false
-    },
+    }
     // '/_ipx/**': {
     //   cache: {
     //     maxAge: 2000
