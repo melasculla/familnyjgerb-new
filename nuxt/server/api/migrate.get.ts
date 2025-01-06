@@ -48,12 +48,14 @@ export default defineEventHandler(async event => {
    for (const post of result[0] as any[]) {
       postID = post.ID
 
-      // if (post.ID !== 15110)
-      //    continue
-
       const slug = `${post.post_name}.html`
 
       const content = convertHtmlToOutputData(post.post_content, post.post_title)
+
+      if (postID === 14188) {
+         test = post.post_content
+         patrik = content
+      }
 
       const thumbnail = {
          path: post.thumbnail_url?.replaceAll('https://familnyjgerb.com', '').replaceAll('http://familnyjgerb.com', '') || '',
@@ -111,132 +113,133 @@ export default defineEventHandler(async event => {
 })
 
 function convertHtmlToOutputData(html: string, title: string) {
-   html = html.replaceAll('gm.RVek@yandex.ru', 'Times.family77@gmail.com').replaceAll('[php snippet=3]', '+971 54 439 1710')
-   const dom = new JSDOM(html)
-   const document = dom.window.document
+   html = html
+      .replaceAll('gm.RVek@yandex.ru', 'Times.family77@gmail.com')
+      .replaceAll('[php snippet=3]', '+971 54 439 1710');
+   const dom = new JSDOM(html);
+   const document = dom.window.document;
 
-   const blocks: any = []
+   const blocks: any[] = [];
 
    const processShortcodes = (content: string): string => {
       return content.replace(
          /\[(\w+)([^\]]*)\](?:(.*?)\[\/\1\])?/gs,
-         (match, shortcode, attributes, innerContent = "") => {
+         (match, shortcode, attributes, innerContent = '') => {
             const attrObj: any = {};
             attributes
                .trim()
                .split(/\s+/)
-               .forEach((attr: any) => {
-                  const [key, value] = attr.split("=")
-                  attrObj[key] = value?.replace(/"/g, "")
-               })
+               .forEach((attr: string) => {
+                  const [key, value] = attr.split('=');
+                  attrObj[key] = value?.replace(/"/g, '');
+               });
 
-            if (shortcode === "button") {
+            if (shortcode === 'button') {
                if (
-                  attrObj?.link === "/anketa-dlya-razrabotki-monogrammy" ||
-                  attrObj?.link === "/anketa"
+                  attrObj?.link === '/anketa-dlya-razrabotki-monogrammy' ||
+                  attrObj?.link === '/anketa'
                )
                   return '';
 
-               // test.push({
-               //    type: 'button',
-               //    data: {
-               //       href: attrObj?.link === '/category/geraldika-v-zhizni' ? '/geraldika-v-zhizni' : attrObj?.link,
-               //       icon: attrObj?.icon,
-               //       iconPosition: attrObj?.icon_position,
-               //       content: innerContent,
-               //    },
-               // })
-            } else if (shortcode === "contact") {
-               // TODO: make form in editorJS
-               // [contact-form-7 id=»14463″ title=»Контактная форма 3″]
-            } else if (shortcode === "fullwidth") {
-               return ''
+               // You can add the "button" block if needed here
+            } else if (shortcode === 'contact') {
+               // TODO: Handle "contact" shortcode logic if required
+            } else if (shortcode === 'fullwidth') {
+               return ''; // Remove [fullwidth] shortcodes
             }
 
-            return ''
+            return ''; // Default: Remove unknown shortcodes
          }
-      )
-   }
+      );
+   };
 
    const convertNodeToEditorJsBlock = (node: any) => {
-      if (node.tagName?.startsWith('H') && ['H1', 'H2', 'H3', 'H4', 'H5', 'H6'].includes(node.tagName)) {
+      if (node.tagName?.startsWith("H") && ["H1", "H2", "H3", "H4", "H5", "H6"].includes(node.tagName)) {
          if (node.textContent !== title) {
             blocks.push({
-               type: 'header',
+               type: "header",
                data: {
-                  text: node.textContent,
+                  text: node.textContent.trim(),
                   level: parseInt(node.tagName[1]),
                },
-            })
+            });
          }
-      } else if (node.tagName === 'P') {
-         const childBlocks: any[] = []
+      } else if (node.tagName === "P" || node.tagName === "DIV") {
+         const childBlocks: string[] = [];
 
+         // Traverse all child nodes to combine text and inline elements
          for (const child of node.childNodes) {
             if (child.nodeType === 1) {
-               convertNodeToEditorJsBlock(child)
+               // Handle inline elements like <a>, <em>, etc.
+               if (child.tagName === "A") {
+                  childBlocks.push(
+                     `<a href="${child.href}">${child.textContent.trim()}</a>`
+                  );
+               } else if (child.tagName === "EM") {
+                  childBlocks.push(`<em>${child.textContent.trim()}</em>`);
+               } else {
+                  // Default fallback for unknown tags
+                  childBlocks.push(child.textContent.trim());
+               }
             } else if (child.nodeType === 3) {
-               const textContent = child.textContent.trim()
+               // Handle plain text nodes
+               const textContent = child.textContent.trim();
                if (textContent) {
-                  childBlocks.push(processShortcodes(textContent))
+                  childBlocks.push(textContent);
                }
             }
          }
 
          if (childBlocks.length) {
             blocks.push({
-               type: 'paragraph',
+               type: "paragraph",
                data: {
-                  text: childBlocks.join(' '),
+                  text: childBlocks.join(" "),
                },
-            })
+            });
          }
-      } else if (node.tagName === 'IMG') {
+      } else if (node.tagName === "IMG") {
          blocks.push({
-            type: 'image',
+            type: "image",
             data: {
                file: {
-                  url: node.src.replaceAll('https://familnyjgerb.com', '').replaceAll('http://familnyjgerb.com', '').replaceAll('http://gerb.ainsworth.ml', ''),
+                  url: node.src
+                     .replaceAll("https://familnyjgerb.com", "")
+                     .replaceAll("http://familnyjgerb.com", "")
+                     .replaceAll("http://gerb.ainsworth.ml", ""),
                },
-               caption: node.alt || '',
+               caption: node.alt || "",
                withBorder: false,
                withBackground: false,
                stretched: false,
             },
-         })
-      } else if (node.tagName === 'UL' || node.tagName === 'OL') {
-         const style = node.tagName === 'UL' ? 'unordered' : 'ordered'
-         const items: any[] = []
+         });
+      } else if (node.tagName === "UL" || node.tagName === "OL") {
+         const style = node.tagName === "UL" ? "unordered" : "ordered";
+         const items: any[] = [];
 
-         node.querySelectorAll('li').forEach((li: any) => {
-            items.push({ content: li.textContent || '', meta: {}, items: [] })
-         })
+         node.querySelectorAll("li").forEach((li: any) => {
+            items.push({ content: li.textContent || "", meta: {}, items: [] });
+         });
 
          blocks.push({
-            type: 'list',
+            type: "list",
             data: {
                style,
                items,
             },
-         })
+         });
       } else if (node.nodeType === 3) {
          const textContent = node.textContent.trim();
-
          if (textContent) {
-            const paragraphs = textContent.split(/\n+/).map((line: string) => line.trim());
-
-            paragraphs.forEach((paragraph: string) => {
-               if (paragraph) {
-                  blocks.push({
-                     type: 'paragraph',
-                     data: {
-                        text: processShortcodes(paragraph),
-                     },
-                  });
-               }
+            blocks.push({
+               type: "paragraph",
+               data: {
+                  text: processShortcodes(textContent),
+               },
             });
          }
-      } else if (node.tagName === 'DIV' || node.tagName === 'EM') {
+      } else if (node.tagName === "SPAN" || node.tagName === "EM") {
          for (const element of node.childNodes) {
             convertNodeToEditorJsBlock(element);
          }
@@ -244,11 +247,7 @@ function convertHtmlToOutputData(html: string, title: string) {
    };
 
    for (const node of document.body.childNodes) {
-      convertNodeToEditorJsBlock(node)
-   }
-
-   if (postID === 14188) {
-      test = blocks
+      convertNodeToEditorJsBlock(node);
    }
 
    return blocks.length
@@ -258,10 +257,8 @@ function convertHtmlToOutputData(html: string, title: string) {
          version: '2.30.7',
       }
       : {
-         blocks: [
-            { type: 'paragraph', data: { text: html } },
-         ],
+         blocks: [{ type: 'paragraph', data: { text: html } }],
          version: '2.30.7',
          time: 2,
-      }
+      };
 }
