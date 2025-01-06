@@ -41,6 +41,7 @@
     "editorjs-text-color-plugin": "git+https://github.com/dariox64/editorjs-text-color-plugin.git",
     "h3-zod": "^0.5.3",
     "handlebars": "^4.7.8",
+    "he": "^1.2.0",
     "jsdom": "^25.0.1",
     "libphonenumber-js": "^1.11.17",
     "mysql2": "^3.12.0",

@@ -26,14 +26,12 @@ class CustomButtonTool {
       const slotContent = this.data.slot || 'Default Text';
 
       this.wrapper.innerHTML = `
-       <div id="editorjs-button-wrapper">
+       <div class="editorjs-button-wrapper">
          <component is="${buttonName}">${slotContent}</component>
        </div>
      `;
 
-      // useNuxtApp().runWithContext(() => {
-      //    resolveComponent()
-      // })
+
 
       return this.wrapper;
    }

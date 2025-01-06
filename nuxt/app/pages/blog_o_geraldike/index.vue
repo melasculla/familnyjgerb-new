@@ -16,7 +16,7 @@ const { data: posts, status, error } = await useLazyFetch('/api/posts', {
             <NuxtLink class="text-center text-base" :to="`/blog_o_geraldike/${post.category?.slug}/${post.slug}`">
                <NuxtImg class="aspect-square object-cover w-full" :src="'/fs/' + post.thumbnail?.path"
                   :alt="post.thumbnail?.alt" :title="post.thumbnail?.alt" placeholder="/loader.svg" loading="lazy" />
-               <span v-html="post.title"></span>
+               <span>{{ post.title }}</span>
             </NuxtLink>
          </div>
       </div>

@@ -1,5 +1,7 @@
 import mysql from 'mysql2/promise';
 // @ts-expect-error
+import he from 'he';
+// @ts-expect-error
 import { JSDOM } from 'jsdom';
 import { count } from 'drizzle-orm/sql'
 
@@ -50,10 +52,10 @@ export default defineEventHandler(async event => {
 
       const slug = `${post.post_name}.html`
 
-      const content = convertHtmlToOutputData(post.post_content, post.post_title)
+      const content = convertHtmlToOutputData(post.post_content, he.decode(post.post_title))
 
-      if (postID === 14188) {
-         test = post.post_content
+      if (postID === 14188) { // || postID === 14387
+         test.push(post.post_content)
          patrik = content
       }
 
@@ -116,7 +118,7 @@ function convertHtmlToOutputData(html: string, title: string) {
    html = html
       .replaceAll('gm.RVek@yandex.ru', 'Times.family77@gmail.com')
       .replaceAll('[php snippet=3]', '+971 54 439 1710');
-   const dom = new JSDOM(html);
+   const dom = new JSDOM(html, { contentType: "text/html" });
    const document = dom.window.document;
 
    const blocks: any[] = [];
@@ -140,10 +142,8 @@ function convertHtmlToOutputData(html: string, title: string) {
                   attrObj?.link === '/anketa'
                )
                   return '';
-
-               // You can add the "button" block if needed here
             } else if (shortcode === 'contact') {
-               // TODO: Handle "contact" shortcode logic if required
+               // Handle "contact" shortcode logic if required
             } else if (shortcode === 'fullwidth') {
                return ''; // Remove [fullwidth] shortcodes
             }
@@ -153,7 +153,43 @@ function convertHtmlToOutputData(html: string, title: string) {
       );
    };
 
-   const convertNodeToEditorJsBlock = (node: any) => {
+   const convertNodeToEditorJsBlock = (node: any, nextNode?: any) => {
+      // if (postID === 14188) {
+
+      if (nextNode && (nextNode.nodeType === 3 || nextNode.nodeType === 1)) {
+         if (node.nodeType === 1 && nextNode.nodeType === 3) {
+            const wrapper = document.createElement("template");
+            wrapper.content.appendChild(node.cloneNode(true));
+            const textNode = document.createTextNode(' ' + nextNode.textContent.trim());
+            wrapper.content.appendChild(textNode)
+
+            // if (postID === 14188) { test.push([node.outerHTML, wrapper.outerHTML]) }
+
+            node = wrapper
+            nextNode.remove();
+         } else if (node.nodeType === 3 && nextNode.nodeType === 1) {
+            if (nextNode.tagName === "A") {
+               node.textContent += `<a href="${nextNode.href}">${nextNode.textContent.trim()}</a>`
+            } else if (nextNode.tagName === "EM" || nextNode.tagName === "I") {
+               node.textContent += `<i>${nextNode.textContent.trim()}</i>`
+            } else if (nextNode.tagName === "STRONG" || nextNode.tagName === "B") {
+               node.textContent += `<b>${nextNode.textContent.trim()}</b>`
+            } else if (nextNode.tagName === "SPAN") {
+               node.textContent += `<span>${nextNode.textContent.trim()}</span>`
+            } else {
+               node.textContent += nextNode.textContent.trim()
+            }
+            nextNode.remove();
+         }
+      }
+
+      if (node.nodeType === 3 || node.nodeType === 1) {
+         const wrapper = document.createElement("P");
+         wrapper.appendChild(node.cloneNode(true));
+         node = wrapper;
+      }
+
+
       if (node.tagName?.startsWith("H") && ["H1", "H2", "H3", "H4", "H5", "H6"].includes(node.tagName)) {
          if (node.textContent !== title) {
             blocks.push({
@@ -167,25 +203,30 @@ function convertHtmlToOutputData(html: string, title: string) {
       } else if (node.tagName === "P" || node.tagName === "DIV") {
          const childBlocks: string[] = [];
 
-         // Traverse all child nodes to combine text and inline elements
          for (const child of node.childNodes) {
-            if (child.nodeType === 1) {
-               // Handle inline elements like <a>, <em>, etc.
-               if (child.tagName === "A") {
-                  childBlocks.push(
-                     `<a href="${child.href}">${child.textContent.trim()}</a>`
-                  );
-               } else if (child.tagName === "EM") {
-                  childBlocks.push(`<em>${child.textContent.trim()}</em>`);
-               } else {
-                  // Default fallback for unknown tags
-                  childBlocks.push(child.textContent.trim());
-               }
-            } else if (child.nodeType === 3) {
-               // Handle plain text nodes
+            if (child.nodeType === 3) {
                const textContent = child.textContent.trim();
                if (textContent) {
                   childBlocks.push(textContent);
+               }
+            } else if (child.nodeType === 1) {
+               if (child.tagName === "A") {
+                  childBlocks.push(`<a href="${child.href}">${child.textContent.trim()}</a>`);
+               } else if (child.tagName === "EM" || child.tagName === "I") {
+                  childBlocks.push(`<i>${child.textContent.trim()}</i>`);
+               } else if (child.tagName === "STRONG" || child.tagName === "B") {
+                  childBlocks.push(`<b>${child.textContent.trim()}</b>`);
+               } else if (child.tagName === "SPAN") {
+                  childBlocks.push(`<span>${child.textContent.trim()}</span>`);
+               } else if (child.tagName === "TEMPLATE") {
+                  blocks.push({
+                     type: "paragraph",
+                     data: {
+                        text: processShortcodes(child.innerHTML),
+                     },
+                  });
+               } else {
+                  childBlocks.push(child.textContent.trim());
                }
             }
          }
@@ -240,14 +281,23 @@ function convertHtmlToOutputData(html: string, title: string) {
             });
          }
       } else if (node.tagName === "SPAN" || node.tagName === "EM") {
-         for (const element of node.childNodes) {
-            convertNodeToEditorJsBlock(element);
+         for (const [eIndex, element] of node.childNodes.entries()) {
+            const nextChildNode = node.childNodes[eIndex + 1]
+            convertNodeToEditorJsBlock(element, nextChildNode);
          }
+      } else if (node.tagName === "TEMPLATE") {
+         blocks.push({
+            type: "paragraph",
+            data: {
+               text: processShortcodes(node.innerHTML),
+            },
+         });
       }
    };
 
-   for (const node of document.body.childNodes) {
-      convertNodeToEditorJsBlock(node);
+   for (const [index, node] of document.body.childNodes.entries()) {
+      const nextNode = document.body.childNodes[index + 1]
+      convertNodeToEditorJsBlock(node, nextNode)
    }
 
    return blocks.length
