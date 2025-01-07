@@ -54,7 +54,7 @@ export default defineEventHandler(async event => {
 
       const content = convertHtmlToOutputData(post.post_content, he.decode(post.post_title))
 
-      if (postID === 14188) { // || postID === 14387
+      if (postID === 14387) { // 14387 22046 14188 13693 21355
          test.push(post.post_content)
          patrik = content
       }
@@ -117,7 +117,13 @@ export default defineEventHandler(async event => {
 function convertHtmlToOutputData(html: string, title: string) {
    html = html
       .replaceAll('gm.RVek@yandex.ru', 'Times.family77@gmail.com')
-      .replaceAll('[php snippet=3]', '+971 54 439 1710');
+      .replaceAll('[php snippet=3]', '+971 54 439 1710')
+      .replaceAll('https://familnyjgerb.com/wp-content', '/api/media/wp-content')
+      .replaceAll('http://familnyjgerb.com/wp-content', '/api/media/wp-content')
+      .replaceAll("https://familnyjgerb.com", "")
+      .replaceAll("http://familnyjgerb.com", "")
+      .replaceAll("http://gerb.ainsworth.ml", "")
+
    const dom = new JSDOM(html, { contentType: "text/html" });
    const document = dom.window.document;
 
@@ -142,8 +148,11 @@ function convertHtmlToOutputData(html: string, title: string) {
                   attrObj?.link === '/anketa'
                )
                   return '';
+
+               // test.push(attrObj)
             } else if (shortcode === 'contact') {
                // Handle "contact" shortcode logic if required
+               return ''
             } else if (shortcode === 'fullwidth') {
                return ''; // Remove [fullwidth] shortcodes
             }
@@ -153,42 +162,63 @@ function convertHtmlToOutputData(html: string, title: string) {
       );
    };
 
-   const convertNodeToEditorJsBlock = (node: any, nextNode?: any) => {
-      // if (postID === 14188) {
-
-      if (nextNode && (nextNode.nodeType === 3 || nextNode.nodeType === 1)) {
+   const convertNodeToEditorJsBlock = (node: any, nextNode?: any, nestedLevel: boolean = false) => {
+      if (!nestedLevel && nextNode && (nextNode.nodeType === 3 || nextNode.nodeType === 1)) {
          if (node.nodeType === 1 && nextNode.nodeType === 3) {
-            const wrapper = document.createElement("template");
-            wrapper.content.appendChild(node.cloneNode(true));
-            const textNode = document.createTextNode(' ' + nextNode.textContent.trim());
-            wrapper.content.appendChild(textNode)
+            if (node.tagName === 'IMG' || node.tagName === 'P') { // || node.tagName?.startsWith('H')
 
-            // if (postID === 14188) { test.push([node.outerHTML, wrapper.outerHTML]) }
-
-            node = wrapper
-            nextNode.remove();
-         } else if (node.nodeType === 3 && nextNode.nodeType === 1) {
-            if (nextNode.tagName === "A") {
-               node.textContent += `<a href="${nextNode.href}">${nextNode.textContent.trim()}</a>`
-            } else if (nextNode.tagName === "EM" || nextNode.tagName === "I") {
-               node.textContent += `<i>${nextNode.textContent.trim()}</i>`
-            } else if (nextNode.tagName === "STRONG" || nextNode.tagName === "B") {
-               node.textContent += `<b>${nextNode.textContent.trim()}</b>`
-            } else if (nextNode.tagName === "SPAN") {
-               node.textContent += `<span>${nextNode.textContent.trim()}</span>`
             } else {
-               node.textContent += nextNode.textContent.trim()
+               const wrapper = document.createElement("p");
+               wrapper.appendChild(node.cloneNode(true));
+
+               const textNode = document.createTextNode(' ' + nextNode.textContent.trim());
+               wrapper.appendChild(textNode)
+
+               node = wrapper
+               nextNode.remove();
             }
-            nextNode.remove();
          }
       }
 
-      if (node.nodeType === 3 || node.nodeType === 1) {
-         const wrapper = document.createElement("P");
-         wrapper.appendChild(node.cloneNode(true));
-         node = wrapper;
-      }
+      //    } else if (node.nodeType === 3 && nextNode.nodeType === 1) {
+      //       if (nextNode.tagName === "A") {
+      //          node.textContent += `<a href="${nextNode.href}">${nextNode.textContent.trim()}</a>`
+      //       } else if (nextNode.tagName === "EM" || nextNode.tagName === "I") {
+      //          node.textContent += `<i>${nextNode.textContent.trim()}</i>`
+      //       } else if (nextNode.tagName === "STRONG" || nextNode.tagName === "B") {
+      //          let text = ''
+      //          for (const element of nextNode.childNodes) {
+      //             if (element.outerHTML) {
+      //                text += element.outerHTML.trim() + ' '
+      //             } else {
+      //                text += element.textContent.trim() + ' '
+      //             }
+      //          }
+      //          node.textContent += `<b>${text.trim()}</b>`
+      //       } else if (nextNode.tagName === "SPAN") {
+      //          node.textContent += `<span>${nextNode.textContent.trim()}</span>`
+      //       } else {
+      //          node.textContent += nextNode.textContent.trim()
+      //       }
+      //       nextNode.remove();
+      //    }
+      // }
 
+      // if (node.nodeType === 3 || node.nodeType === 1) {
+      //    const wrapper = document.createElement("P");
+      //    wrapper.appendChild(node.cloneNode(true));
+      //    node = wrapper;
+      // }
+
+      // if (postID === 21355) test.push({
+      //    tag: node.tagName,
+      //    types: {
+      //       current: node.nodeType,
+      //       next: nextNode?.nodeType,
+      //    },
+      //    content: node.outerHTML ?? node.textContent,
+      //    nested: nestedLevel,
+      // })
 
       if (node.tagName?.startsWith("H") && ["H1", "H2", "H3", "H4", "H5", "H6"].includes(node.tagName)) {
          if (node.textContent !== title) {
@@ -206,25 +236,179 @@ function convertHtmlToOutputData(html: string, title: string) {
          for (const child of node.childNodes) {
             if (child.nodeType === 3) {
                const textContent = child.textContent.trim();
+
                if (textContent) {
-                  childBlocks.push(textContent);
+                  const paragraphs = textContent.split(/\n+/).map((line: string) => line.trim());
+
+                  paragraphs.forEach((paragraph: string) => {
+                     if (paragraph) {
+                        childBlocks.push(processShortcodes(paragraph))
+                     }
+                  });
                }
             } else if (child.nodeType === 1) {
                if (child.tagName === "A") {
+                  const images: any = Array.from(child.childNodes).filter((item: any) => item.tagName === 'IMG')
+                  for (const image of images) {
+                     if (!image.src)
+                        continue
+
+                     blocks.push({
+                        type: "image",
+                        data: {
+                           file: {
+                              url: image.src
+                                 .replaceAll("/api/media", "")
+                                 .replaceAll("https://familnyjgerb.com", "")
+                                 .replaceAll("http://familnyjgerb.com", "")
+                                 .replaceAll("http://gerb.ainsworth.ml", ""),
+                           },
+                           caption: image.alt || "",
+                           withBorder: false,
+                           withBackground: false,
+                           stretched: false,
+                        },
+                     });
+
+                     image.remove()
+                  }
+                  // childBlocks.push(child.innerHTML ? child.innerHTML.trim() : `<a href="${child.href}">${child.textContent.trim()}</a>`);
                   childBlocks.push(`<a href="${child.href}">${child.textContent.trim()}</a>`);
                } else if (child.tagName === "EM" || child.tagName === "I") {
-                  childBlocks.push(`<i>${child.textContent.trim()}</i>`);
+                  const images: any = Array.from(child.childNodes).filter((item: any) => item.tagName === 'IMG')
+                  for (const image of images) {
+                     if (!image.src)
+                        continue
+
+                     blocks.push({
+                        type: "image",
+                        data: {
+                           file: {
+                              url: image.src
+                                 .replaceAll("/api/media", "")
+                                 .replaceAll("https://familnyjgerb.com", "")
+                                 .replaceAll("http://familnyjgerb.com", "")
+                                 .replaceAll("http://gerb.ainsworth.ml", ""),
+                           },
+                           caption: image.alt || "",
+                           withBorder: false,
+                           withBackground: false,
+                           stretched: false,
+                        },
+                     });
+
+                     image.remove()
+                  }
+                  childBlocks.push(child.innerHTML ? child.innerHTML.replaceAll('em>', 'i>').trim() : `<i>${child.textContent.trim()}</i>`);
                } else if (child.tagName === "STRONG" || child.tagName === "B") {
-                  childBlocks.push(`<b>${child.textContent.trim()}</b>`);
+                  const images: any = Array.from(child.childNodes).filter((item: any) => item.tagName === 'IMG')
+                  for (const image of images) {
+                     if (!image.src)
+                        continue
+
+                     blocks.push({
+                        type: "image",
+                        data: {
+                           file: {
+                              url: image.src
+                                 .replaceAll("/api/media", "")
+                                 .replaceAll("https://familnyjgerb.com", "")
+                                 .replaceAll("http://familnyjgerb.com", "")
+                                 .replaceAll("http://gerb.ainsworth.ml", ""),
+                           },
+                           caption: image.alt || "",
+                           withBorder: false,
+                           withBackground: false,
+                           stretched: false,
+                        },
+                     });
+
+                     image.remove()
+                  }
+                  childBlocks.push(child.innerHTML ? child.innerHTML.replaceAll('strong>', 'b>').trim() : `<b>${child.textContent.trim()}</b>`);
                } else if (child.tagName === "SPAN") {
-                  childBlocks.push(`<span>${child.textContent.trim()}</span>`);
-               } else if (child.tagName === "TEMPLATE") {
+                  const images: any = Array.from(child.childNodes).filter((item: any) => item.tagName === 'IMG')
+                  for (const image of images) {
+                     if (!image.src)
+                        continue
+
+                     blocks.push({
+                        type: "image",
+                        data: {
+                           file: {
+                              url: image.src
+                                 .replaceAll("/api/media", "")
+                                 .replaceAll("https://familnyjgerb.com", "")
+                                 .replaceAll("http://familnyjgerb.com", "")
+                                 .replaceAll("http://gerb.ainsworth.ml", ""),
+                           },
+                           caption: image.alt || "",
+                           withBorder: false,
+                           withBackground: false,
+                           stretched: false,
+                        },
+                     });
+
+                     image.remove()
+                  }
+                  childBlocks.push(child.innerHTML ? child.innerHTML.replaceAll('em>', 'i>').replaceAll('strong>', 'b>').trim() : `<span>${child.textContent.trim()}</span>`);
+               } else if (child.tagName === "P") {
+                  const images: any = Array.from(child.childNodes).filter((item: any) => item.tagName === 'IMG')
+                  for (const image of images) {
+                     if (!image.src)
+                        continue
+
+                     blocks.push({
+                        type: "image",
+                        data: {
+                           file: {
+                              url: image.src
+                                 .replaceAll("/api/media", "")
+                                 .replaceAll("https://familnyjgerb.com", "")
+                                 .replaceAll("http://familnyjgerb.com", "")
+                                 .replaceAll("http://gerb.ainsworth.ml", ""),
+                           },
+                           caption: image.alt || "",
+                           withBorder: false,
+                           withBackground: false,
+                           stretched: false,
+                        },
+                     });
+
+                     image.remove()
+                  }
+                  childBlocks.push(child.innerHTML ? child.innerHTML.trim() : child.textContent.trim());
+               } else if (child.tagName === "IMG") {
                   blocks.push({
-                     type: "paragraph",
+                     type: "image",
                      data: {
-                        text: processShortcodes(child.innerHTML),
+                        file: {
+                           url: child.src
+                              .replaceAll("/api/media", "")
+                              .replaceAll("https://familnyjgerb.com", "")
+                              .replaceAll("http://familnyjgerb.com", "")
+                              .replaceAll("http://gerb.ainsworth.ml", ""),
+                        },
+                        caption: child.alt || "",
+                        withBorder: false,
+                        withBackground: false,
+                        stretched: false,
                      },
                   });
+               } else if (child.tagName?.startsWith("H") && ["H1", "H2", "H3", "H4", "H5", "H6"].includes(child.tagName)) {
+                  if (child.textContent !== title) {
+                     blocks.push({
+                        type: "header",
+                        data: {
+                           text: child.textContent.trim(),
+                           level: parseInt(child.tagName[1]),
+                        },
+                     });
+                  }
+               } else if (child.tagName === "DIV") {
+                  for (const nestedNode of child.childNodes) {
+                     convertNodeToEditorJsBlock(nestedNode, undefined, true)
+                  }
                } else {
                   childBlocks.push(child.textContent.trim());
                }
@@ -245,6 +429,7 @@ function convertHtmlToOutputData(html: string, title: string) {
             data: {
                file: {
                   url: node.src
+                     .replaceAll("/api/media", "")
                      .replaceAll("https://familnyjgerb.com", "")
                      .replaceAll("http://familnyjgerb.com", "")
                      .replaceAll("http://gerb.ainsworth.ml", ""),
@@ -281,17 +466,24 @@ function convertHtmlToOutputData(html: string, title: string) {
             });
          }
       } else if (node.tagName === "SPAN" || node.tagName === "EM") {
-         for (const [eIndex, element] of node.childNodes.entries()) {
-            const nextChildNode = node.childNodes[eIndex + 1]
-            convertNodeToEditorJsBlock(element, nextChildNode);
+         const items: any = Array.from(node.childNodes).filter((item: any) => ['DIV', 'UL', 'OL', 'P'].includes(item.tagName))
+         if (items.length) {
+            for (const [eIndex, element] of node.childNodes.entries()) {
+               const nextChildNode = node.childNodes[eIndex + 1]
+               element.outerHTML = element.outerHTML.replaceAll('em>', 'i>').replaceAll('strong>', 'b>')
+               convertNodeToEditorJsBlock(element, nextChildNode, true);
+            }
+         } else {
+            const textContent = node.innerHTML?.replaceAll('em>', 'i>').replaceAll('strong>', 'b>').trim() ?? node.textContent.replaceAll('em>', 'i>').replaceAll('strong>', 'b>').trim();
+            if (textContent) {
+               blocks.push({
+                  type: "paragraph",
+                  data: {
+                     text: processShortcodes(textContent),
+                  },
+               });
+            }
          }
-      } else if (node.tagName === "TEMPLATE") {
-         blocks.push({
-            type: "paragraph",
-            data: {
-               text: processShortcodes(node.innerHTML),
-            },
-         });
       }
    };
 
