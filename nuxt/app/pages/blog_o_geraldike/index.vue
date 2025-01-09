@@ -7,6 +7,10 @@ const { data: posts, status, error } = await useLazyFetch('/api/posts', {
    },
    getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] || nuxtApp.static.data[key]
 })
+
+useSeoMeta({
+   title: 'Blog'
+})
 </script>
 
 <template>

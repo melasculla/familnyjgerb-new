@@ -92,15 +92,7 @@ export class PostRepository implements IPostRepository {
          where: and(
             eq(postsTable[by], slugOrId),
             langId ? eq(postsTable.langId, langId) : undefined
-         ),
-         // with: {
-         //    category: {
-         //       columns: {
-         //          slug: true
-         //       }
-         //    }
-         // }
-         // TODO make category in entity
+         )
       })
       if (!result)
          return null

@@ -62,7 +62,7 @@ export const uploadImages = async (imageList: Ref<UploadedImage[]>, baseUrl?: Ni
       }
 
       try {
-         const uploadedUrls = await $fetch<string[]>(baseUrl ? baseUrl : routesList.uploadImage, {
+         const uploadedUrls = await $fetch<string[]>(baseUrl ? baseUrl : routesList.api.media.images.upload, {
             method: 'POST',
             body,
             query: { types }

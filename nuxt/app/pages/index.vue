@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Editor } from '#components'
+import { type Editor } from '#components'
 
 const editor = ref<InstanceType<typeof Editor>>()
 const result = ref()
@@ -15,7 +15,7 @@ const data = {
       {
          "type": "customButton",
          "data": {
-            "name": "Main",
+            "name": "Order",
             props: {
                "text": "Заказать разработку монограммы",
                "href": "/nashi-kontakty"

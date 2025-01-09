@@ -35,7 +35,7 @@ defineExpose({ validate })
                </transition>
             </div>
             <p class="text-balance text-center md:text-left">{{ $t('form.fields.policy-1') }} <NuxtLink
-                  :to="routesList.policy">{{ $t('form.fields.policy-2') }}</NuxtLink>
+                  :to="routesList.client.policy">{{ $t('form.fields.policy-2') }}</NuxtLink>
             </p>
          </label>
       </div>

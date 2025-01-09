@@ -1,49 +1,33 @@
 <script setup lang="ts">
 import type { OutputData } from '@editorjs/editorjs';
-// import { ButtonsMain, ButtonsOrder } from '#components'
-
-const buttons = {
-   'Main': resolveComponent('ButtonsMain'),
-   'Order': resolveComponent('ButtonsOrder')
-}
 
 const { content } = defineProps<{
    content: OutputData | null
 }>()
-// TODO: dynamic resolveCompoentn
+
+const parseLink = async (e: MouseEvent) => {
+   const target = e.target as HTMLAnchorElement
+   if (target.nodeName !== 'A')
+      return
+
+   e.preventDefault()
+
+   const url = new URL(target.href)
+   const isExternal: boolean = useRequestURL().hostname !== url.hostname
+   await navigateTo(url.pathname, { external: isExternal })
+}
 </script>
 
 <template>
-   <div class="grid gap-4 px-4" v-if="content">
+   <div class="grid gap-4 px-4" v-if="content" @click="parseLink">
       <template v-for="block in content.blocks" :key="block.id">
          <div v-if="block.type === 'columns'" class="grid gap-4 grid-cols-1 sm:grid-cols-2"
             :class="block.data.cols.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'">
             <div v-for="column, index in block.data.cols" :key="index">
-               <template v-for="columnBlock in column.blocks" :key="columnBlock.id">
-                  <EditorTitle v-if="columnBlock.type === 'header'" :block="columnBlock.data"
-                     :tunes="columnBlock.tunes" />
-                  <EditorText v-else-if="columnBlock.type === 'paragraph'" :block="columnBlock.data"
-                     :tunes="columnBlock.tunes" />
-                  <EditorImage v-else-if="columnBlock.type === 'image'" :block="columnBlock.data" />
-                  <EditorList v-else-if="columnBlock.type === 'list'" :block="columnBlock.data" />
-                  <EditorCheckList v-else-if="columnBlock.type === 'checklist'" :block="columnBlock.data" />
-                  <EditorQuote v-else-if="columnBlock.type === 'quote'" :block="columnBlock.data" />
-                  <EditorEmbed v-else-if="columnBlock.type === 'embed'" :block="columnBlock.data" />
-                  <component v-else-if="columnBlock.type === 'customButton'" v-bind="block.data.props"
-                     :is="block.data.name ? buttons[block.data.name as keyof typeof buttons] : buttons.Main" />
-               </template>
+               <EditorColumns v-for="columnBlock in column.blocks" :key="columnBlock.id" :block="columnBlock" />
             </div>
          </div>
-         <EditorTitle v-else-if="block.type === 'header'" :block="block.data" :tunes="block.tunes" />
-         <EditorText v-else-if="block.type === 'paragraph'" :block="block.data" :tunes="block.tunes" />
-         <EditorImage v-else-if="block.type === 'image'" :block="block.data" />
-         <EditorList v-else-if="block.type === 'list'" :block="block.data" />
-         <EditorCheckList v-else-if="block.type === 'checklist'" :block="block.data" />
-         <EditorQuote v-else-if="block.type === 'quote'" :block="block.data" />
-         <EditorEmbed v-else-if="block.type === 'embed'" :block="block.data" />
-         <EditorAlert v-else-if="block.type === 'alert'" :block="block.data" />
-         <component v-else-if="block.type === 'customButton'" v-bind="block.data.props"
-            :is="block.data.name ? buttons[block.data.name as keyof typeof buttons] : buttons.Main" />
+         <EditorColumns v-else :block="block" />
       </template>
    </div>
 </template>

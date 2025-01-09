@@ -27,7 +27,9 @@ class MyImage extends Image {
 
    render() {
       if (this.ui.nodes.imageEl)
-         this.ui.nodes.imageEl.src = routesList.getFile(this.data.file.url)
+         this.ui.nodes.imageEl.src = routesList.api.media.getFile(this.data.file.url)
+
+      this.ui.nodes.imageEl.style.marginInline = 'auto'
 
       return super.render()
    }
@@ -50,7 +52,7 @@ const uploadByFile = async (file: File) => {
    const body = new FormData()
    body.append('images', file)
    try {
-      const urls = await $fetch<string[]>(routesList.uploadImage, {
+      const urls = await $fetch<string[]>(routesList.api.media.images.upload, {
          method: 'POST',
          body
       })
@@ -60,7 +62,7 @@ const uploadByFile = async (file: File) => {
       return {
          success: 1,
          file: {
-            url: routesList.getFile(urls[0]),
+            url: routesList.api.media.getFile(urls[0]),
          }
       }
    } catch (err: any) {
@@ -167,7 +169,8 @@ onMounted(() => {
 
          if (props.data?.blocks.length)
             await editor.value?.render(props.data)
-      }
+      },
+      // data: props.data || { blocks: [] }
    })
 })
 

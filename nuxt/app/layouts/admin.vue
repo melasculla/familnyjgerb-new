@@ -6,11 +6,11 @@ const switchLocalePath = useSwitchLocalePath()
 const { signOut, data } = useAuth()
 
 const pages = [
-   { path: routesList.admin, title: 'Admin', icon: '/icons/admin/dashboard.svg' },
-   { path: routesList.users, title: 'Users', icon: '/icons/admin/users.svg' },
-   { path: routesList.getPortfolioAdmin, title: 'Portfolio', icon: '/icons/admin/portfolio.svg' },
-   { path: routesList.adminFooterGallery, title: 'Gallery', icon: '/icons/admin/gallery.svg' },
-   { path: routesList.adminUploadImages, title: 'Images', icon: '/icons/admin/uploadImage.svg' },
+   // { path: routesList.client.admin.main, title: 'Admin', icon: '/icons/admin/dashboard.svg' },
+   // { path: routesList.client.admin.users.list, title: 'Users', icon: '/icons/admin/users.svg' },
+   { path: routesList.client.admin.posts.list, title: 'Posts', icon: '/icons/admin/posts.svg' },
+   // { path: routesList.client.admin.projects.list, title: 'Projects', icon: '/icons/admin/gallery.svg' },
+   // { path: routesList.client.admin.images.upload, title: 'Images', icon: '/icons/admin/uploadImage.svg' },
 ]
 </script>
 
@@ -25,15 +25,15 @@ const pages = [
          </NuxtLink>
          <NuxtLink v-for="locale in locales" :key="locale.code" :to="switchLocalePath(locale.code)"
             v-show="locale.code !== currentLocale" class="cursor-pointer relative group">
-            <img class="h-10" :src="`/icons/${locale.code.toUpperCase()}.webp`" alt="" />
+            <!-- <img class="h-10" :src="`/icons/${locale.code.toUpperCase()}.webp`" alt="" /> -->
          </NuxtLink>
          <ThemeSwitcher :admin="true" />
          <div class="ml-auto flex items-center gap-4">
-            <p class="max-xs:hidden text-lg">{{ data?.user?.name }}</p>
-            <img class="size-10 sm:size-14 rounded-full" :src="data?.user?.image || ''" alt="">
-            <div class="icon size-10 sm:size-14 block"
+            <!-- <p class="max-xs:hidden text-lg">{{ data?.user?.name }}</p> -->
+            <!-- <img class="size-10 sm:size-14 rounded-full" :src="data?.user?.image || ''" alt=""> -->
+            <!-- <div class="icon size-10 sm:size-14 block"
                :style="`mask:url(/icons/admin/logout.svg) no-repeat center / contain;`" title="Logout"
-               @click="() => signOut({ callbackUrl: '/' })" />
+               @click="() => signOut({ callbackUrl: '/' })" /> -->
          </div>
       </div>
       <div class="grid grid-cols-[1fr,auto] items-start">

@@ -26,7 +26,7 @@ const search = ({ target }: InputEvent) => {
 }
 const searchParam = ref<string>('')
 
-const { data, status, refresh, error } = await useLazyFetch<{ data: string[], total: number }>(routesList.imagesList, {
+const { data, status, refresh, error } = await useLazyFetch<{ data: string[], total: number }>(routesList.api.media.images.list, {
    query: {
       page: currentPage,
       perPage: perPage,

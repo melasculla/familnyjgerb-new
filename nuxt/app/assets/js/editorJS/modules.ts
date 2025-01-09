@@ -15,80 +15,107 @@ class CustomButtonTool {
    constructor({ data }: { data: Record<any, any> }) {
       this.data = Object.keys(data).length ? data : { name: 'Main', props: { text: '', href: '/blog_o_geraldike' } }
       this.wrapper = document.createElement('div');
+      this.config = {}
    }
 
    render() {
       this.wrapper.contentEditable = `false`;
-      this.wrapper.style.outline = '1px solid orange'
+      this.wrapper.style.outline = '2px solid orange'
+      this.wrapper.style.outlineOffset = '8px'
       this.wrapper.style.borderRadius = '20px'
       this.wrapper.style.padding = '1rem'
-      this.wrapper.classList.add('my-3', 'p-2', 'text-base', 'grid', 'gap-4', 'text-center')
+      this.wrapper.style.margin = '0.75rem auto';
+      this.wrapper.style.padding = '0.5rem';
+      this.wrapper.style.display = 'grid';
+      this.wrapper.style.gap = '1rem';
+      this.wrapper.style.textAlign = 'center';
 
-      const textDiv = document.createElement('div')
-      textDiv.classList.add('flex', 'flex-shrink-0', 'gap-2', 'items-center')
-      const textInput = document.createElement('input')
-      textInput.value = this.data.props.text
-      const textLabel = document.createElement('label')
-      textLabel.innerHTML = 'Текст: '
-      textDiv.appendChild(textLabel)
-      textDiv.appendChild(textInput)
-      textInput.classList.add('px-2', 'py-1.5', 'rounded-lg', 'w-full', 'text-center', 'border-2', 'border-red-300', 'text')
-      this.wrapper.appendChild(textDiv)
-
-      const hrefDiv = document.createElement('div')
-      hrefDiv.classList.add('flex', 'flex-shrink-0', 'gap-2', 'items-center')
-      const hrefInput = document.createElement('input')
-      hrefInput.value = this.data.props.href
-      const hrefLabel = document.createElement('label')
-      hrefLabel.innerHTML = 'Ссылка: '
-      hrefDiv.appendChild(hrefLabel)
-      hrefDiv.appendChild(hrefInput)
-      hrefInput.classList.add('px-2', 'py-1.5', 'rounded-lg', 'w-full', 'text-center', 'border-2', 'border-red-300', 'link')
-      this.wrapper.appendChild(hrefDiv)
+      this.createField('Текст', 'text', this.data.props.text)
+      this.createField('Ссылка', 'link', this.data.props.href)
 
       return this.wrapper;
    }
 
+   private createField(text: string, customClass: string, value: string) {
+      const wrapper = document.createElement('div')
+      wrapper.style.display = 'flex'
+      wrapper.style.gap = '.5rem'
+      wrapper.style.justifyContent = 'center'
+      wrapper.style.fontSize = '1.7rem';
+
+
+      const input = document.createElement('input')
+      input.value = value
+
+      const label = document.createElement('label')
+      label.innerHTML = `${text}: `
+      wrapper.appendChild(label)
+      wrapper.appendChild(input)
+      input.style.padding = '0.2rem 0.5rem';
+      input.style.borderRadius = '0.5rem';
+      input.style.width = '100%';
+      input.style.textAlign = 'center';
+      input.style.border = '2px solid #fca5a5';
+      input.classList.add(customClass)
+      this.wrapper.appendChild(wrapper)
+   }
+
    async rendered() {
+      if (this.config.rendered)
+         return
+
       const buttonComponents = import.meta.glob('@/components/Buttons/*.vue') as Record<string, any> // , { eager: true }
 
       const buttonList = document.createElement('div');
-      const title = document.createElement('h2')
-      title.style.flexGrow = '1'
-      title.style.flexShrink = '0'
-      title.style.width = '100%'
-      title.innerHTML = 'Choose button';
-      buttonList.appendChild(title)
       buttonList.style.display = 'flex';
       buttonList.style.flexWrap = 'wrap';
       buttonList.style.gap = '1rem';
       buttonList.style.justifyContent = 'center'
 
+      // const title = document.createElement('h2')
+      // title.style.flexGrow = '1'
+      // title.style.flexShrink = '0'
+      // title.style.width = '100%'
+      // title.innerHTML = 'Choose button';
+
+      // buttonList.appendChild(title)
+
+      const outline = '2px solid red'
+
       for (const path in buttonComponents) {
          const name = path.split('/').pop()?.replace('.vue', '');
-         const button = document.createElement('button');
+         const buttonWrapper = document.createElement('div');
+         buttonWrapper.classList.add('button-preview')
 
-         button.textContent = `${name}`;
-         button.style.padding = '.5rem 1rem';
-         button.style.borderRadius = '20px';
-         button.style.outline = this.data.name === name ? '1px solid red' : ''
-         button.onclick = async () => {
+         this.renderButtonComponent((await buttonComponents[path]()).default, buttonWrapper, name)
+
+         buttonWrapper.style.outline = this.data.name === name ? outline : ''
+         buttonWrapper.style.outlineOffset = '6px'
+         buttonWrapper.onclick = async () => {
             this.data.name = name
-            for (const item of buttonList.querySelectorAll('button')) {
+
+            for (const item of buttonList.querySelectorAll('div.button-preview') as NodeListOf<HTMLDivElement>) {
                item.style.outline = ''
             }
-            button.style.outline = '1px solid red'
-            // const component = (await buttonComponents[path]()).default;
+            buttonWrapper.style.outline = outline
          };
 
-         buttonList.appendChild(button);
+         buttonList.appendChild(buttonWrapper);
       }
 
+      this.config.rendered = true
       this.wrapper.appendChild(buttonList);
+   }
 
-      // const preview = document.createElement('div');
-      // preview.id = 'button-preview';
-      // this.wrapper.appendChild(preview);
+   private async renderButtonComponent(passedComponent: ConcreteComponent, wrapper: Element, text?: string) {
+      renderComponent(
+         h(passedComponent, {
+            // 'onUpdate:props': (newProps: Record<string, any>) => {
+            //    this.data.props = newProps
+            // }
+         }, { default: () => text ?? this.data.props.text }),
+         wrapper
+      )
    }
 
    save() {
@@ -103,21 +130,6 @@ class CustomButtonTool {
          }
       }
    }
-
-   // private async renderButtonComponent(passedComponent: ConcreteComponent) {
-   //    // const { vueApp } = useNuxtApp();
-
-   //    renderComponent(
-   //       h(passedComponent, {
-   //          ...this.data.props,
-   //          editor: true,
-   //          'onUpdate:props': (newProps: Record<string, any>) => {
-   //             this.data.props = newProps
-   //          }
-   //       }),
-   //       this.wrapper
-   //    )
-   // }
 
    // destroy() {
    //    renderComponent(null, this.wrapper)

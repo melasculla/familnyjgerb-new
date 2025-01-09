@@ -12,8 +12,8 @@ let patrik: any;
 export default defineEventHandler(async event => {
    postID = null
    test = []
-   // patrik = null
-   patrik = new Set()
+   patrik = null
+
    // Connect to WordPress DB
    const wpDb = await mysql.createConnection({
       host: 'familnyjgerb-db-1',
@@ -108,8 +108,6 @@ export default defineEventHandler(async event => {
       // });
    }
 
-   console.log(patrik)
-
    return {
       result: await db.select({ count: count() }).from(postsTable),
       test,
@@ -162,7 +160,6 @@ function convertHtmlToOutputData(html: string, title: string) {
                   'fa-phone-square': '',
                   'fa-pagelines': ''
                }
-               patrik.add(title)
 
                blocks.push({
                   type: "customButton",
@@ -487,13 +484,19 @@ function convertHtmlToOutputData(html: string, title: string) {
       convertNodeToEditorJsBlock(node, nextNode)
    }
 
-   return blocks.length
-      ? {
+   // if (blocks.length) {
+   //    for (const [index, block] of blocks.entries()) {
+   // TODO: make columns for images which goes 2-3 in a row
+   //    }
+   // }
+
+   return blocks.length ?
+      {
          time: 1,
          blocks,
          version: '2.30.7',
-      }
-      : {
+      } :
+      {
          blocks: [{ type: 'paragraph', data: { text: html } }],
          version: '2.30.7',
          time: 2,
