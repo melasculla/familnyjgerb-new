@@ -12,7 +12,8 @@ let patrik: any;
 export default defineEventHandler(async event => {
    postID = null
    test = []
-   patrik = null
+   // patrik = null
+   patrik = new Set()
    // Connect to WordPress DB
    const wpDb = await mysql.createConnection({
       host: 'familnyjgerb-db-1',
@@ -54,10 +55,10 @@ export default defineEventHandler(async event => {
 
       const content = convertHtmlToOutputData(post.post_content, he.decode(post.post_title))
 
-      if (postID === 14387) { // 14387 22046 14188 13693 21355
-         test.push(post.post_content)
-         patrik = content
-      }
+      // if (postID === 19410) { // 14387 22046 14188 13693 21355 19410
+      //    test.push(post.post_content)
+      //    patrik = content
+      // }
 
       const thumbnail = {
          path: post.thumbnail_url?.replaceAll('https://familnyjgerb.com', '').replaceAll('http://familnyjgerb.com', '') || '',
@@ -107,6 +108,8 @@ export default defineEventHandler(async event => {
       // });
    }
 
+   console.log(patrik)
+
    return {
       result: await db.select({ count: count() }).from(postsTable),
       test,
@@ -149,7 +152,28 @@ function convertHtmlToOutputData(html: string, title: string) {
                )
                   return '';
 
-               // test.push(attrObj)
+               const icons = {
+                  'fa-question-circle': '',
+                  'fa-shopping-cart': '',
+                  'fa-share-square-o': '',
+                  'fa-pencil': '',
+                  'fa-tty': '',
+                  'fa-comments-o': '',
+                  'fa-phone-square': '',
+                  'fa-pagelines': ''
+               }
+               patrik.add(title)
+
+               blocks.push({
+                  type: "customButton",
+                  data: {
+                     name: "Main",
+                     props: {
+                        text: innerContent,
+                        href: attrObj.link.replace('/category/geraldika-v-zhizni', '/blog_o_geraldike/geraldika-v-zhizni')
+                     }
+                  }
+               })
             } else if (shortcode === 'contact') {
                // Handle "contact" shortcode logic if required
                return ''
@@ -180,37 +204,7 @@ function convertHtmlToOutputData(html: string, title: string) {
          }
       }
 
-      //    } else if (node.nodeType === 3 && nextNode.nodeType === 1) {
-      //       if (nextNode.tagName === "A") {
-      //          node.textContent += `<a href="${nextNode.href}">${nextNode.textContent.trim()}</a>`
-      //       } else if (nextNode.tagName === "EM" || nextNode.tagName === "I") {
-      //          node.textContent += `<i>${nextNode.textContent.trim()}</i>`
-      //       } else if (nextNode.tagName === "STRONG" || nextNode.tagName === "B") {
-      //          let text = ''
-      //          for (const element of nextNode.childNodes) {
-      //             if (element.outerHTML) {
-      //                text += element.outerHTML.trim() + ' '
-      //             } else {
-      //                text += element.textContent.trim() + ' '
-      //             }
-      //          }
-      //          node.textContent += `<b>${text.trim()}</b>`
-      //       } else if (nextNode.tagName === "SPAN") {
-      //          node.textContent += `<span>${nextNode.textContent.trim()}</span>`
-      //       } else {
-      //          node.textContent += nextNode.textContent.trim()
-      //       }
-      //       nextNode.remove();
-      //    }
-      // }
-
-      // if (node.nodeType === 3 || node.nodeType === 1) {
-      //    const wrapper = document.createElement("P");
-      //    wrapper.appendChild(node.cloneNode(true));
-      //    node = wrapper;
-      // }
-
-      // if (postID === 21355) test.push({
+      // if (postID === 19410) test.push({
       //    tag: node.tagName,
       //    types: {
       //       current: node.nodeType,
@@ -409,6 +403,7 @@ function convertHtmlToOutputData(html: string, title: string) {
                   for (const nestedNode of child.childNodes) {
                      convertNodeToEditorJsBlock(nestedNode, undefined, true)
                   }
+               } else if (child.tagName === 'STYLE') {
                } else {
                   childBlocks.push(child.textContent.trim());
                }

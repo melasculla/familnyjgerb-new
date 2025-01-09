@@ -171,6 +171,10 @@ export default defineNuxtConfig({
   routeRules: {
     '/admin/**': {
       ssr: false
+    },
+    '/zapisi-geraldista/**': {
+      redirect: '/blog_o_geraldike/zapisi-geraldista/**',
+      static: true
     }
     // '/_ipx/**': {
     //   cache: {

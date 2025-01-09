@@ -1,9 +1,16 @@
 <script setup lang="ts">
 import type { OutputData } from '@editorjs/editorjs';
+// import { ButtonsMain, ButtonsOrder } from '#components'
+
+const buttons = {
+   'Main': resolveComponent('ButtonsMain'),
+   'Order': resolveComponent('ButtonsOrder')
+}
 
 const { content } = defineProps<{
    content: OutputData | null
 }>()
+// TODO: dynamic resolveCompoentn
 </script>
 
 <template>
@@ -22,6 +29,8 @@ const { content } = defineProps<{
                   <EditorCheckList v-else-if="columnBlock.type === 'checklist'" :block="columnBlock.data" />
                   <EditorQuote v-else-if="columnBlock.type === 'quote'" :block="columnBlock.data" />
                   <EditorEmbed v-else-if="columnBlock.type === 'embed'" :block="columnBlock.data" />
+                  <component v-else-if="columnBlock.type === 'customButton'" v-bind="block.data.props"
+                     :is="block.data.name ? buttons[block.data.name as keyof typeof buttons] : buttons.Main" />
                </template>
             </div>
          </div>
@@ -33,6 +42,8 @@ const { content } = defineProps<{
          <EditorQuote v-else-if="block.type === 'quote'" :block="block.data" />
          <EditorEmbed v-else-if="block.type === 'embed'" :block="block.data" />
          <EditorAlert v-else-if="block.type === 'alert'" :block="block.data" />
+         <component v-else-if="block.type === 'customButton'" v-bind="block.data.props"
+            :is="block.data.name ? buttons[block.data.name as keyof typeof buttons] : buttons.Main" />
       </template>
    </div>
 </template>
