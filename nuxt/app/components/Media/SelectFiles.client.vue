@@ -7,7 +7,7 @@ const emit = defineEmits<{
    selected: [image: string[]]
 }>()
 
-const { perPage, currentPageState: currentPage, pages, totaItems } = usePagination(24, 'selectFilesPage')
+const { perPage, currentPage, pages, totaItems } = usePagination(24, 'state', 'selectFilesPage')
 
 let debounceTimer: NodeJS.Timeout;
 const search = ({ target }: InputEvent) => {
@@ -82,7 +82,7 @@ const selectMultiple = (image: string) => {
             @click="multiple ? selectMultiple(image) : select(image)">
             <NuxtImg :src="'/fs/' + image" loading="lazy" class="w-full" placeholder="/loader.svg" />
          </div>
-         <div v-else-if="status === 'pending'" v-for="image in 48" class="flex">
+         <div v-else-if="status === 'pending' || status === 'idle'" v-for="image in 48" class="flex">
             <img src="/loader.svg" loading="lazy" class="w-full" />
          </div>
          <div v-else-if="status === 'error'"

@@ -1,13 +1,16 @@
 <script setup lang="ts">
 const route = useRoute()
 const { locale } = useI18n()
+const slug = computed(() => Array.isArray(route.params.slug) ? route.params.slug[0]! : route.params.slug!)
 const { data, status, error } = await useLazyFetch<{ post: Post, category: Category }>(
-   routesList.api.posts.getSingle(Array.isArray(route.params.slug) ? route.params.slug[0]! : route.params.slug!),
+   routesList.api.posts.getSingle(slug.value),
    {
       query: {
          locale: 'ru',
-      }
-   }
+      },
+      getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] || nuxtApp.static.data[key],
+      key: `ru:blog_posts:${slug.value}`
+   },
 )
 
 useSeoMeta({
@@ -26,7 +29,7 @@ useSeoMeta({
             API
          </a>
          <a class="underline text-base text-purple-600 my-5 block text-center" target="_blank"
-            :href="`https://familnyjgerb.com/${route.params.category}/${route.params.slug}`">
+            :href="`https://familnyjgerb.com/${data?.category.slug}/${route.params.slug}`">
             Original
          </a>
          <NuxtLink v-if="route.params.slug && !Array.isArray(route.params.slug)"
@@ -38,11 +41,11 @@ useSeoMeta({
       <div v-if="status === 'success' && data">
          <EditorContent :content="data.post.content" />
       </div>
-      <div v-else-if="status === 'pending'">
+      <div v-else-if="status === 'pending' || status === 'idle'">
          Loading
       </div>
-      <div v-else-if="status === 'error'">
-         {{ `Error: ${error?.message}` }}
+      <div v-else-if="status === 'error'" class="text-center text-red-500 font-bold text-lg">
+         {{ `Error: ${error?.statusMessage || error?.message || error?.data?.message}` }}
       </div>
    </div>
 </template>

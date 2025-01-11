@@ -3,6 +3,7 @@ import { type OutputBlockData } from '@editorjs/editorjs'
 
 defineProps<{
    block: OutputBlockData
+   child?: boolean
 }>()
 
 const buttons = {
@@ -14,7 +15,7 @@ const buttons = {
 <template>
    <EditorTitle v-if="block.type === 'header'" :block="block.data" :tunes="block.tunes" />
    <EditorText v-else-if="block.type === 'paragraph'" :block="block.data" :tunes="block.tunes" />
-   <EditorImage v-else-if="block.type === 'image'" :block="block.data" />
+   <EditorImage v-else-if="block.type === 'image'" :block="block.data" :child="child" />
    <EditorList v-else-if="block.type === 'list'" :block="block.data" />
    <EditorCheckList v-else-if="block.type === 'checklist'" :block="block.data" />
    <EditorQuote v-else-if="block.type === 'quote'" :block="block.data" />

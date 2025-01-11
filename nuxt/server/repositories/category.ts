@@ -27,19 +27,21 @@ export class CategoryRepository implements ICategoryRepository {
 
    async save(categoryEntity: CategoryEntity) {
       if (categoryEntity.id) {
-         await db.update(categoriesTable).set({
+         const [updated] = await db.update(categoriesTable).set({
             slug: categoryEntity.slug,
             nameEn: categoryEntity.nameEn,
             nameRu: categoryEntity.nameRu,
-         }).where(eq(categoriesTable.id, categoryEntity.id))
+         }).where(eq(categoriesTable.id, categoryEntity.id)).returning()
+
+         categoryEntity = Object.assign(updated)
       } else {
          const [inserted] = await db.insert(categoriesTable).values({
             slug: categoryEntity.slug,
             nameEn: categoryEntity.nameEn,
             nameRu: categoryEntity.nameRu,
-         }).returning({ id: categoriesTable.id })
+         }).returning()
 
-         categoryEntity.id = inserted.id
+         categoryEntity = Object.assign(inserted)
       }
 
       return categoryEntity

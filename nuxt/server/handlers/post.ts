@@ -60,7 +60,6 @@ export class PostHandler {
       const params = await useSafeValidatedParams(event, SlugSchema)
       if (!params.data || params.error) {
          const error = JSON.parse(params.error.message)[0]
-         console.log(error)
          throw createError({
             statusCode: 400,
             message: `${error.message}`,
@@ -75,13 +74,16 @@ export class PostHandler {
       const query = await useSafeValidatedQuery(event, CategorySchema)
       if (!query.data || query.error) {
          const error = JSON.parse(query.error.message)[0]
-         console.log(error)
          throw createError({
             statusCode: 400,
             message: `${error.message}`,
             data: query.error
          })
       }
+
+      if (!query.data.category)
+         return
+
 
       event.context.requestDTO.category = query.data.category
    }

@@ -22,9 +22,12 @@ const parseLink = async (e: MouseEvent) => {
    <div class="grid gap-4 px-4" v-if="content" @click="parseLink">
       <template v-for="block in content.blocks" :key="block.id">
          <div v-if="block.type === 'columns'" class="grid gap-4 grid-cols-1 sm:grid-cols-2"
-            :class="block.data.cols.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2'">
-            <div v-for="column, index in block.data.cols" :key="index">
-               <EditorColumns v-for="columnBlock in column.blocks" :key="columnBlock.id" :block="columnBlock" />
+            :class="block.data.cols.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'">
+            <div
+               :class="block.data.cols.length === 3 ? 'sm:max-lg:last:col-span-2 sm:max-lg:last:w-1/2 sm:max-lg:last:mx-auto' : undefined"
+               v-for="column, index in block.data.cols" :key="index">
+               <EditorColumns v-for="columnBlock in column.blocks" :key="columnBlock.id" :block="columnBlock"
+                  :child="true" />
             </div>
          </div>
          <EditorColumns v-else :block="block" />

@@ -100,20 +100,22 @@ export class UserRepository implements IUserRepository {
 
 	async save(userEntity: UserEntity) {
 		if (userEntity.id) {
-			await db.update(usersTable)
+			const [updated] = await db.update(usersTable)
 				.set({
 					role: userEntity.role
 				})
-				.where(eq(usersTable.id, userEntity.id));
+				.where(eq(usersTable.id, userEntity.id)).returning()
+
+			userEntity = Object.assign(updated)
 		} else {
 			const [inserted] = await db.insert(usersTable).values({
 				name: userEntity.name,
 				email: userEntity.email,
 				uid: userEntity.uid,
 				role: userEntity.role,
-			}).returning({ id: usersTable.id })
+			}).returning()
 
-			userEntity.id = inserted.id
+			userEntity = Object.assign(inserted)
 		}
 
 		return userEntity

@@ -20,11 +20,11 @@ useSeoMeta({
       <div v-if="status === 'success' && data">
          <Editor class="w-11/12 mx-auto" :data="data.post.content" />
       </div>
-      <div v-else-if="status === 'pending'">
+      <div v-else-if="status === 'pending' || status === 'idle'">
          Loading
       </div>
-      <div v-else-if="status === 'error'">
-         {{ `Error: ${error?.message}` }}
+      <div v-else-if="status === 'error'" class="text-center text-red-500 font-bold text-lg">
+         {{ `Error: ${error?.statusMessage || error?.message || error?.data?.message}` }}
       </div>
    </div>
 </template>

@@ -1,12 +1,38 @@
-export const usePagination = (_perPage: number, stateOrQueryName: string = 'page') => {
+export const usePagination = (
+   _perPage: number,
+   mode: 'state' | 'query' | 'page' = 'state',
+   stateOrQueryName: string,
+   urlBase?: (page?: number) => string
+): { perPage: number, currentPage: Ref<number>, pages: Ref<number>, totaItems: Ref<number> } => {
    const route = useRoute()
    const perPage = _perPage
    const totaItems = ref<number>(0)
 
-   const currentPageState = useState<number>(stateOrQueryName, () => 1)
-   const currentPageQuery = computed<number>(() => route.query[stateOrQueryName] ? +route.query[stateOrQueryName] : 1)
+   const currentPage = computed<number>({
+      get: () => {
+         if (mode === 'state')
+            return useState<number>(stateOrQueryName, () => 1).value
+
+         if (mode === 'query')
+            return route.query[stateOrQueryName] ? +route.query[stateOrQueryName] : 1
+
+         if (mode === 'page')
+            return parseInt(route.path.split('/').pop() || '1') || 1
+
+         return 1
+      },
+      set: (page: number) => {
+         if (mode === 'query')
+            route.query[stateOrQueryName] = `${page}`
+
+         if (mode === 'query')
+            urlBase ?
+               navigateTo(urlBase(page)) :
+               alert('urlBase is not defined in usePagination()')
+      }
+   })
 
    const pages = computed<number>(() => Math.ceil(totaItems.value / perPage))
 
-   return { perPage, currentPageState, currentPageQuery, pages, totaItems }
+   return { perPage, currentPage, pages, totaItems }
 }

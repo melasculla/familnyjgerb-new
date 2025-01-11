@@ -22,8 +22,10 @@ export default {
       },
       posts: {
          list: '/blog_o_geraldike',
+         page: (page?: number) => page ? `/blog_o_geraldike/page/${page}` : '/blog_o_geraldike',
          single: (slug: string) => `/blog_o_geraldike/${slug}`,
          category: (slug: string) => `/blog_o_geraldike/category/${slug}`,
+         categoryPage: (slug: string) => (page?: number) => page ? `/blog_o_geraldike/category/${slug}/page/${page}` : `/blog_o_geraldike/category/${slug}`,
       },
       policy: '/policy'
    },
@@ -34,6 +36,9 @@ export default {
          create: '/api/posts/create',
          edit: '/api/posts/edit',
          delete: '/api/posts/delete',
+      },
+      categories: {
+         getAll: '/api/categories'
       },
       mail: {
          send: '/api/mail/send'

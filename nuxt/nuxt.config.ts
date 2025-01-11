@@ -172,10 +172,70 @@ export default defineNuxtConfig({
     '/admin/**': {
       ssr: false
     },
-    '/zapisi-geraldista/**': {
-      redirect: '/blog_o_geraldike/zapisi-geraldista/**',
+    '/aktsii/**': {
+      redirect: '/blog_o_geraldike/**',
       static: true
-    }
+    },
+    '/geraldika-v-zhizni/**': {
+      redirect: '/blog_o_geraldike/**',
+      static: true
+    },
+    '/zapisi-geraldista/**': {
+      redirect: '/blog_o_geraldike/**',
+      static: true
+    },
+    '/kompetentnoe-mnenie/**': {
+      redirect: '/blog_o_geraldike/**',
+      static: true
+    },
+    '/news/**': {
+      redirect: '/blog_o_geraldike/**',
+      static: true
+    },
+    '/aktsii/': {
+      redirect: '/blog_o_geraldike/category/aktsii/',
+      static: true
+    },
+    '/geraldika-v-zhizni/': {
+      redirect: '/blog_o_geraldike/category/geraldika-v-zhizni/',
+      static: true
+    },
+    '/zapisi-geraldista/': {
+      redirect: '/blog_o_geraldike/category/zapisi-geraldista/',
+      static: true
+    },
+    '/kompetentnoe-mnenie/': {
+      redirect: '/blog_o_geraldike/category/kompetentnoe-mnenie/',
+      static: true
+    },
+    '/news/': {
+      redirect: '/blog_o_geraldike/category/news/',
+      static: true
+    },
+    '/aktsii/page/**': {
+      redirect: '/blog_o_geraldike/category/aktsii/page/**',
+      static: true
+    },
+    '/geraldika-v-zhizni/page/**': {
+      redirect: '/blog_o_geraldike/category/geraldika-v-zhizni/page/**',
+      static: true
+    },
+    '/zapisi-geraldista/page/**': {
+      redirect: '/blog_o_geraldike/category/zapisi-geraldista/page/**',
+      static: true
+    },
+    '/kompetentnoe-mnenie/page/**': {
+      redirect: '/blog_o_geraldike/category/kompetentnoe-mnenie/page/**',
+      static: true
+    },
+    '/news/page/**': {
+      redirect: '/blog_o_geraldike/category/news/page/**',
+      static: true
+    },
+    '/heraldist-notes/**': {
+      redirect: '/blog_o_geraldike/**',
+      static: true
+    },
     // '/_ipx/**': {
     //   cache: {
     //     maxAge: 2000

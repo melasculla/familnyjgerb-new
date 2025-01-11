@@ -55,7 +55,7 @@ export default defineEventHandler(async event => {
 
       const content = convertHtmlToOutputData(post.post_content, he.decode(post.post_title))
 
-      // if (postID === 19410) { // 14387 22046 14188 13693 21355 19410
+      // if (postID === 19006) { // 14387 22046 14188 13693 21355 19410 19006
       //    test.push(post.post_content)
       //    patrik = content
       // }
@@ -484,11 +484,35 @@ function convertHtmlToOutputData(html: string, title: string) {
       convertNodeToEditorJsBlock(node, nextNode)
    }
 
-   // if (blocks.length) {
-   //    for (const [index, block] of blocks.entries()) {
-   // TODO: make columns for images which goes 2-3 in a row
-   //    }
-   // }
+   if (blocks.length) {
+      for (const [index, block] of blocks.entries()) {
+         const nextBlock = blocks[index + 1]
+         const secondNextBlock = blocks[index + 2]
+
+         if (block.type === 'image' && nextBlock?.type === 'image') {
+            const tempBlock = {
+               type: 'columns',
+               data: {
+                  cols: [
+                     { blocks: [block] },
+                     { blocks: [nextBlock] }
+                  ]
+               }
+            };
+
+            if (secondNextBlock?.type === 'image') {
+               tempBlock.data.cols.push({
+                  blocks: [secondNextBlock]
+               });
+               blocks.splice(index + 2, 1);
+            }
+
+            blocks.splice(index, 2);
+
+            blocks.splice(index, 0, tempBlock);
+         }
+      }
+   }
 
    return blocks.length ?
       {
