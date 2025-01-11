@@ -22,10 +22,13 @@ export const usePagination = (
          return 1
       },
       set: (page: number) => {
+         if (mode === 'state')
+            useState<number>(stateOrQueryName, () => 1).value = page
+
          if (mode === 'query')
             route.query[stateOrQueryName] = `${page}`
 
-         if (mode === 'query')
+         if (mode === 'page')
             urlBase ?
                navigateTo(urlBase(page)) :
                alert('urlBase is not defined in usePagination()')

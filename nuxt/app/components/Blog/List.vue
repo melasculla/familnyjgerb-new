@@ -42,7 +42,7 @@ useSeoMeta({
 
 <template>
    <div>
-      <Pagination class="mt-5" v-bind="{
+      <Pagination class="mt-5" v-model="currentPage" v-bind="{
          pages,
          currentPage,
          urlBase: pageBase,
