@@ -1,0 +1,1 @@
+ALTER TABLE "gallery_items" ALTER COLUMN "order" DROP NOT NULL;

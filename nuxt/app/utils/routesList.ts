@@ -48,7 +48,7 @@ export default {
             list: '/api/media/images/',
             upload: '/api/media/images/',
          },
-         getFile: (file: string) => `${useRequestURL().origin}/api/media/${file}` as const,
+         getFile: (file: string) => `/api/media/${file}` as const,
       },
    } as const,
 }

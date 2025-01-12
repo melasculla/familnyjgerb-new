@@ -21,9 +21,9 @@ const parseLink = async (e: MouseEvent) => {
 <template>
    <div class="grid gap-4 px-4" v-if="content" @click="parseLink">
       <template v-for="block in content.blocks" :key="block.id">
-         <div v-if="block.type === 'columns'" class="grid gap-4 grid-cols-1 sm:grid-cols-2"
+         <div v-if="block.type === 'columns'" class="grid gap-4 grid-cols-1 sm:grid-cols-2 editor__columns"
             :class="block.data.cols.length === 3 ? 'lg:grid-cols-3' : 'lg:grid-cols-2'">
-            <div
+            <div class="editor__columns__child"
                :class="block.data.cols.length === 3 ? 'sm:max-lg:last:col-span-2 sm:max-lg:last:w-1/2 sm:max-lg:last:mx-auto' : undefined"
                v-for="column, index in block.data.cols" :key="index">
                <EditorColumns v-for="columnBlock in column.blocks" :key="columnBlock.id" :block="columnBlock"
@@ -38,5 +38,14 @@ const parseLink = async (e: MouseEvent) => {
 <style scoped>
 :deep(a) {
    text-decoration: underline
+}
+
+:deep(.editor__columns:has(.editor__columns__child .image:only-child)) .image:only-child {
+   height: 100%;
+
+   &>img {
+      height: 100%;
+      object-fit: cover;
+   }
 }
 </style>

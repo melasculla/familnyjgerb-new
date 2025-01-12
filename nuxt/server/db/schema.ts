@@ -48,8 +48,6 @@ export const postsTable = pgTable('posts', {
 }, (table) => [
    unique().on(table.slug, table.langId)
 ])
-// Поиск
-// Похожие
 
 export const postsStatusList = ['hidden', 'deleted', 'published'] as const
 export type PostStatus = typeof postsStatusList[number]
@@ -107,8 +105,10 @@ export const projectsTable = pgTable('projects', {
    seoKeys: varchar('seo_keys', { length: 256 }),
    ogImage: varchar('og_image', { length: 256 }),
    langId: integer('lang_id').references(() => langsTable.id),
-})
-// След предыдущие
+   langGroup: integer('lang_group').references((): AnyPgColumn => projectsTable.id, { onDelete: 'restrict' }),
+}, (table) => [
+   unique().on(table.slug, table.langId)
+])
 // Похожие
 
 export const projectsStatusList = ['hidden', 'deleted', 'published'] as const
@@ -142,13 +142,15 @@ export type GalleryCategory = typeof galleryCategoriesTable.$inferSelect
 
 export const galleryItemsTable = pgTable('gallery_items', {
    id: serial('id').primaryKey(),
-   image: varchar('image', { length: 256 }).notNull(),
+   image: varchar('image', { length: 256 }).notNull().unique(),
    title: varchar('title', { length: 256 }),
    altEn: varchar('alt_en', { length: 256 }),
    altRu: varchar('alt_ru', { length: 256 }),
-   order: integer('order').notNull(),
+   order: integer('order'),
    categoryId: serial('category_id').references(() => galleryCategoriesTable.id).notNull(),
-})
+}, (table) => [
+   unique().on(table.order, table.categoryId)
+])
 
 export type GalleryItem = typeof galleryItemsTable.$inferSelect
 export type NewGalleryItem = typeof galleryItemsTable.$inferInsert

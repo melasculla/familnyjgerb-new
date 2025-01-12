@@ -5,9 +5,10 @@ export interface IPostService {
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
       isAdmin?: boolean,
-      showHidden?: boolean,
-      showDeleted?: boolean
-   ): Promise<PostList>;
+      statuses?: ProjectStatus[],
+   ): Promise<PostList>
+
+   // TODO: get similar by category
 
    getPostBy(by: 'slug' | 'id', slugOrId: string | number, langId: number): Promise<PostEntity>
 
@@ -16,13 +17,14 @@ export interface IPostService {
       categorySlug?: string,
       searchParam?: string,
       isAdmin?: boolean,
-      showHidden?: boolean,
-      showDeleted?: boolean,
+      statuses?: ProjectStatus[],
    ): Promise<number>
+
+   getAdjacents(id: number, langId: number): Promise<{ prev?: string, next?: string }>
 
    upsertPost(postObject: NewPost): Promise<PostEntity>
 
-   deletePost(id: number): Promise<void>;
+   deletePost(id: number): Promise<void>
 }
 
 export class PostService implements IPostService {
@@ -40,10 +42,9 @@ export class PostService implements IPostService {
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
       isAdmin?: boolean,
-      showHidden?: boolean,
-      showDeleted?: boolean
+      statuses?: ProjectStatus[],
    ) {
-      return await this.repository.findAll(lang, categorySlug, searchParam, pagination, isAdmin, showHidden, showDeleted)
+      return await this.repository.findAll(lang, categorySlug, searchParam, pagination, isAdmin, statuses)
    }
 
    async getPostBy(by: 'slug' | 'id', slugOrId: string | number, langId: number) {
@@ -72,10 +73,14 @@ export class PostService implements IPostService {
       categorySlug?: string,
       searchParam?: string,
       isAdmin?: boolean,
-      showHidden?: boolean,
-      showDeleted?: boolean,
+      statuses?: ProjectStatus[],
    ) {
-      return await this.repository.count(lang, categorySlug, searchParam, isAdmin, showHidden, showDeleted)
+      return await this.repository.count(lang, categorySlug, searchParam, isAdmin, statuses)
+   }
+
+   async getAdjacents(id: number, langId: number) {
+      const { prev, next } = await this.repository.findNear(id, langId)
+      return { prev, next }
    }
 
    async upsertPost(postObject: NewPost) {

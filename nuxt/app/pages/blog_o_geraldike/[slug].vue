@@ -2,7 +2,7 @@
 const route = useRoute()
 const { locale } = useI18n()
 const slug = computed(() => Array.isArray(route.params.slug) ? route.params.slug[0]! : route.params.slug!)
-const { data, status, error } = await useLazyFetch<{ post: Post, category: Category }>(
+const { data, status, error } = await useLazyFetch<{ post: Post, category: Category, prev?: string, next?: string }>(
    routesList.api.posts.getSingle(slug.value),
    {
       query: {
@@ -40,6 +40,15 @@ useSeoMeta({
       </div>
       <div v-if="status === 'success' && data">
          <EditorContent :content="data.post.content" />
+         <div
+            class="flex justify-between px-10 py-2 mt-5 backdrop-brightness-125 bg-gray-200/80 text-lg uppercase sticky bottom-0 w-full">
+            <NuxtLink v-if="data.prev" :to="data.prev" class="text-teal-400">
+               Prev
+            </NuxtLink>
+            <NuxtLink v-if="data.next" :to="data.next" class="text-teal-400">
+               Next
+            </NuxtLink>
+         </div>
       </div>
       <div v-else-if="status === 'pending' || status === 'idle'">
          Loading

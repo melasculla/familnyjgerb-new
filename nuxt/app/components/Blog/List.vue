@@ -42,12 +42,13 @@ useSeoMeta({
 
 <template>
    <div>
-      <Pagination class="mt-5" v-model="currentPage" v-bind="{
-         pages,
-         currentPage,
-         urlBase: pageBase,
-         pagesLoading: 11
-      }" @page-changed="(page: number) => currentPage = page" />
+      <Pagination class="mt-5"
+         :class="{ 'select-none pointer-events-none': (status === 'pending' || status === 'idle') }" v-bind="{
+            pages,
+            currentPage,
+            urlBase: pageBase,
+            pagesLoading: 11
+         }" />
       <BlogCategories :current="category" />
       <div v-if="status === 'success' && posts" class="grid grid-cols-2 md:grid-cols-6 gap-4">
          <BlogCard v-for="post in posts.posts" :key="post.id" :post="post" />

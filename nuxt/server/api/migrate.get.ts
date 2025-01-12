@@ -14,6 +14,8 @@ export default defineEventHandler(async event => {
    test = []
    patrik = null
 
+   const { fill } = getQuery(event)
+
    // Connect to WordPress DB
    const wpDb = await mysql.createConnection({
       host: 'familnyjgerb-db-1',
@@ -48,6 +50,8 @@ export default defineEventHandler(async event => {
       GROUP BY p.ID, p.post_name, p.post_title, p.post_content, p.post_date, p.post_modified, p.post_date_gmt;
    `)
 
+   fill && await db.delete(postsTable)
+
    for (const post of result[0] as any[]) {
       postID = post.ID
 
@@ -55,10 +59,10 @@ export default defineEventHandler(async event => {
 
       const content = convertHtmlToOutputData(post.post_content, he.decode(post.post_title))
 
-      // if (postID === 19006) { // 14387 22046 14188 13693 21355 19410 19006
-      //    test.push(post.post_content)
-      //    patrik = content
-      // }
+      if (postID === 14041) { // 14387 22046 14188 13693 21355 19410 19006 22086 18398 21170
+         test.push(post.post_content)
+         patrik = content
+      }
 
       const thumbnail = {
          path: post.thumbnail_url?.replaceAll('https://familnyjgerb.com', '').replaceAll('http://familnyjgerb.com', '') || '',
@@ -92,20 +96,20 @@ export default defineEventHandler(async event => {
          'auto-draft': 'hidden',
       }
 
-      // await db.insert(postsTable).values({
-      //    slug,
-      //    title: post.post_title,
-      //    description: post.seo_description || null,
-      //    content,
-      //    thumbnail,
-      //    status: statuses[post.post_status],
-      //    createdAt: new Date(post.post_date),
-      //    editedAt: new Date(post.post_modified),
-      //    plannedAt: post.post_date_gmt ? new Date(post.post_date_gmt) : null,
-      //    seoKeys: post.seo_keywords || '',
-      //    categoryId: category[post.categories] ?? 3,
-      //    langId: 1,
-      // });
+      fill && await db.insert(postsTable).values({
+         slug,
+         title: post.post_title,
+         description: post.seo_description || null,
+         content,
+         thumbnail,
+         status: statuses[post.post_status],
+         createdAt: new Date(post.post_date),
+         editedAt: new Date(post.post_modified),
+         plannedAt: post.post_date_gmt ? new Date(post.post_date_gmt) : null,
+         seoKeys: post.seo_keywords || '',
+         categoryId: category[post.categories] ?? 3,
+         langId: 1,
+      });
    }
 
    return {
@@ -124,6 +128,13 @@ function convertHtmlToOutputData(html: string, title: string) {
       .replaceAll("https://familnyjgerb.com", "")
       .replaceAll("http://familnyjgerb.com", "")
       .replaceAll("http://gerb.ainsworth.ml", "")
+      .replaceAll("http://www.familnyjgerb.mvremia.ru", "/")
+      .replaceAll("http://familnyjgerb.mvremia.ru", "/")
+      .replaceAll("http://monogram.mvremia.ru/", "/")
+   // /wp-content/themes/
+
+   // if (html.includes('/wp-content/themes/'))
+   //    test.push({ postID, html })
 
    const dom = new JSDOM(html, { contentType: "text/html" });
    const document = dom.window.document;
@@ -160,6 +171,7 @@ function convertHtmlToOutputData(html: string, title: string) {
                   'fa-phone-square': '',
                   'fa-pagelines': ''
                }
+               // TODO: add icons
 
                blocks.push({
                   type: "customButton",
@@ -201,7 +213,7 @@ function convertHtmlToOutputData(html: string, title: string) {
          }
       }
 
-      // if (postID === 19410) test.push({
+      // if (postID === 14041) test.push({
       //    tag: node.tagName,
       //    types: {
       //       current: node.nodeType,
@@ -210,6 +222,8 @@ function convertHtmlToOutputData(html: string, title: string) {
       //    content: node.outerHTML ?? node.textContent,
       //    nested: nestedLevel,
       // })
+
+      // TODO: add <form> support
 
       if (node.tagName?.startsWith("H") && ["H1", "H2", "H3", "H4", "H5", "H6"].includes(node.tagName)) {
          if (node.textContent !== title) {
@@ -232,14 +246,24 @@ function convertHtmlToOutputData(html: string, title: string) {
                   const paragraphs = textContent.split(/\n+/).map((line: string) => line.trim());
 
                   paragraphs.forEach((paragraph: string) => {
-                     if (paragraph) {
-                        childBlocks.push(processShortcodes(paragraph))
+                     if (paragraph && paragraph !== '.') {
+                        // childBlocks.push(processShortcodes(paragraph))
+                        // if (blocks[blocks.length - 1]?.type === 'paragraph') {
+                        //    blocks[blocks.length - 1].data.text += ` ${processShortcodes(paragraph)}`
+                        // } else {
+                        // }
+                        blocks.push({
+                           type: "paragraph",
+                           data: {
+                              text: processShortcodes(paragraph),
+                           },
+                        })
                      }
                   });
                }
             } else if (child.nodeType === 1) {
                if (child.tagName === "A") {
-                  const images: any = Array.from(child.childNodes).filter((item: any) => item.tagName === 'IMG')
+                  const images = child.querySelectorAll('img')
                   for (const image of images) {
                      if (!image.src)
                         continue
@@ -264,9 +288,15 @@ function convertHtmlToOutputData(html: string, title: string) {
                      image.remove()
                   }
                   // childBlocks.push(child.innerHTML ? child.innerHTML.trim() : `<a href="${child.href}">${child.textContent.trim()}</a>`);
-                  childBlocks.push(`<a href="${child.href}">${child.textContent.trim()}</a>`);
+                  // childBlocks.push(`<a href="${child.href}">${child.textContent.trim()}</a>`);
+                  blocks.push({
+                     type: "paragraph",
+                     data: {
+                        text: processShortcodes(`<a href="${child.href}">${child.textContent.trim()}</a>`),
+                     },
+                  })
                } else if (child.tagName === "EM" || child.tagName === "I") {
-                  const images: any = Array.from(child.childNodes).filter((item: any) => item.tagName === 'IMG')
+                  const images = child.querySelectorAll('img')
                   for (const image of images) {
                      if (!image.src)
                         continue
@@ -290,9 +320,16 @@ function convertHtmlToOutputData(html: string, title: string) {
 
                      image.remove()
                   }
-                  childBlocks.push(child.innerHTML ? child.innerHTML.replaceAll('em>', 'i>').trim() : `<i>${child.textContent.trim()}</i>`);
+                  // childBlocks.push(child.innerHTML ? child.innerHTML.replaceAll('em>', 'i>').trim() : `<i>${child.textContent.trim()}</i>`);
+                  blocks.push({
+                     type: "paragraph",
+                     data: {
+                        text: processShortcodes(child.innerHTML ? child.innerHTML.replaceAll('em>', 'i>').trim() : `<i>${child.textContent.trim()}</i>`),
+                     },
+                  })
                } else if (child.tagName === "STRONG" || child.tagName === "B") {
-                  const images: any = Array.from(child.childNodes).filter((item: any) => item.tagName === 'IMG')
+                  // const images: any = Array.from(child.childNodes).filter((item: any) => item.tagName === 'IMG')
+                  const images = child.querySelectorAll('img')
                   for (const image of images) {
                      if (!image.src)
                         continue
@@ -316,9 +353,15 @@ function convertHtmlToOutputData(html: string, title: string) {
 
                      image.remove()
                   }
-                  childBlocks.push(child.innerHTML ? child.innerHTML.replaceAll('strong>', 'b>').trim() : `<b>${child.textContent.trim()}</b>`);
+                  // childBlocks.push(child.innerHTML ? child.innerHTML.replaceAll('strong>', 'b>').trim() : `<b>${child.textContent.trim()}</b>`);
+                  blocks.push({
+                     type: "paragraph",
+                     data: {
+                        text: processShortcodes(child.innerHTML ? child.innerHTML.replaceAll('strong>', 'b>').trim() : `<b>${child.textContent.trim()}</b>`),
+                     },
+                  })
                } else if (child.tagName === "SPAN") {
-                  const images: any = Array.from(child.childNodes).filter((item: any) => item.tagName === 'IMG')
+                  const images = child.querySelectorAll('img')
                   for (const image of images) {
                      if (!image.src)
                         continue
@@ -342,9 +385,15 @@ function convertHtmlToOutputData(html: string, title: string) {
 
                      image.remove()
                   }
-                  childBlocks.push(child.innerHTML ? child.innerHTML.replaceAll('em>', 'i>').replaceAll('strong>', 'b>').trim() : `<span>${child.textContent.trim()}</span>`);
+                  // childBlocks.push(child.innerHTML ? child.innerHTML.replaceAll('em>', 'i>').replaceAll('strong>', 'b>').trim() : `<span>${child.textContent.trim()}</span>`);
+                  blocks.push({
+                     type: "paragraph",
+                     data: {
+                        text: processShortcodes(child.innerHTML ? child.innerHTML.replaceAll('em>', 'i>').replaceAll('strong>', 'b>').trim() : `<span>${child.textContent.trim()}</span>`),
+                     },
+                  })
                } else if (child.tagName === "P") {
-                  const images: any = Array.from(child.childNodes).filter((item: any) => item.tagName === 'IMG')
+                  const images = child.querySelectorAll('img')
                   for (const image of images) {
                      if (!image.src)
                         continue
@@ -368,7 +417,13 @@ function convertHtmlToOutputData(html: string, title: string) {
 
                      image.remove()
                   }
-                  childBlocks.push(child.innerHTML ? child.innerHTML.trim() : child.textContent.trim());
+                  // childBlocks.push(child.innerHTML ? child.innerHTML.trim() : child.textContent.trim());
+                  blocks.push({
+                     type: "paragraph",
+                     data: {
+                        text: processShortcodes(child.innerHTML ? child.innerHTML.trim() : child.textContent.trim()),
+                     },
+                  })
                } else if (child.tagName === "IMG") {
                   blocks.push({
                      type: "image",
@@ -402,7 +457,13 @@ function convertHtmlToOutputData(html: string, title: string) {
                   }
                } else if (child.tagName === 'STYLE') {
                } else {
-                  childBlocks.push(child.textContent.trim());
+                  // childBlocks.push(child.textContent.trim());
+                  blocks.push({
+                     type: "paragraph",
+                     data: {
+                        text: processShortcodes(child.textContent.trim()),
+                     },
+                  })
                }
             }
          }
@@ -489,7 +550,10 @@ function convertHtmlToOutputData(html: string, title: string) {
          const nextBlock = blocks[index + 1]
          const secondNextBlock = blocks[index + 2]
 
+         block.type === 'image' && (block.data.file.url = block.data.file.url.replace(/-\d+x\d+(?=\.\w+$)/, ''))
+
          if (block.type === 'image' && nextBlock?.type === 'image') {
+            nextBlock.data.file.url = nextBlock.data.file.url.replace(/-\d+x\d+(?=\.\w+$)/, '')
             const tempBlock = {
                type: 'columns',
                data: {
@@ -501,6 +565,7 @@ function convertHtmlToOutputData(html: string, title: string) {
             };
 
             if (secondNextBlock?.type === 'image') {
+               secondNextBlock.data.file.url = secondNextBlock.data.file.url.replace(/-\d+x\d+(?=\.\w+$)/, '')
                tempBlock.data.cols.push({
                   blocks: [secondNextBlock]
                });

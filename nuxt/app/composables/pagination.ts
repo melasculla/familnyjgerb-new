@@ -6,7 +6,7 @@ export const usePagination = (
 ): { perPage: number, currentPage: Ref<number>, pages: Ref<number>, totaItems: Ref<number> } => {
    const route = useRoute()
    const perPage = _perPage
-   const totaItems = ref<number>(0)
+   const totaItems = useState<number>(`${stateOrQueryName}:total`, () => 0)
 
    const currentPage = computed<number>({
       get: () => {

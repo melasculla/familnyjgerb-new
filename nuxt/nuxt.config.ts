@@ -206,7 +206,7 @@ export default defineNuxtConfig({
     },
     '/kompetentnoe-mnenie/': {
       redirect: '/blog_o_geraldike/category/kompetentnoe-mnenie/',
-      static: true
+      static: true,
     },
     '/news/': {
       redirect: '/blog_o_geraldike/category/news/',

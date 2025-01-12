@@ -6,14 +6,14 @@ const { block, tunes } = defineProps<{
    tunes: any
 }>()
 
-const align = ref<'text-left' | 'text-center' | 'text-right'>('text-left')
+const align = ref<'text-left' | 'text-center' | 'text-right'>('text-center')
 
 switch (tunes?.AligmentTune?.alignment) {
    case 'center': align.value = 'text-center'
       break;
    case 'right': align.value = 'text-right'
       break;
-   default: align.value = 'text-left'
+   default: align.value = 'text-center'
       break;
 }
 </script>
@@ -23,8 +23,7 @@ switch (tunes?.AligmentTune?.alignment) {
       <!-- <component :is="`h${block.level}`" class="text-xl" :class="align" v-if="block.level === 1 || block.level === 2"
          v-html="block.text" />
       <component :is="`h${block.level}`" class="text-lg" :class="align" v-else v-html="block.text" /> -->
-      <h1 class="text-xl" :class="align" v-if="block.level === 1" v-html="block.text"></h1>
-      <h2 class="text-xl" :class="align" v-else-if="block.level === 2" v-html="block.text"></h2>
+      <h2 class="text-xl" :class="align" v-if="block.level === 1 || block.level === 2" v-html="block.text"></h2>
       <h3 class="text-lg" :class="align" v-else-if="block.level === 3" v-html="block.text"></h3>
       <h4 class="text-lg" :class="align" v-else-if="block.level === 4" v-html="block.text"></h4>
       <h5 class="text-lg" :class="align" v-else-if="block.level === 5" v-html="block.text"></h5>

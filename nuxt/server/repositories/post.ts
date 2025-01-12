@@ -1,5 +1,5 @@
 import { PostEntity } from "#imports"
-import { eq, not, and, count, or, ilike, lt, gte, isNull, inArray, desc } from "drizzle-orm";
+import { eq, not, and, count, or, ilike, lt, gt, isNull, inArray, desc } from "drizzle-orm";
 
 export interface IPostRepository {
    findAll(
@@ -8,15 +8,16 @@ export interface IPostRepository {
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
       showPlanned?: boolean,
-      showHidden?: boolean,
-      showDeleted?: boolean,
+      statuses?: ProjectStatus[],
    ): Promise<PostList>
 
    findAllTranslations(langGroup: number): Promise<PostEntity[]>
 
    findBy(by: 'slug' | 'id', slugOrId: string | number, langId?: number): Promise<PostEntity | null>
 
-   count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: boolean, showHidden?: boolean, showDeleted?: boolean): Promise<number>
+   findNear(id: number, langId: number): Promise<{ prev?: string, next?: string }>
+
+   count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: boolean, statuses?: ProjectStatus[]): Promise<number>
 
    save(postEntity: PostEntity): Promise<PostEntity>
 
@@ -30,8 +31,7 @@ export class PostRepository implements IPostRepository {
       searchParam?: string,
       pagination: { page: number | undefined, perPage: number | undefined } = { page: undefined, perPage: undefined },
       showPlanned?: boolean,
-      showHidden?: boolean,
-      showDeleted?: boolean,
+      statuses?: ProjectStatus[],
    ) {
       const isPaginationSetted = pagination.page && pagination.perPage
       const offset = isPaginationSetted && (pagination.page! - 1) * pagination.perPage!
@@ -59,19 +59,25 @@ export class PostRepository implements IPostRepository {
          .leftJoin(langsTable, eq(postsTable.langId, langsTable.id))
          .where(
             and(
-               lang ? eq(langsTable.lang, lang) : undefined,
-               categorySlug ? eq(categoriesTable.slug, categorySlug) : undefined,
-               searchParam ? or(
-                  ilike(postsTable.title, `%${searchParam}%`),
-                  ilike(postsTable.description, `%${searchParam}%`),
-               ) : undefined,
-               showPlanned ? undefined :
+               lang ?
+                  eq(langsTable.lang, lang) :
+                  undefined,
+               categorySlug ?
+                  eq(categoriesTable.slug, categorySlug) :
+                  undefined,
+               searchParam ?
+                  or(
+                     ilike(postsTable.title, `%${searchParam}%`),
+                     ilike(postsTable.description, `%${searchParam}%`),
+                  )
+                  : undefined,
+               showPlanned ?
+                  undefined :
                   or(
                      isNull(postsTable.plannedAt),
                      lt(postsTable.plannedAt, new Date())
                   ),
-               showHidden ? inArray(postsTable.status, ['published', 'hidden']) : undefined,
-               showDeleted ? eq(postsTable.status, 'deleted') : undefined,
+               inArray(postsTable.status, statuses || ['published'])
             )
          )
          .offset(offset ?? 0)
@@ -100,7 +106,35 @@ export class PostRepository implements IPostRepository {
       return new PostEntity(result)
    }
 
-   async count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: boolean, showHidden?: boolean, showDeleted?: boolean) {
+   async findNear(id: number, langId: number) {
+      const [prev, next] = await Promise.all([
+         db.query.postsTable.findFirst({
+            columns: { slug: true },
+            where: and(
+               gt(postsTable.id, id),
+               eq(postsTable.status, 'published'),
+               eq(postsTable.langId, langId)
+            ),
+            orderBy: (postsTable, { asc }) => [asc(postsTable.id)]
+         }),
+         db.query.postsTable.findFirst({
+            columns: { slug: true },
+            where: and(
+               lt(postsTable.id, id),
+               eq(postsTable.status, 'published'),
+               eq(postsTable.langId, langId)
+            ),
+            orderBy: (postsTable, { desc }) => [desc(postsTable.id)]
+         })
+      ])
+
+      return {
+         prev: prev?.slug,
+         next: next?.slug
+      }
+   }
+
+   async count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: boolean, statuses?: ProjectStatus[]) {
       const [result] = await db
          .select({ count: count() })
          .from(postsTable)
@@ -109,17 +143,22 @@ export class PostRepository implements IPostRepository {
          .where(
             and(
                lang ? eq(langsTable.lang, lang) : undefined,
-               categorySlug ? eq(categoriesTable.slug, categorySlug) : undefined,
-               searchParam ? or(
-                  ilike(postsTable.title, `%${searchParam}%`),
-                  ilike(postsTable.description, `%${searchParam}%`),
-               ) : undefined,
+               categorySlug ?
+                  eq(categoriesTable.slug, categorySlug) :
+                  undefined,
+               searchParam ?
+                  or(
+                     ilike(postsTable.title, `%${searchParam}%`),
+                     ilike(postsTable.description, `%${searchParam}%`),
+                  ) :
+                  undefined,
                showPlanned ?
                   undefined :
                   or(
                      isNull(postsTable.plannedAt),
                      lt(postsTable.plannedAt, new Date())
-                  )
+                  ),
+               inArray(postsTable.status, statuses || ['published'])
             )
          )
 

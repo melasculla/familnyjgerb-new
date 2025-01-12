@@ -24,4 +24,8 @@ switch (tunes?.AligmentTune?.alignment) {
    </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+:deep(p:has(a[style*="background:"])) {
+   text-align: center;
+}
+</style>

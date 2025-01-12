@@ -10,6 +10,11 @@ const CategorySchema = z.object({
    category: z.string().min(3, 'Category must be at least 3 characters long').optional(),
 })
 
+const StatusSchema = z.object({
+   statuses: z.array(z.string().min(3, 'Category must be at least 3 characters long').toLowerCase()).optional()
+      .or(z.string().min(3, 'Category must be at least 3 characters long').toLowerCase().optional()),
+})
+
 const ImageJSONSchema = z.object({
    path: z.string(),
    alt: z.string().optional(),
@@ -86,5 +91,31 @@ export class PostHandler {
 
 
       event.context.requestDTO.category = query.data.category
+   }
+
+   public static async validateStatuses(event: H3Event<EventHandlerRequest>) {
+      const query = await useSafeValidatedQuery(event, StatusSchema)
+      if (!query.data || query.error) {
+         const error = JSON.parse(query.error.message)[0]
+         throw createError({
+            statusCode: 400,
+            message: `${error.message}`,
+            data: query.error
+         })
+      }
+
+      if (!query.data.statuses)
+         return
+
+      const statuses = typeof query.data.statuses === 'string' ? [query.data.statuses] : query.data.statuses
+      const validStatuses = statuses.filter(item => postsStatusList.includes(item as any))
+      if (!validStatuses.length) {
+         throw createError({ statusCode: 400, message: `Statuses ${statuses.filter(item => !postsStatusList.includes(item as any)).join(' and ')} not found` })
+      }
+
+      if (validStatuses.includes('hidden') || validStatuses.includes('deleted'))
+         AdminAuthHandler.checkAccess(event)
+
+      event.context.requestDTO.stasuses = validStatuses
    }
 }
