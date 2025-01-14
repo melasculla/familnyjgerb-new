@@ -1,8 +1,11 @@
+import { joinURL } from 'ufo'
+
 /**
  * List Routes
 */
 export default {
    client: {
+
       admin: {
          main: '/admin',
          users: {
@@ -16,10 +19,18 @@ export default {
             list: '/admin/projects',
             single: (slug: string) => `/admin/projects/${slug}`,
          },
+         gallery: {
+            list: '/admin/gallery',
+            category: {
+               list: (gallery: string) => `/admin/gallery/${gallery}`,
+               single: (gallery: string, category: string) => `/admin/gallery/${gallery}/${category}`
+            },
+         },
          images: {
             upload: '/admin/uploadImages',
          },
       },
+
       posts: {
          list: '/blog_o_geraldike',
          page: (page?: number) => page ? `/blog_o_geraldike/page/${page}` : '/blog_o_geraldike',
@@ -27,9 +38,15 @@ export default {
          category: (slug: string) => `/blog_o_geraldike/category/${slug}`,
          categoryPage: (slug: string) => (page?: number) => page ? `/blog_o_geraldike/category/${slug}/page/${page}` : `/blog_o_geraldike/category/${slug}`,
       },
+
       policy: '/policy'
    },
+
+   /**
+    * API ROUTES
+   */
    api: {
+
       posts: {
          getAll: '/api/posts',
          getSingle: (slug: string) => `/api/posts/${slug}` as const,
@@ -37,18 +54,31 @@ export default {
          edit: '/api/posts/edit',
          delete: '/api/posts/delete',
       },
+
       categories: {
          getAll: '/api/categories'
       },
+
+      gallery: {
+         list: '/api/gallery',
+         category: {
+            list: (gallery: string) => `/api/gallery/${gallery}` as const,
+            single: (gallery: string, category: string) => `/api/gallery/${gallery}/${category}` as const
+         },
+      },
+
       mail: {
          send: '/api/mail/send'
       },
+
       media: {
+         list: '/api/media',
          images: {
             list: '/api/media/images/',
             upload: '/api/media/images/',
          },
-         getFile: (file: string) => `/api/media/${file}` as const,
+         getFile: (file: string) => joinURL('/api/media/', file) as `/api/media/${string}`,
       },
+
    } as const,
 }

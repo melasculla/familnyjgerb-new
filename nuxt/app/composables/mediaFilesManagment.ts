@@ -2,7 +2,15 @@ import type { ModelRef } from "vue"
 import type { UploadedImage } from "~/components/Media/UploadFiles.vue"
 import type { NitroFetchRequest } from 'nitropack'
 
-export const useSelectFilesWindow = (images: ModelRef<UploadedImage[] | undefined>) => {
+type Image = { path: string, file?: File }
+
+export const useSelectFilesWindow = (
+   images?: ModelRef<UploadedImage[] | undefined>
+): {
+   isOpen: Ref<boolean>,
+   open: () => void,
+   callback: (imageList: string[]) => void
+} => {
    const isOpen = ref<boolean>(false)
 
    const keyCloseSelectWinwow = (e: KeyboardEvent) => {
@@ -19,6 +27,9 @@ export const useSelectFilesWindow = (images: ModelRef<UploadedImage[] | undefine
    }
 
    const filesSelectedFromFS = (imageList: string[]) => {
+      if (!images)
+         return
+
       for (const item of imageList) {
          const isImageExist = images.value?.find(({ path }) => item === path)
          if (isImageExist)
@@ -38,8 +49,9 @@ export const useSelectFilesWindow = (images: ModelRef<UploadedImage[] | undefine
 }
 
 
-
-export const uploadImages = async (imageList: Ref<UploadedImage[]>, baseUrl?: NitroFetchRequest, types?: string[]) => {
+export const uploadImages = async (
+   imageList: Ref<Image[]>, baseUrl?: NitroFetchRequest, types?: string[]
+) => {
    const chunkArray = <T>(arr: T[], size: number): T[][] => {
       const chunks = []
       for (let i = 0; i < arr.length; i += size) {
@@ -77,7 +89,7 @@ export const uploadImages = async (imageList: Ref<UploadedImage[]>, baseUrl?: Ni
    return replaceBlobUrls(imageList, urls)
 }
 
-const replaceBlobUrls = (imageList: Ref<UploadedImage[]>, urls: string[]) => {
+const replaceBlobUrls = (imageList: Ref<Image[]>, urls: string[]) => {
    let index = 0
 
    for (const item of imageList.value) {
@@ -90,4 +102,52 @@ const replaceBlobUrls = (imageList: Ref<UploadedImage[]>, urls: string[]) => {
    }
 
    return imageList.value
+}
+
+
+/**
+ * 
+ * @param afterHandle Hook for handling uploaded Files
+ * @returns 
+ */
+export const useUploadedFiles = (afterHandle?: (images: Image[]) => void) => {
+   const MAX_FILE_SIZE = 5 // Mb
+
+   const files = ref<Image[]>([])
+   const error = ref<string>('')
+
+   const handle = (e: Event) => {
+      files.value = []
+      error.value = ''
+
+      const filesInput = (e.target as HTMLInputElement).files
+
+      if (!filesInput)
+         return
+
+      for (let file of filesInput) {
+         const isFileExists = files.value.find(({ file: loopFile }) => (file.name === loopFile?.name && file.size === loopFile?.size))
+         const isSupportedFormat = file.type.includes('image')
+         const isAllowedSize = file.size <= (MAX_FILE_SIZE * 1024 * 1024)
+         const size = (file.size / 1024 / 1024).toFixed(2)
+
+         if (!isSupportedFormat) {
+            error.value += `File ${file.name} have unsupported format ${file.type} (supported only images)<br>`
+            continue
+         }
+         if (isFileExists || !isAllowedSize) {
+            if (!isAllowedSize) error.value += `File ${file.name} too large: ${size} Mb (max size ${MAX_FILE_SIZE} Mb)<br>`
+            if (isFileExists) error.value += `File ${file.name} already exists<br>`
+            continue
+         }
+
+         const preview = URL.createObjectURL(file)
+         files.value.push({ path: preview, file: file })
+      }
+
+      if (afterHandle)
+         afterHandle(files.value)
+   }
+
+   return { handle, files, error }
 }

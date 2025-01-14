@@ -23,13 +23,13 @@ const protectedRoutes: Route[] = [
          { roles: ['admin'] }
       ]
    },
-   {
-      path: '/api/media',
-      permissions: [
-         { methods: ['GET'] },
-         { roles: ['admin'] }
-      ]
-   }
+   // {
+   //    path: '/api/media',
+   //    permissions: [
+   //       { methods: ['GET'] },
+   //       { roles: ['admin'] }
+   //    ]
+   // }
 ]
 
 export default defineEventHandler(async event => {

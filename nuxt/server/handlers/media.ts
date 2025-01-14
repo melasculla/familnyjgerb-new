@@ -11,9 +11,11 @@ export class MediaHandler {
       const directoryPath = match[1]
       const lastSegment = match[2]
 
-      if (lastSegment && /\.[a-zA-Z0-9]+$/.test(lastSegment)) {
-         event.context.requestDTO.storageKey = directoryPath.replaceAll('/', ':')
-         event.context.requestDTO.filename = lastSegment
+      const regexFilename = /\.[a-zA-Z0-9]+$/
+      const isRootFilename = regexFilename.test(directoryPath)
+      if ((lastSegment && regexFilename.test(lastSegment)) || isRootFilename) {
+         event.context.requestDTO.storageKey = isRootFilename ? null : directoryPath.replaceAll('/', ':')
+         event.context.requestDTO.filename = isRootFilename ? directoryPath : lastSegment
       } else {
          const fullPath = event.context.params!.path.replace(/\/$/, '')
          event.context.requestDTO.storageKey = fullPath.replaceAll('/', ':')

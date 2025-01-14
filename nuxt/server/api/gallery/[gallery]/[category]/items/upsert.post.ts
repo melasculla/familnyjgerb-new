@@ -1,5 +1,6 @@
 export default defineEventHandler({
    onRequest: [
+      // AdminAuthHandler.checkAccess,
       GalleryHandler.validateBody,
       GalleryHandler.validateGallery,
       GalleryHandler.validateCategory,

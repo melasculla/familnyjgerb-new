@@ -21,7 +21,8 @@ export default defineEventHandler({
 
          return await new MediaService(event.context.requestDTO.storageKey).getAll(
             event.context.requestDTO.pagination,
-            event.context.requestDTO.searchParam
+            event.context.requestDTO.searchParam,
+            // { depth: true }
          )
       }
 

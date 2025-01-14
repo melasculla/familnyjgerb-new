@@ -28,13 +28,15 @@ useHead({
    <div class="sidebar-item group" @click="themeState = 'change'" :class="{ 'cursor-pointer': admin }">
       <div class="relative">
          <template v-if="themeState === 'dark'">
-            <NuxtImg class="inintal-img" :class="{ 'h-14': admin }" src="/icons/moon.webp" alt="" />
-            <NuxtImg v-if="!admin" class="hovered-img" src="/icons/moon-active.webp" alt="" />
+            to light
+            <!-- <NuxtImg class="inintal-img" :class="{ 'h-14': admin }" src="/icons/moon.webp" alt="" /> -->
+            <!-- <NuxtImg v-if="!admin" class="hovered-img" src="/icons/moon-active.webp" alt="" /> -->
             <div class="tooltip" v-if="!admin">{{ $t('sidebar.light') }}</div>
          </template>
          <template v-else>
-            <NuxtImg class="inintal-img" :class="{ 'h-14': admin }" src="/icons/sun.webp" alt="" />
-            <NuxtImg v-if="!admin" class="hovered-img" src="/icons/sun-active.webp" alt="" />
+            to dark
+            <!-- <NuxtImg class="inintal-img" :class="{ 'h-14': admin }" src="/icons/sun.webp" alt="" />
+            <NuxtImg v-if="!admin" class="hovered-img" src="/icons/sun-active.webp" alt="" /> -->
             <div class="tooltip" v-if="!admin">{{ $t('sidebar.dark') }}</div>
          </template>
       </div>

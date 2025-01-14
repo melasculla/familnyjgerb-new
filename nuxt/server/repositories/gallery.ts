@@ -18,9 +18,7 @@ export class GalleryItemRepository implements IGalleryItemRepository {
    }
 
    async save(galleryCategoryId: number, galleryItemEntities: GalleryItemEntity[]) {
-      const itemsToUpdate = galleryItemEntities.filter(item => item.id)
-
-      for (const item of itemsToUpdate) {
+      for (const item of galleryItemEntities) {
          if (item.order == undefined || item.image == undefined) {
             throw createError({
                statusCode: 400,
@@ -29,6 +27,7 @@ export class GalleryItemRepository implements IGalleryItemRepository {
          }
       }
 
+      const itemsToUpdate = galleryItemEntities.filter(item => item.id)
       if (itemsToUpdate.length) {
          let errorCode: number = 500
          let errorMessage: string = ''

@@ -33,6 +33,8 @@ export class GalleryItemService implements IGalleryItemService {
 
 
 export interface IGalleryCategoryService {
+   getAll(galleryId: number): Promise<GalleryCategory[]>
+
    getCategoryByName(name: string, galleryId: number): Promise<GalleryCategoryEntity>
 
    // TODO: add upsert and delete
@@ -43,6 +45,10 @@ export class GalleryCategoryService implements IGalleryCategoryService {
 
    constructor() {
       this.repository = new GalleryCategoryRepository()
+   }
+
+   async getAll(galleryId: number) {
+      return await this.repository.findAll(galleryId)
    }
 
    async getCategoryByName(name: string, galleryId: number) {

@@ -26,7 +26,7 @@ const search = ({ target }: InputEvent) => {
 }
 const searchParam = ref<string>('')
 
-const { data, status, refresh, error } = await useLazyFetch<{ data: string[], total: number }>(routesList.api.media.images.list, {
+const { data, status, refresh, error } = await useLazyFetch<{ data: string[], total: number }>('/api/media/wp-content', { //routesList.api.media.list
    query: {
       page: currentPage,
       perPage: perPage,
@@ -68,13 +68,13 @@ const selectMultiple = (image: string) => {
             </svg>
             <input type="text" name="search" class="text-lg border border-orange-400 rounded-md px-2 py-1"
                @input="search($event as InputEvent)" placeholder="Найти фото:">
-            <Button class="ml-auto" @click="refresh">
+            <button class="ml-auto" @click="refresh()" type="button">
                Refresh
-            </Button>
-            <ButtonsSubmit class="ml-auto" v-if="multiple && selectedImages.length"
-               @click="emit('selected', selectedImages)">
+            </button>
+            <button class="ml-auto" v-if="multiple && selectedImages.length" @click="emit('selected', selectedImages)"
+               type="button">
                Apply
-            </ButtonsSubmit>
+            </button>
          </div>
          <div v-if="status === 'success' && data" v-for="image in data.data" :key="image"
             class="transform hover:scale-105 transition-all cursor-pointer flex items-center"

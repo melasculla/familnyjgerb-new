@@ -2,7 +2,7 @@ import { type Storage, type StorageValue, type StorageMeta } from 'unstorage'
 import { type MimeType, type MultiPartData } from 'h3'
 
 export interface IMediaService {
-   getAll(pagination: { page: number | undefined, perPage: number | undefined }, searchParam?: string): Promise<{
+   getAll(pagination: { page: number | undefined, perPage: number | undefined }, searchParam?: string, options?: { depth?: boolean }): Promise<{
       data: string[]
       total: number
    }>
@@ -25,26 +25,29 @@ export class MediaService implements IMediaService {
 
    /** Constructor for MediaService.
     * 
-    * @param {string} [storageKey='images'] - The storage key to use. ('songs:look:test') ('images:avatars')
+    * @param {string} [storageKey='images'] - The storage key to use. `('songs:look:test')` `('images:avatars')`
     * 
    **/
-   constructor(storageKey: string) {
-      this.repositroy = useStorage(`media:${storageKey}`)
-      this.storageKey = storageKey
+   constructor(storageKey: string | null) {
+      this.repositroy = useStorage(storageKey ? `media:${storageKey}` : 'media')
+      this.storageKey = storageKey || ''
    }
 
    async getAll(
       pagination: { page: number | undefined, perPage: number | undefined } = { page: undefined, perPage: undefined },
-      searchParam?: string
+      searchParam?: string,
+      options?: { depth?: boolean }
    ) {
       const allKeys = await this.repositroy.getKeys()
 
-      let currentDirKeys = allKeys
-         .filter(key => {
-            const relativeKey = key.replace(`${this.storageKey}:`, '')
-            return !relativeKey.includes(':')
-         })
-         .map(key => `${this.storageKey.replaceAll(':', '/')}/${key}`)
+      let currentDirKeys = options?.depth // TODO: make depth support (folders)
+         ? allKeys
+         : allKeys
+            .filter(key => {
+               const relativeKey = key.replace(`${this.storageKey}:`, '')
+               return !relativeKey.includes(':')
+            })
+            .map(key => `${this.storageKey.replaceAll(':', '/')}/${key}`)
 
       let length = currentDirKeys.length
 

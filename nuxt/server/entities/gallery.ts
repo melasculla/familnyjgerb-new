@@ -9,7 +9,7 @@ export class GalleryItemEntity {
 
    constructor(galleryItem: NewGalleryItem) {
       this.id = galleryItem.id || null
-      this.image = galleryItem.image
+      this.image = galleryItem.image as string
       this.title = galleryItem.title || null
       this.altEn = galleryItem.altEn || null
       this.altRu = galleryItem.altRu || null
