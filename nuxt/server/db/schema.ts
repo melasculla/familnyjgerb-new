@@ -131,32 +131,44 @@ export const galleriesTable = pgTable('galleries', {
 })
 
 export type Gallery = typeof galleriesTable.$inferSelect
+export type NewGallery = typeof galleriesTable.$inferInsert
 
 export const galleryCategoriesTable = pgTable('gallery_categories', {
    id: serial('id').primaryKey(),
    name: varchar('name', { length: 256 }).notNull(),
    galleryId: serial('gallery_id').references(() => galleriesTable.id),
-})
+}, (table) => [
+   unique().on(table.name, table.galleryId)
+])
 
 export type GalleryCategory = typeof galleryCategoriesTable.$inferSelect
+export type NewGalleryCategory = typeof galleryCategoriesTable.$inferInsert
+
+export const galleryCategoriesRelations = relations(galleryCategoriesTable, ({ one }) => ({
+   gallery: one(galleriesTable, {
+      fields: [galleryCategoriesTable.galleryId],
+      references: [galleriesTable.id]
+   }),
+}))
 
 export const galleryItemsTable = pgTable('gallery_items', {
    id: serial('id').primaryKey(),
-   image: varchar('image', { length: 256 }).notNull().unique(),
+   image: varchar('image', { length: 256 }),
    title: varchar('title', { length: 256 }),
    altEn: varchar('alt_en', { length: 256 }),
    altRu: varchar('alt_ru', { length: 256 }),
    order: integer('order'),
    categoryId: serial('category_id').references(() => galleryCategoriesTable.id).notNull(),
 }, (table) => [
-   unique().on(table.order, table.categoryId)
+   unique().on(table.order, table.categoryId),
+   unique().on(table.image, table.categoryId)
 ])
 
 export type GalleryItem = typeof galleryItemsTable.$inferSelect
 export type NewGalleryItem = typeof galleryItemsTable.$inferInsert
 
 export const galleryItemsRelations = relations(galleryItemsTable, ({ one }) => ({
-   lang: one(galleryCategoriesTable, {
+   category: one(galleryCategoriesTable, {
       fields: [galleryItemsTable.categoryId],
       references: [galleryCategoriesTable.id]
    }),

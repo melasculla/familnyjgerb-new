@@ -98,7 +98,7 @@ export default defineEventHandler(async event => {
 
       fill && await db.insert(postsTable).values({
          slug,
-         title: post.post_title,
+         title: he.decode(post.post_title),
          description: post.seo_description || null,
          content,
          thumbnail,

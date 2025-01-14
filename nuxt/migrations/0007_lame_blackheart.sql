@@ -1,0 +1,2 @@
+ALTER TABLE "gallery_items" DROP CONSTRAINT "gallery_items_image_unique";--> statement-breakpoint
+ALTER TABLE "gallery_items" ADD CONSTRAINT "gallery_items_image_category_id_unique" UNIQUE("image","category_id");

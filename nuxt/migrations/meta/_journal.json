@@ -50,6 +50,20 @@
       "when": 1736720422219,
       "tag": "0006_warm_rhodey",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1736765860222,
+      "tag": "0007_lame_blackheart",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1736770187255,
+      "tag": "0008_public_cerise",
+      "breakpoints": true
     }
   ]
 }

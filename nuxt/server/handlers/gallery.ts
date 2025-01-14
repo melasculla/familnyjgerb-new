@@ -1,20 +1,27 @@
 import { type H3Event, type EventHandlerRequest } from 'h3'
-import { useSafeValidatedQuery, useSafeValidatedBody, useSafeValidatedParams } from 'h3-zod'
+import { useSafeValidatedBody, useSafeValidatedParams } from 'h3-zod'
 import { z } from 'zod'
 
 const GalleryItemsSchema = z.object({
    items: z.array(
       z.object({
-         id: z.string().optional(),
+         id: z.number().optional(),
          image: z.string().min(3, 'Image path must be at least 3 characters long'),
-         title: z.string().optional(),
-         altEn: z.string().optional(),
-         altRu: z.string().optional(),
+         title: z.string().optional().nullable(),
+         altEn: z.string().optional().nullable(),
+         altRu: z.string().optional().nullable(),
          order: z.number(),
       })
    ),
-   category: z.string()
 }).strict()
+
+const GalleryCategorySchema = z.object({
+   category: z.string().min(3, 'Category must be at least 3 characters long').toLowerCase()
+})
+
+const GallerySchema = z.object({
+   gallery: z.string().min(3, 'Gallery name must be at least 3 characters long').toLowerCase()
+})
 
 export class GalleryHandler {
    public static async validateBody(event: H3Event<EventHandlerRequest>) {
@@ -26,6 +33,30 @@ export class GalleryHandler {
             data: body.error
          })
 
-      event.context.requestDTO.body = body.data
+      event.context.requestDTO.body = body.data.items
+   }
+
+   public static async validateCategory(event: H3Event<EventHandlerRequest>) {
+      const query = await useSafeValidatedParams(event, GalleryCategorySchema)
+      if (!query.data || query.error)
+         throw createError({
+            statusCode: 400,
+            message: JSON.parse(query.error.message)[0].message,
+            data: query.error
+         })
+
+      event.context.requestDTO.category = query.data.category
+   }
+
+   public static async validateGallery(event: H3Event<EventHandlerRequest>) {
+      const query = await useSafeValidatedParams(event, GallerySchema)
+      if (!query.data || query.error)
+         throw createError({
+            statusCode: 400,
+            message: JSON.parse(query.error.message)[0].message,
+            data: query.error
+         })
+
+      event.context.requestDTO.gallery = query.data.gallery
    }
 }

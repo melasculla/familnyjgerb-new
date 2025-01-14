@@ -17,3 +17,25 @@ export class GalleryItemEntity {
       this.categoryId = galleryItem.categoryId
    }
 }
+
+export class GalleryCategoryEntity {
+   public id
+   public name
+   public galleryId
+
+   constructor(galleryCategory: NewGalleryCategory) {
+      this.id = galleryCategory.id || null
+      this.name = galleryCategory.name
+      this.galleryId = galleryCategory.galleryId
+   }
+}
+
+export class GalleryEntity {
+   public id
+   public name
+
+   constructor(gallery: NewGallery) {
+      this.id = gallery.id || null
+      this.name = gallery.name
+   }
+}
