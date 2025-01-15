@@ -1,4 +1,18 @@
 import { type H3Event, type EventHandlerRequest } from 'h3'
+import { useSafeValidatedQuery } from 'h3-zod'
+import { z } from 'zod'
+
+const OptionsSchema = z.object({
+   options: z.preprocess(val => {
+      if (typeof val === 'string')
+         try { return JSON.parse(val) } catch { return undefined }
+
+      return val
+   }, z.object({
+      depth: z.boolean().default(false),
+      folders: z.boolean().default(false),
+   })).optional(),
+});
 
 export class MediaHandler {
    public static validatePath(event: H3Event<EventHandlerRequest>) {
@@ -46,5 +60,17 @@ export class MediaHandler {
       }
 
       event.context.requestDTO.acceptedTypes = acceptedTypes.length ? acceptedTypes : undefined
+   }
+
+   public static async validateOptions(event: H3Event<EventHandlerRequest>) {
+      const query = await useSafeValidatedQuery(event, OptionsSchema)
+      if (query.error)
+         throw createError({
+            statusCode: 400,
+            message: JSON.parse(query.error.message)[0].message,
+            data: query.error
+         })
+
+      event.context.requestDTO.options = query.data.options || {}
    }
 }

@@ -65,6 +65,10 @@ export default {
             list: (gallery: string) => `/api/gallery/${gallery}` as const,
             single: (gallery: string, category: string) => `/api/gallery/${gallery}/${category}` as const
          },
+         items: {
+            upsert: (gallery: string, category: string) => `/api/gallery/${gallery}/${category}/items/upsert` as const,
+            delete: (gallery: string, category: string) => `/api/gallery/${gallery}/${category}/items/delete` as const,
+         }
       },
 
       mail: {
@@ -72,11 +76,12 @@ export default {
       },
 
       media: {
-         list: '/api/media',
+         list: '/api/media/index',
          images: {
             list: '/api/media/images/',
             upload: '/api/media/images/',
          },
+         match: (route: string) => `/api/media/${route}` as const,
          getFile: (file: string) => joinURL('/api/media/', file) as `/api/media/${string}`,
       },
 

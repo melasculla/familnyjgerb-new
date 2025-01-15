@@ -2,10 +2,16 @@ import { type Storage, type StorageValue, type StorageMeta } from 'unstorage'
 import { type MimeType, type MultiPartData } from 'h3'
 
 export interface IMediaService {
-   getAll(pagination: { page: number | undefined, perPage: number | undefined }, searchParam?: string, options?: { depth?: boolean }): Promise<{
+   getAll(
+      pagination: { page: number | undefined, perPage: number | undefined },
+      searchParam?: string,
+      options?: { depth?: boolean }
+   ): Promise<{
       data: string[]
       total: number
    }>
+
+   getFolders(): Promise<string[]>
 
    getByKey(key: string): Promise<{
       data: Buffer;
@@ -40,14 +46,15 @@ export class MediaService implements IMediaService {
    ) {
       const allKeys = await this.repositroy.getKeys()
 
-      let currentDirKeys = options?.depth // TODO: make depth support (folders)
-         ? allKeys
-         : allKeys
-            .filter(key => {
-               const relativeKey = key.replace(`${this.storageKey}:`, '')
-               return !relativeKey.includes(':')
-            })
-            .map(key => `${this.storageKey.replaceAll(':', '/')}/${key}`)
+      let currentDirKeys = allKeys
+         .filter(key => {
+            if (options?.depth)
+               return true
+
+            const relativeKey = key.replace(`${this.storageKey}:`, '')
+            return !relativeKey.includes(':')
+         })
+         .map(key => `${this.storageKey.replaceAll(':', '/')}/${key.replaceAll(':', '/')}`)
 
       let length = currentDirKeys.length
 
@@ -68,6 +75,27 @@ export class MediaService implements IMediaService {
       }
 
       return { data: currentDirKeys, total: length }
+   }
+
+   async getFolders() {
+      const allKeys = await this.repositroy.getKeys()
+
+      const folders = new Set<string>()
+      allKeys.forEach(item => {
+         const parts = item.split(':')
+         parts.pop()
+
+         let currentPath = ''
+         parts.forEach(part => {
+            if (!part)
+               return
+
+            currentPath += `/${part}`;
+            folders.add(currentPath.replaceAll(':', '/'))
+         })
+      })
+
+      return Array.from(folders)
    }
 
    async getByKey(key: string) {

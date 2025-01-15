@@ -18,18 +18,28 @@ export default defineEventHandler({
          }
 
          SearchHandler.validateSearchRequest(event)
+         await MediaHandler.validateOptions(event)
 
-         return await new MediaService(event.context.requestDTO.storageKey).getAll(
+         const storageKey = event.context.requestDTO.storageKey === 'index'
+            ? null
+            : event.context.requestDTO.storageKey
+
+         const mediaService = new MediaService(storageKey)
+
+         if (event.context.requestDTO.options.folders)
+            return { data: await mediaService.getFolders() }
+
+         return await mediaService.getAll(
             event.context.requestDTO.pagination,
             event.context.requestDTO.searchParam,
-            // { depth: true }
+            event.context.requestDTO.options
          )
       }
 
 
       else if (event.method === 'POST') {
          const files = await readMultipartFormData(event)
-         if (!files || event.context.requestDTO.filename)
+         if (!files || event.context.requestDTO.filename || event.context.requestDTO.storageKey === 'index')
             throw createError(errorsList.badRequest)
 
          MediaHandler.validateTypes(event)
