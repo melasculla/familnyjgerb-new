@@ -74,8 +74,8 @@ const selectMultiple = (image: string) => {
          <Pagination class="col-start-2" :pages="pages ?? null" :current-page="currentPage" :total="totaItems"
             @page-changed="changePage" />
          <div class="uppercase text-lg flex items-center gap-2">
-            <p>all:</p>
-            <input v-if="!folder" type="checkbox" v-model="depth" class="size-10" title="Depth">
+            <p>DEPTH:</p>
+            <input type="checkbox" v-model="depth" class="size-10" title="Depth">
          </div>
       </div>
       <div class="grid grid-cols-8 gap-4 px-2">

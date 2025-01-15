@@ -1,9 +1,9 @@
 export default defineEventHandler({
    onRequest: [
-      // GalleryHandler.validateBody
+      // AdminAuthHandler.checkAccess,
+      GalleryHandler.validateIds
    ],
    handler: async event => {
-      // TODO make gallery category handler
-      return await new GalleryItemService().deleteItems(event.context.requestDTO.body)
+      return await new GalleryItemService().deleteItems(event.context.requestDTO.ids)
    }
 })

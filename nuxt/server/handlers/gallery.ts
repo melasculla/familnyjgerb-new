@@ -23,6 +23,10 @@ const GallerySchema = z.object({
    gallery: z.string().min(3, 'Gallery name must be at least 3 characters long').toLowerCase()
 })
 
+const IdsSchema = z.object({
+   ids: z.array(z.number())
+}).strict()
+
 export class GalleryHandler {
    public static async validateBody(event: H3Event<EventHandlerRequest>) {
       const body = await useSafeValidatedBody(event, GalleryItemsSchema)
@@ -58,5 +62,17 @@ export class GalleryHandler {
          })
 
       event.context.requestDTO.gallery = query.data.gallery
+   }
+
+   public static async validateIds(event: H3Event<EventHandlerRequest>) {
+      const query = await useSafeValidatedBody(event, IdsSchema)
+      if (!query.data || query.error)
+         throw createError({
+            statusCode: 400,
+            message: JSON.parse(query.error.message)[0].message,
+            data: query.error
+         })
+
+      event.context.requestDTO.ids = query.data.ids
    }
 }

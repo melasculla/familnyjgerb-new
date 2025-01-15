@@ -14,7 +14,9 @@ export default defineEventHandler({
       )
 
       try {
-         return await new GalleryItemService().upsertItems(category.id!, event.context.requestDTO.body)
+         const data = await new GalleryItemService().upsertItems(category.id!, event.context.requestDTO.body)
+         setResponseStatus(event, 201)
+         return data
       } catch (err: any) {
          if (err.message.includes('duplicate'))
             throw createError({ statusCode: 409, message: `Item with this order or source already exists` })

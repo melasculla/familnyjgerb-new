@@ -4,13 +4,21 @@ import { VueDraggableNext as draggable } from 'vue-draggable-next'
 const route = useRoute()
 const galleryParam = route.params.gallery as string
 const categoryParam = route.params.category as string
-const { data, status, error } = await useLazyFetch(routesList.api.gallery.category.single(galleryParam, categoryParam))
+const initialData = ref<GalleryItem[]>([])
+const { data, status, error, refresh } = await useLazyFetch(routesList.api.gallery.category.single(galleryParam, categoryParam))
 
 type RequiredFields<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
 type ClientGalleryItem = Omit<RequiredFields<NewGalleryItem & { file?: File }, "image" | "order">, 'categoryId'>
 
 const images = ref<ClientGalleryItem[]>([])
-watch(data, (newData) => newData && (images.value = newData), { immediate: true })
+watch(data, (newData) => {
+   if (!newData)
+      return
+
+   images.value = newData
+
+   initialData.value = JSON.parse(JSON.stringify(newData))
+}, { immediate: true })
 watch(images, () => changeOrder())
 
 const label = useId()
@@ -54,20 +62,44 @@ const changeOrder = () => {
 
 
 const saveData = async () => {
-   // await $fetch(routesList.api.gallery.items.delete(galleryParam, categoryParam), {
-   //    method: 'DELETE',
-   //    body: imagesToRemove.value.map(item => item.id!)
-   // })
+   if (imagesToRemove.value.length)
+      await $fetch(routesList.api.gallery.items.delete(galleryParam, categoryParam), {
+         method: 'DELETE',
+         body: {
+            ids: imagesToRemove.value.map(item => item.id!)
+         }
+      })
 
-   // TODO: make array of changed items
-   const data = await $fetch(routesList.api.gallery.items.upsert(galleryParam, categoryParam), {
+   if (!initialData.value)
+      return
+
+   const itemsToUpsert = [
+      ...images.value.filter(item => !item.id),
+      ...images.value.filter(item => {
+         if (!item.id)
+            return false
+
+         const correspondingItem = initialData.value.find(initialItem => initialItem.id === item.id);
+         return correspondingItem && (item.order !== correspondingItem.order || item.image !== correspondingItem.image);
+      })
+   ]
+
+   if (!itemsToUpsert.length)
+      return
+
+   const updatedItems = await $fetch<GalleryItem[]>(routesList.api.gallery.items.upsert(galleryParam, categoryParam), {
       method: 'POST',
       body: {
-         items: [
-            ...images.value.filter(item => !item.id)
-         ]
+         items: itemsToUpsert
       }
    })
+
+   updatedItems.forEach(item => {
+      const index = images.value.findIndex(image => image.image === item.image)
+      images.value[index] = item
+   })
+
+   refresh() // TODO: fill new data somehow
 }
 </script>
 
@@ -77,7 +109,6 @@ const saveData = async () => {
          <LazyMediaSelectFiles v-if="isOpen" @selected="handleSelectedImages"
             class="fixed inset-0 w-full h-full z-10 bg-slate-400" multiple />
       </Teleport>
-      <pre>{{ images }}</pre>
       <div class="flex justify-center items-center flex-wrap mb-5 gap-4">
          <div>
             <!-- <NuxtLink v-show="locale !== _locale.code" v-for="_locale in locales" :key="_locale.code"
