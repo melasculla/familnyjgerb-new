@@ -95,7 +95,13 @@ const saveData = async () => {
             return false
 
          const correspondingItem = initialData.value.find(initialItem => initialItem.id === item.id);
-         return correspondingItem && (item.order !== correspondingItem.order || item.image !== correspondingItem.image);
+         return correspondingItem && (
+            item.order !== correspondingItem.order
+            || item.image !== correspondingItem.image
+            || item.altEn !== correspondingItem.altEn
+            || item.altRu !== correspondingItem.altRu
+            || item.title !== correspondingItem.title
+         )
       }).map(({ categoryId, ...item }) => item)
    ]
 
