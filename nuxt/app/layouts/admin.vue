@@ -19,17 +19,26 @@ const pages: Page[] = [
 </script>
 
 <template>
-   <div
-      class="[&_.icon]:cursor-pointer [&_.icon]:bg-secondary [&_.icon:hover]:bg-fuchsia-700 [&_.icon-parent:hover_.icon]:bg-fuchsia-700 [&_.icon]:transition-colors">
-      <div class="flex gap-2 sm:gap-8 items-center flex-wrap px-2 py-2 border-b-[5px] border-title">
-         <NuxtLink :to="localPath(routesList.client.admin.main) || routesList.client.admin.main">
+   <div class="">
+      <div class="flex gap-2 items-center flex-wrap px-2 py-2 border-b-[5px] border-title">
+         <NuxtLink :to="localPath(routesList.client.admin.main)">
             <IconsHome class="icon size-12 sm:size-14 block" />
          </NuxtLink>
-         <NuxtLink v-for="locale in locales" :key="locale.code" :to="switchLocalePath(locale.code)"
-            v-show="locale.code !== currentLocale" class="cursor-pointer relative group">
-            <!-- <img class="h-10" :src="`/icons/${locale.code.toUpperCase()}.webp`" alt="" /> -->
-            {{ locale }}
-         </NuxtLink>
+         <button @click="$router.back()">
+            <svg class="icon size-12 sm:size-14 block" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
+               viewBox="0 0 24 24">
+               <path fill="currentColor" d="m7.825 13l5.6 5.6L12 20l-8-8l8-8l1.425 1.4l-5.6 5.6H20v2z" />
+            </svg>
+         </button>
+         <div class="flex gap-2 text-lg uppercase">
+            <NuxtLink v-for="locale in locales" :key="locale.code" :to="switchLocalePath(locale.code)"
+               class="cursor-pointer relative group [&.router-link-active]:bg-red-700 p-2 rounded-md">
+               {{ locale.code }}
+            </NuxtLink>
+         </div>
+         <div class="flex-shrink flex-grow" v-if="$slots.header">
+            <slot name="header" />
+         </div>
          <!-- <ThemeSwitcher :admin="true" /> -->
          <div class="ml-auto flex items-center gap-4" v-if="data?.user">
             <p class="max-xs:hidden text-lg">{{ data?.user?.name }}</p>

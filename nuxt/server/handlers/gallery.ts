@@ -11,7 +11,7 @@ const GalleryItemsSchema = z.object({
          altEn: z.string().optional().nullable(),
          altRu: z.string().optional().nullable(),
          order: z.number(),
-      })
+      }).strict()
    ),
 }).strict()
 

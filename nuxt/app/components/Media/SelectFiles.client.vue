@@ -78,7 +78,7 @@ const selectMultiple = (image: string) => {
             <input type="checkbox" v-model="depth" class="size-10" title="Depth">
          </div>
       </div>
-      <div class="grid grid-cols-8 gap-4 px-2">
+      <div class="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 gap-4 px-2">
          <div class="col-span-full flex items-center gap-4 max-w-full flex-wrap">
             <div class="flex-shrink-0 flex gap-2">
                <svg class="max-xs:hidden size-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
