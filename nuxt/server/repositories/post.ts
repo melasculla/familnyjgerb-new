@@ -8,7 +8,7 @@ export interface IPostRepository {
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
       showPlanned?: boolean,
-      statuses?: ProjectStatus[],
+      statuses?: PostStatus[],
    ): Promise<PostList>
 
    findAllTranslations(langGroup: number): Promise<PostEntity[]>
@@ -17,7 +17,7 @@ export interface IPostRepository {
 
    findNear(id: number, langId: number): Promise<{ prev?: string, next?: string }>
 
-   count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: boolean, statuses?: ProjectStatus[]): Promise<number>
+   count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: boolean, statuses?: PostStatus[]): Promise<number>
 
    save(postEntity: PostEntity): Promise<PostEntity>
 
@@ -31,7 +31,7 @@ export class PostRepository implements IPostRepository {
       searchParam?: string,
       pagination: { page: number | undefined, perPage: number | undefined } = { page: undefined, perPage: undefined },
       showPlanned?: boolean,
-      statuses?: ProjectStatus[],
+      statuses?: PostStatus[],
    ) {
       const isPaginationSetted = pagination.page && pagination.perPage
       const offset = isPaginationSetted && (pagination.page! - 1) * pagination.perPage!
@@ -134,7 +134,7 @@ export class PostRepository implements IPostRepository {
       }
    }
 
-   async count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: boolean, statuses?: ProjectStatus[]) {
+   async count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: boolean, statuses?: PostStatus[]) {
       const [result] = await db
          .select({ count: count() })
          .from(postsTable)

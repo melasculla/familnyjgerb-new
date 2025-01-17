@@ -13,7 +13,7 @@ const route = useRoute()
 const galleryParam = route.params.gallery as string
 const categoryParam = route.params.category as string
 const initialData = ref<GalleryItem[]>([])
-const { data, status, error } = await useLazyFetch(routesList.api.gallery.category.single(galleryParam, categoryParam))
+const { data, status, error, refresh } = await useLazyFetch(routesList.api.gallery.category.single(galleryParam, categoryParam))
 
 const showAllItems = ref<boolean>(false)
 
@@ -152,6 +152,10 @@ const { data: categories } = await useLazyFetch(routesList.api.gallery.category.
          </template>
 
          <div class="flex justify-center items-center flex-wrap mb-5 gap-4">
+            <button class="uppercase text-lg p-1 bg-green-400 border-none outline-none rounded-md" @click="refresh()"
+               type="button">
+               <IconsRefresh />
+            </button>
             <ButtonsMain @click="open">
                Выбрать
             </ButtonsMain>
@@ -171,7 +175,7 @@ const { data: categories } = await useLazyFetch(routesList.api.gallery.category.
             <p v-html="uploadError"></p>
          </div>
          <div v-if="status === 'success' && data">
-            <draggable class="grid grid-cols-3 gap-3 relative" v-model="images" handle=".drag-handle">
+            <draggable class="grid grid-cols-3 3xl:grid-cols-6 gap-3 relative" v-model="images" handle=".drag-handle">
                <transition-group name="list">
                   <div v-for="image, i in images" :key="image.image!" class="relative group" :data-id="image.order"
                      v-show="showAllItems || i < 6">
@@ -193,11 +197,11 @@ const { data: categories } = await useLazyFetch(routesList.api.gallery.category.
                </transition-group>
             </draggable>
             <button v-if="!showAllItems" @click="showAllItems = true"
-               class="block mx-auto text-lg mt-7 rounded-lg bg-sky-400 px-4 py-2">
+               class="block mx-auto text-lg mt-7 rounded-lg bg-sky-400 px-4 py-2 sticky bottom-2">
                Show all
             </button>
          </div>
-         <div v-else-if="status === 'pending' || status === 'idle'" class="grid grid-cols-3 gap-3">
+         <div v-else-if="status === 'pending' || status === 'idle'" class="grid grid-cols-3 3xl:grid-cols-6 gap-3">
             <img src="/loader.svg" class="w-full" loading="lazy" v-for="item in 12" />
          </div>
          <div v-else-if="status === 'error'" class="text-center text-red-500 font-bold text-lg">

@@ -115,6 +115,11 @@ export const projectsStatusList = ['hidden', 'deleted', 'published'] as const
 export type ProjectStatus = typeof projectsStatusList[number]
 export type Project = typeof projectsTable.$inferSelect
 export type NewProject = typeof projectsTable.$inferInsert
+export type ProjectList = Array<
+   Pick<Project, 'id' | 'slug' | 'title' | 'description' | 'thumbnail' | 'createdAt'> & {
+      lang: Lang | null
+   }
+>
 
 export const projectsRelations = relations(projectsTable, ({ one }) => ({
    lang: one(langsTable, {

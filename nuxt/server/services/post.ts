@@ -5,7 +5,7 @@ export interface IPostService {
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
       isAdmin?: boolean,
-      statuses?: ProjectStatus[],
+      statuses?: PostStatus[],
    ): Promise<PostList>
 
    // TODO: get similar by category
@@ -17,7 +17,7 @@ export interface IPostService {
       categorySlug?: string,
       searchParam?: string,
       isAdmin?: boolean,
-      statuses?: ProjectStatus[],
+      statuses?: PostStatus[],
    ): Promise<number>
 
    getAdjacents(id: number, langId: number): Promise<{ prev?: string, next?: string }>
@@ -33,7 +33,7 @@ export class PostService implements IPostService {
 
    constructor() {
       this.repository = new PostRepository()
-      this.translationService = new TranslationService(new LangService(), this.repository)
+      this.translationService = new TranslationService(new LangService(), { postRepository: this.repository })
    }
 
    async getPosts(
@@ -42,7 +42,7 @@ export class PostService implements IPostService {
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
       isAdmin?: boolean,
-      statuses?: ProjectStatus[],
+      statuses?: PostStatus[],
    ) {
       return await this.repository.findAll(lang, categorySlug, searchParam, pagination, isAdmin, statuses)
    }
@@ -73,7 +73,7 @@ export class PostService implements IPostService {
       categorySlug?: string,
       searchParam?: string,
       isAdmin?: boolean,
-      statuses?: ProjectStatus[],
+      statuses?: PostStatus[],
    ) {
       return await this.repository.count(lang, categorySlug, searchParam, isAdmin, statuses)
    }
@@ -92,11 +92,11 @@ export class PostService implements IPostService {
 
       if (postObject.id)
          this.translationService
-            .syncSlugIfNeeded(upsertedPost.slug, upsertedPost.langGroup!).catch(err => console.warn(`[POSTS]: Sync slug failed: ${err}`))
+            .syncPostSlugIfNeeded(upsertedPost.slug, upsertedPost.langGroup!).catch(err => console.warn(`[POSTS]: Sync slug failed: ${err}`))
 
       if (!postObject.id)
          this.translationService
-            .createTranslations(upsertedPost).catch(err => console.warn(`[POSTS]: Creating translations failed: ${err}`))
+            .createPostTranslations(upsertedPost).catch(err => console.warn(`[POSTS]: Creating translations failed: ${err}`))
 
       return upsertedPost
    }

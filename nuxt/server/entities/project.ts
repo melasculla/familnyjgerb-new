@@ -14,7 +14,8 @@ export class ProjectEntity {
    public seoKeys
    public ogImage
    public langId
-   
+   public langGroup
+
    constructor(project: NewProject) {
       this.id = project.id || null
       this.slug = project.slug
@@ -31,5 +32,11 @@ export class ProjectEntity {
       this.seoKeys = project.seoKeys || null
       this.ogImage = project.ogImage || null
       this.langId = project.langId || null
+      this.langGroup = project.langGroup || null
+   }
+
+   async assignLangGroup(repository: IProjectRepository) {
+      const existingProject = await repository.findBy('slug', this.slug)
+      this.langGroup = existingProject ? existingProject.langGroup : null
    }
 }
