@@ -25,7 +25,7 @@ useSeoMeta({
             Blog
          </NuxtLink>
          <a class="underline text-base text-purple-600 my-5 block text-center" target="_blank"
-            :href="`/api/posts/${route.params.slug}?locale=ru`">
+            :href="routesList.api.posts.getSingle(route.params.slug as string) + '?locale=ru'">
             API
          </a>
          <a class="underline text-base text-purple-600 my-5 block text-center" target="_blank"

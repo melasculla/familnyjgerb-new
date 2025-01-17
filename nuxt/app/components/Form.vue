@@ -88,7 +88,7 @@ const handleSubscribe = async (): Promise<void> => {
    }
 
    try {
-      await $fetch('/api/mail/send', {
+      await $fetch(routesList.api.mail.send, {
          method: 'POST',
          body
       })
@@ -112,7 +112,7 @@ const handleForm = async (attachFavourites: boolean): Promise<boolean> => {
    // }
 
    try {
-      await $fetch('/api/mail/send', {
+      await $fetch(routesList.api.mail.send, {
          method: 'POST',
          body: form.value
       })

@@ -27,7 +27,7 @@ export default {
             },
          },
          images: {
-            upload: '/admin/uploadImages',
+            upload: '/admin/upload',
          },
       },
 
@@ -57,6 +57,14 @@ export default {
 
       categories: {
          getAll: '/api/categories'
+      },
+
+      projects: {
+         getAll: '/api/projects',
+         getSingle: (slug: string) => `/api/projects/${slug}` as const,
+         create: '/api/projects/create',
+         edit: '/api/projects/edit',
+         delete: '/api/projects/delete',
       },
 
       gallery: {

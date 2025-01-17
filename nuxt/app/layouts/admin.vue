@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { type ConcreteComponent } from 'vue'
 
-const { locales, locale: currentLocale } = useI18n()
+const { locales } = useI18n()
 const localPath = useLocalePath()
 const switchLocalePath = useSwitchLocalePath()
 
@@ -9,19 +9,19 @@ const { signOut, data } = useAuth()
 
 type Page = { path: string, title: string, icon: ConcreteComponent | string }
 const pages: Page[] = [
-   // { path: routesList.client.admin.main, title: 'Admin', icon: '/icons/admin/dashboard.svg' },
+   { path: routesList.client.admin.main, title: 'Admin', icon: resolveComponent('IconsDashboard') },
    // { path: routesList.client.admin.users.list, title: 'Users', icon: '/icons/admin/users.svg' },
    { path: routesList.client.admin.posts.list, title: 'Posts', icon: resolveComponent('IconsPosts') },
-   // { path: routesList.client.admin.projects.list, title: 'Projects', icon: '/icons/admin/gallery.svg' },
+   { path: routesList.client.admin.projects.list, title: 'Projects', icon: resolveComponent('IconsProjects') },
    { path: routesList.client.admin.gallery.list, title: 'Gallery', icon: resolveComponent('IconsGallery') },
-   // { path: routesList.client.admin.images.upload, title: 'Images', icon: '/icons/admin/uploadImage.svg' },
+   { path: routesList.client.admin.images.upload, title: 'Upload', icon: resolveComponent('IconsUpload') },
 ]
 </script>
 
 <template>
    <div class="">
       <div class="flex gap-2 items-center flex-wrap px-2 py-2 border-b-[5px] border-title">
-         <NuxtLink :to="localPath(routesList.client.admin.main)">
+         <NuxtLink :to="localPath('/')">
             <IconsHome class="icon size-12 sm:size-14 block" />
          </NuxtLink>
          <button @click="$router.back()">
@@ -56,6 +56,7 @@ const pages: Page[] = [
          <aside class="group grid justify-items-center sticky top-0">
             <nav class="text-base">
                <ul class="grid gap-3 divide-y-4 divide-fill">
+                  <!-- [&.router-link-active]:bg-red-300 -->
                   <li v-for="page in pages" class="pt-2 px-3 text-center">
                      <NuxtLink :to="localPath(page.path) || page.path" class="flex items-center icon-parent">
                         <p
