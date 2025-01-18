@@ -1,116 +1,124 @@
 <script setup lang="ts">
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
 
-export type UploadedImage = {
-   path: string
-   alt?: string
-   file?: File
-}
-
-const label = ref<string>('')
-onMounted(() => label.value = String(Math.floor(Math.random() * 9e15)))
-const images = defineModel<UploadedImage[]>()
-
-const { multiple, title, upload } = defineProps<{
+const { multiple, itemsToShow } = defineProps<{
    title: string
    multiple: boolean
+   itemsToShow?: number
    upload?: boolean
 }>()
 
-const error = ref<string>('')
-
-const canAddMoreImages = computed(() => multiple ? true : images.value!.length === 0)
-
-const handleFiles = (e: Event) => {
-   if (!canAddMoreImages.value)
-      return
-
-   error.value = ''
-
-   const filesInput = (e.target as HTMLInputElement).files
-   if (!filesInput)
-      return
-
-   for (let file of filesInput) {
-      const isFileExists = images.value!.find(({ file: loopFile }) => (file.name === loopFile?.name && file.size === loopFile?.size))
-      const isSupportedFormat = file.type.includes('image')
-      const isAllowedSize = file.size <= 1024 * 1024 * 5 // 5 Mb
-      const size = (file.size / 1024 / 1024).toFixed(2)
-
-      if (!isSupportedFormat) {
-         error.value += `File ${file.name} have unsupported format ${file.type} (supported only images)<br>`
-         continue
-      }
-      if (isFileExists || !isAllowedSize) {
-         if (!isAllowedSize) error.value += `File ${file.name} too large: ${size} Mb (max size 3 Mb)<br>`
-         if (isFileExists) error.value += `File ${file.name} already exists<br>`
-         continue
-      }
-
-      const preview = URL.createObjectURL(file)
-      images.value!.push({ path: preview, file: file })
-
-      if (!multiple)
-         break
-   }
-}
-
-const removeFile = (removePath: string) => {
-   if (!images.value?.length)
-      return
-
-   images.value = images.value.filter(({ path }) => path !== removePath)
-}
+const images = defineModel<UploadedImage[]>({ default: [] })
+const canAddMore = computed(() => multiple || images.value.length < 1)
+const showAllItems = ref<boolean>(!itemsToShow)
+const label = useId()
+const toast = useToast()
+const uploading = ref<boolean>(false)
 
 const { isOpen, open, callback } = useSelectFilesWindow(images)
+
+const wannaCustomPath = ref<boolean>(false)
+const path = ref<string | undefined>()
+const validatePath = computed<string | undefined>({
+   get: () => path.value,
+   set: (newPath) => {
+      if (!newPath || newPath == undefined)
+         return path.value = undefined
+
+      return path.value = newPath
+         .replace(/[^a-zA-Z0-9\s/]/g, '')
+         .replace(/(?<!\/)\/+/g, '/')
+         .replace(/\s+/g, '/')
+   }
+})
+const { handle, error: errors } = useUploadedFiles(async files => {
+   uploading.value = true
+   const uploadingToast = toast.loading('Uploading images...')
+
+   const result = await uploadImages(toRef(files), path.value)
+   for (const item of result) {
+      images.value.unshift({ path: item.path })
+   }
+
+   uploading.value = false
+   toast.update(uploadingToast, {
+      render: 'Images Uploaded',
+      autoClose: true,
+      closeOnClick: true,
+      type: 'success',
+      isLoading: false
+   })
+})
+
+const remove = (pathToRemove: string) => images.value = images.value.filter(({ path }) => path !== pathToRemove)
 </script>
 
 <template>
-   <div class="grid mx-auto text-center justify-center justify-items-center">
-      <LazyMediaSelectFiles v-if="isOpen" :multiple="multiple"
-         class="fixed w-full left-0 bottom-0 h-svh overflow-y-scroll bg-white p-2 z-50" @selected="callback" />
-      <div v-if="multiple ? true : images && !images.length" class="flex flex-wrap justify-items-center gap-4">
-         <ButtonsSelect v-if="!upload" @click="open" type="button" class="block">
+   <div class="grid gap-4 mx-auto text-center justify-center justify-items-center">
+      {{ images }}
+      <Teleport to="#teleports">
+         <LazyMediaSelectFiles v-if="isOpen" @selected="callback" :multiple="multiple"
+            class="fixed inset-0 w-full h-full z-10 bg-slate-400 overflow-y-auto [scroll-behavior:none]" />
+      </Teleport>
+
+      <button v-if="!wannaCustomPath && upload" type="button" @click="wannaCustomPath = true" class="text-base mb-2">
+         Do you want a custom path?
+      </button>
+      <input v-if="wannaCustomPath" type="text" class="min-w-0 px-2 py-1 rounded-md text-base" placeholder="Path"
+         v-model="validatePath">
+
+      <div v-if="canAddMore" class="flex flex-wrap justify-items-center gap-4">
+         <ButtonsMain v-if="!upload" @click="open" class="disabled:opacity-60 disabled:cursor-not-allowed"
+            :disabled="uploading">
             Select {{ title }}
-         </ButtonsSelect>
-         <ButtonsSelect class="!p-0" type="button">
-            <label :for="`upload-${label}`" class="cursor-pointer block px-6 py-2">
-               Upload {{ title }}
-            </label>
-         </ButtonsSelect>
-         <input :id="`upload-${label}`" type="file" :multiple="multiple" @change="handleFiles" class="sr-only"
-            accept=".jpg,.jpeg,.png,.webp,.gif">
+         </ButtonsMain>
+         <ButtonsMain :disabled="uploading"
+            class="disabled:opacity-60 disabled:cursor-not-allowed [&:disabled>label]:cursor-not-allowed relative">
+            Upload {{ title }}
+            <label :for="`upload-${label}`" class="absolute inset-0 cursor-pointer" />
+         </ButtonsMain>
+         <ButtonsMain v-if="upload" @click="images = []" class="bg-red-800 hover:text-black">
+            Reset
+         </ButtonsMain>
+         <input :id="`upload-${label}`" type="file" :multiple="multiple" @change="handle" class="sr-only"
+            accept=".jpg,.jpeg,.png,.webp,.gif" :disabled="uploading">
       </div>
-      <div class="text-red-500 my-4" v-if="error">
-         <p v-html="error"></p>
+      <div class="text-red-500" v-if="errors">
+         <p v-html="errors"></p>
       </div>
-      <draggable v-if="images" class="grid gap-4 px-8 mt-4" :class="multiple && 'grid-cols-2 md:grid-cols-4'"
-         v-model="images" handle=".drag-handle">
+      <draggable v-if="images" class="grid xs:grid-cols-3 2xl:grid-cols-6 gap-3 relative" v-model="images"
+         handle=".drag-handle">
          <transition-group name="list">
-            <div v-for="file in images" :key="file.path"
-               class="grid justify-items-center content-between group relative">
-               <div class="w-full relative group"
-                  :class="multiple ? `h-[150px] sm:h-[200px] md:h-[300px]` : `max-w-[400px]`">
-                  <button type="button"
-                     class="absolute right-2 top-2 rounded-full bg-white/60 p-2 opacity-0 text-red-600 transition-opacity group-hover:opacity-100"
-                     @click="removeFile(file.path)">
-                     <svg class="size-5" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="7 7 10 10">
-                        <path fill="currentColor"
-                           d="m8.054 16.673l-.727-.727L11.273 12L7.327 8.079l.727-.727L12 11.298l3.921-3.946l.727.727L12.702 12l3.946 3.946l-.727.727L12 12.727z" />
-                     </svg>
-                  </button>
-                  <img :src="file.path.startsWith('blob:') ? file.path : routesList.api.media.getFile(file.path)"
-                     class="w-full h-full object-cover drag-handle">
+            <div v-for="image, i in images" :key="image.path" class="relative group"
+               v-show="itemsToShow ? showAllItems || i < itemsToShow : true">
+               <img v-if="image.path" class="drag-handle w-full min-h-10" loading="lazy"
+                  :src="image.path.startsWith('blob:') ? image.path : routesList.api.media.getFile(image.path)" />
+               <button v-if="!upload" @click="remove(image.path)" type="button"
+                  class="absolute top-2 right-2 bg-white/50 rounded-full p-2 backdrop-blur">
+                  <svg class="size-5" width="32" height="32" viewBox="7 7 10 10">
+                     <path fill="currentColor"
+                        d="m8.054 16.673l-.727-.727L11.273 12L7.327 8.079l.727-.727L12 11.298l3.921-3.946l.727.727L12.702 12l3.946 3.946l-.727.727L12 12.727z" />
+                  </svg>
+               </button>
+               <div v-if="!upload" class="mt-3 sm:absolute bottom-2 grid gap-2 sm:w-11/12 mx-auto sm:left-1/2 sm:-translate-x-1/2
+                  [&_input]:min-w-0 [&_input]:sm:opacity-0 [&_input]:group-hover:opacity-100
+                  [&_input]:focus-within:opacity-100 [&_input]:border [&_input]:border-orange-400 [&_input]:bg-white
+                  [&_input]:px-2 [&_input]:py-2 [&_input]:rounded-md [&_input]:text-base">
+                  <slot v-if="$slots.inputs" name="inputs" />
+                  <input v-else placeholder="Alt" v-model="image.alt" />
                </div>
-               <input v-if="!upload" v-model="file.alt" placeholder="Image Description"
-                  class="block w-full border border-orange-400 bg-white mt-2 px-2 py-2 rounded-md text-base" />
             </div>
          </transition-group>
       </draggable>
+      <button v-if="!showAllItems" @click="showAllItems = true"
+         class="block mx-auto text-lg mt-7 rounded-lg bg-sky-400 px-4 py-2 sticky bottom-2">
+         Show all
+      </button>
    </div>
 </template>
 
 <style scoped>
+.list-move,
 .list-enter-active,
 .list-leave-active {
    transition: all 400ms ease;
@@ -122,7 +130,8 @@ const { isOpen, open, callback } = useSelectFilesWindow(images)
    transform: scale(0);
 }
 
-/* .list-leave-active {
+.list-leave-active {
    position: absolute;
-} */
+   width: 33.3%;
+}
 </style>
