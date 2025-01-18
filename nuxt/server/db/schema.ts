@@ -95,7 +95,7 @@ export const projectsTable = pgTable('projects', {
    title: varchar('title', { length: 256 }).notNull(),
    description: varchar('description', { length: 256 }),
    content: json('content').$type<OutputData>(),
-   usuage: json('usuage').$type<ImageJSON[]>(),
+   usage: json('usage').$type<ImageJSON[]>(),
    sketches: json('sketches').$type<ImageJSON[]>(),
    thumbnail: json('thumbnail').$type<ImageJSON>(),
    video: varchar('video', { length: 256 }),
@@ -104,7 +104,7 @@ export const projectsTable = pgTable('projects', {
    createdAt: timestamp('created_at').defaultNow().notNull(),
    seoKeys: varchar('seo_keys', { length: 256 }),
    ogImage: varchar('og_image', { length: 256 }),
-   langId: integer('lang_id').references(() => langsTable.id),
+   langId: integer('lang_id').references(() => langsTable.id).notNull().default(1),
    langGroup: integer('lang_group').references((): AnyPgColumn => projectsTable.id, { onDelete: 'restrict' }),
 }, (table) => [
    unique().on(table.slug, table.langId)

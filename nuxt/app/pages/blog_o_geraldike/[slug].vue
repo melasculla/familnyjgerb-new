@@ -45,7 +45,7 @@ useSeoMeta({
             <NuxtLink v-if="data.prev" :to="data.prev" class="text-teal-400">
                Prev
             </NuxtLink>
-            <NuxtLink v-if="data.next" :to="data.next" class="text-teal-400">
+            <NuxtLink v-if="data.next" :to="data.next" class="text-teal-400 ml-auto">
                Next
             </NuxtLink>
          </div>

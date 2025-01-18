@@ -38,6 +38,7 @@ const changeOrder = () => {
 }
 
 const label = useId()
+const toast = useToast()
 
 
 const { isOpen, open } = useSelectFilesWindow()
@@ -57,11 +58,28 @@ const handleSelectedImages = (imagesList: string[]) => {
    isOpen.value = false
 }
 
+const loading = ref<boolean>(false)
+const uploading = ref<boolean>(false)
+
 const { handle, error: uploadError } = useUploadedFiles(async files => {
+   loading.value = true
+   uploading.value = true
+   const uploadingToast = toast.loading('Uploading images...')
+
    const result = await uploadImages(toRef(files))
    for (const item of result) {
       images.value.unshift({ image: item.path, order: images.value.length + 1 })
    }
+
+   loading.value = false
+   uploading.value = false
+   toast.update(uploadingToast, {
+      render: 'Images Uploaded',
+      autoClose: true,
+      closeOnClick: true,
+      type: 'success',
+      isLoading: false
+   })
 })
 
 
@@ -73,13 +91,33 @@ const removeImage = (item: ClientGalleryItem) => {
    images.value = images.value.filter(image => image.image !== item.image)
 }
 
+
+
 const saveData = async () => {
    if (imagesToRemove.value.length) {
+      loading.value = true
+      const removeToast = toast.loading('Deleting images...')
+
       await $fetch(routesList.api.gallery.items.delete(galleryParam, categoryParam), {
          method: 'DELETE',
          body: {
             ids: imagesToRemove.value.map(item => item.id!)
          }
+      }).catch(err => toast.update(removeToast, {
+         render: 'Images wasn\'t deleted',
+         autoClose: true,
+         closeOnClick: true,
+         type: 'error',
+         isLoading: false
+      }))
+
+      loading.value = false
+      toast.update(removeToast, {
+         render: 'Images Deleted',
+         autoClose: true,
+         closeOnClick: true,
+         type: 'success',
+         isLoading: false
       })
 
       imagesToRemove.value = []
@@ -108,11 +146,23 @@ const saveData = async () => {
    if (!itemsToUpsert.length)
       return
 
+   loading.value = true
+   const upsertToast = toast.loading('Saving images...')
+
    const updatedItems = await $fetch<GalleryItem[]>(routesList.api.gallery.items.upsert(galleryParam, categoryParam), {
       method: 'POST',
       body: {
          items: itemsToUpsert
       }
+   })
+
+   loading.value = false
+   toast.update(upsertToast, {
+      render: 'Images Saved',
+      type: 'success',
+      autoClose: true,
+      closeOnClick: true,
+      isLoading: false
    })
 
    updatedItems.forEach(item => {
@@ -133,8 +183,8 @@ const { data: categories } = await useLazyFetch(routesList.api.gallery.category.
    <div>
       <NuxtLayout name="admin">
          <Teleport to="#teleports">
-            <LazyMediaSelectFiles v-if="isOpen" @selected="handleSelectedImages"
-               class="fixed inset-0 w-full h-full z-10 bg-slate-400" multiple />
+            <LazyMediaSelectFiles v-if="isOpen" @selected="handleSelectedImages" multiple
+               class="fixed inset-0 w-full h-full z-10 bg-slate-400 overflow-y-auto [scroll-behavior:none]" />
          </Teleport>
 
          <template #header v-if="categories">
@@ -152,22 +202,25 @@ const { data: categories } = await useLazyFetch(routesList.api.gallery.category.
          </template>
 
          <div class="flex justify-center items-center flex-wrap mb-5 gap-4">
-            <button class="uppercase text-lg p-1 bg-green-400 border-none outline-none rounded-md" @click="refresh()"
-               type="button">
+            <button
+               class="uppercase text-lg p-1 bg-green-400 border-none outline-none rounded-md  disabled:cursor-not-allowed disabled:opacity-60"
+               @click="refresh()" type="button" :disabled="loading">
                <IconsRefresh />
             </button>
-            <ButtonsMain @click="open">
+            <ButtonsMain @click="open" class="disabled:opacity-60 disabled:cursor-not-allowed" :disabled="uploading">
                Выбрать
             </ButtonsMain>
-            <input :id="`upload-${label}`" type="file" :multiple="true" class="sr-only" @change="handle"
-               accept=".jpg,.jpeg,.png,.webp,.gif">
-            <ButtonsMain>
+            <input :id="`upload-${label}`" class="sr-only" type="file" multiple @change="handle"
+               accept=".jpg,.jpeg,.png,.webp,.gif" :disabled="uploading">
+            <ButtonsMain class="disabled:opacity-60 disabled:cursor-not-allowed [&:disabled>label]:cursor-not-allowed"
+               :disabled="uploading">
                <label :for="`upload-${label}`" class="cursor-pointer">
                   Загрузить
                </label>
             </ButtonsMain>
-            <button class="uppercase text-lg px-4 py-2 bg-green-400 border-none outline-none rounded-md"
-               @click="saveData" type="button">
+            <button
+               class="uppercase text-lg px-4 py-2 bg-green-400 border-none outline-none rounded-md disabled:cursor-not-allowed disabled:opacity-60"
+               @click="saveData" type="button" :disabled="loading">
                Сохранить
             </button>
          </div>
@@ -175,7 +228,8 @@ const { data: categories } = await useLazyFetch(routesList.api.gallery.category.
             <p v-html="uploadError"></p>
          </div>
          <div v-if="status === 'success' && data">
-            <draggable class="grid grid-cols-3 3xl:grid-cols-6 gap-3 relative" v-model="images" handle=".drag-handle">
+            <draggable class="grid xs:grid-cols-3 2xl:grid-cols-6 gap-3 relative" v-model="images"
+               handle=".drag-handle">
                <transition-group name="list">
                   <div v-for="image, i in images" :key="image.image!" class="relative group" :data-id="image.order"
                      v-show="showAllItems || i < 6">
@@ -188,10 +242,11 @@ const { data: categories } = await useLazyFetch(routesList.api.gallery.category.
                               d="m8.054 16.673l-.727-.727L11.273 12L7.327 8.079l.727-.727L12 11.298l3.921-3.946l.727.727L12.702 12l3.946 3.946l-.727.727L12 12.727z" />
                         </svg>
                      </button>
-                     <div class="absolute bottom-1 grid gap-2 w-11/12 left-1/2 -translate-x-1/2">
+                     <div
+                        class="mt-3 sm:absolute bottom-2 grid gap-2 sm:w-11/12 mx-auto sm:left-1/2 sm:-translate-x-1/2">
                         <input v-for="item in locales" :key="item.code" :placeholder="`Alt ${item.code}`"
                            v-model="image[`alt${item.code.charAt(0).toUpperCase() + item.code.slice(1)}` as keyof ClientGalleryItem]"
-                           class="min-w-0 opacity-0 group-hover:opacity-100 focus-within:opacity-100 border border-orange-400 bg-white px-2 py-2 rounded-md text-base" />
+                           class="min-w-0 sm:opacity-0 group-hover:opacity-100 focus-within:opacity-100 border border-orange-400 bg-white px-2 py-2 rounded-md text-base" />
                      </div>
                   </div>
                </transition-group>
@@ -201,7 +256,7 @@ const { data: categories } = await useLazyFetch(routesList.api.gallery.category.
                Show all
             </button>
          </div>
-         <div v-else-if="status === 'pending' || status === 'idle'" class="grid grid-cols-3 3xl:grid-cols-6 gap-3">
+         <div v-else-if="status === 'pending' || status === 'idle'" class="grid xs:grid-cols-3 2xl:grid-cols-6 gap-3">
             <img src="/loader.svg" class="w-full" loading="lazy" v-for="item in 12" />
          </div>
          <div v-else-if="status === 'error'" class="text-center text-red-500 font-bold text-lg">

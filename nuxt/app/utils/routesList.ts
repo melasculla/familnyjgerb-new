@@ -31,6 +31,11 @@ export default {
          },
       },
 
+      gallery: {
+         gerbs: '/portfolio/gerbs',
+         monograms: '/portfolio/monograms',
+      },
+
       posts: {
          list: '/blog_o_geraldike',
          page: (page?: number) => page ? `/blog_o_geraldike/page/${page}` : '/blog_o_geraldike',
@@ -39,8 +44,14 @@ export default {
          categoryPage: (slug: string) => (page?: number) => page ? `/blog_o_geraldike/category/${slug}/page/${page}` : `/blog_o_geraldike/category/${slug}`,
       },
 
+      projects: {
+         list: '/portfolio/list',
+         page: (page?: number) => page ? `/portfolio/list?page=${page}` : '/portfolio/list',
+         single: (slug: string) => `/portfolio/${slug}`
+      },
+
       policy: '/policy'
-   },
+   } as const,
 
    /**
     * API ROUTES

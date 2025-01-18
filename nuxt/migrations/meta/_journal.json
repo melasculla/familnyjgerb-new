@@ -64,6 +64,20 @@
       "when": 1736770187255,
       "tag": "0008_public_cerise",
       "breakpoints": true
+    },
+    {
+      "idx": 9,
+      "version": "7",
+      "when": 1737217175254,
+      "tag": "0009_previous_bloodaxe",
+      "breakpoints": true
+    },
+    {
+      "idx": 10,
+      "version": "7",
+      "when": 1737234676958,
+      "tag": "0010_naive_the_enforcers",
+      "breakpoints": true
     }
   ]
 }

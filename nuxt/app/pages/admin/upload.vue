@@ -1,10 +1,10 @@
 <script setup lang="ts">
-const files = ref()
+const files = ref<UploadedImage[]>([])
 </script>
 
 <template>
    <div>
-      <!-- <MediaUploadFiles upload v-model="files" title="Upload" multiple /> -->
+      <MediaUploadFiles upload v-model="files" title="Images" multiple />
    </div>
 </template>
 

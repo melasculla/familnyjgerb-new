@@ -1,15 +1,17 @@
 import type { ModelRef } from "vue"
-import type { UploadedImage } from "~/components/Media/UploadFiles.vue"
-import type { NitroFetchRequest } from 'nitropack'
 
-type Image = { path: string, file?: File }
+export type UploadedImage = {
+   path: string
+   alt?: string
+   file?: File
+}
 
 export const useSelectFilesWindow = (
    images?: ModelRef<UploadedImage[] | undefined>
 ): {
    isOpen: Ref<boolean>,
    open: () => void,
-   callback: (imageList: string[]) => void
+   handleSelected: (imageList: string[]) => void
 } => {
    const isOpen = ref<boolean>(false)
 
@@ -44,13 +46,13 @@ export const useSelectFilesWindow = (
    return {
       isOpen,
       open: openSelectWindow,
-      callback: filesSelectedFromFS
+      handleSelected: filesSelectedFromFS
    }
 }
 
 
 export const uploadImages = async (
-   imageList: Ref<Image[]>, baseUrl?: NitroFetchRequest, types?: string[]
+   imageList: Ref<UploadedImage[]>, baseUrl?: string, types?: string[]
 ) => {
    const chunkArray = <T>(arr: T[], size: number): T[][] => {
       const chunks = []
@@ -74,7 +76,9 @@ export const uploadImages = async (
       }
 
       try {
-         const uploadedUrls = await $fetch<string[]>(baseUrl ? baseUrl : routesList.api.media.images.upload, {
+         const uploadedUrls = await $fetch<string[]>(baseUrl
+            ? routesList.api.media.match(baseUrl.replace('/api/media/', ''))
+            : routesList.api.media.images.upload, {
             method: 'POST',
             body,
             query: { types }
@@ -89,7 +93,7 @@ export const uploadImages = async (
    return replaceBlobUrls(imageList, urls)
 }
 
-const replaceBlobUrls = (imageList: Ref<Image[]>, urls: string[]) => {
+const replaceBlobUrls = (imageList: Ref<UploadedImage[]>, urls: string[]) => {
    let index = 0
 
    for (const item of imageList.value) {
@@ -110,10 +114,10 @@ const replaceBlobUrls = (imageList: Ref<Image[]>, urls: string[]) => {
  * @param afterHandle Hook for handling uploaded Files
  * @returns 
  */
-export const useUploadedFiles = (afterHandle?: (images: Image[]) => void) => {
+export const useUploadedFiles = (afterHandle?: (images: UploadedImage[]) => void) => {
    const MAX_FILE_SIZE = 5 // Mb
 
-   const files = ref<Image[]>([])
+   const files = ref<UploadedImage[]>([])
    const error = ref<string>('')
 
    const handle = (e: Event) => {

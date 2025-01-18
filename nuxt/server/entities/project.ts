@@ -4,7 +4,7 @@ export class ProjectEntity {
    public title
    public description
    public content
-   public usuage
+   public usage
    public sketches
    public thumbnail
    public video
@@ -22,7 +22,7 @@ export class ProjectEntity {
       this.title = project.title
       this.description = project.description || null
       this.content = project.content || null
-      this.usuage = project.usuage || null
+      this.usage = project.usage || null
       this.sketches = project.sketches || null
       this.thumbnail = project.thumbnail || null
       this.video = project.video || null
@@ -31,7 +31,7 @@ export class ProjectEntity {
       this.createdAt = project.createdAt
       this.seoKeys = project.seoKeys || null
       this.ogImage = project.ogImage || null
-      this.langId = project.langId || null
+      this.langId = project.langId
       this.langGroup = project.langGroup || null
    }
 

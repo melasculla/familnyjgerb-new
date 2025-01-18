@@ -8,6 +8,10 @@ const { multiple, itemsToShow } = defineProps<{
    upload?: boolean
 }>()
 
+const emit = defineEmits<{
+   'update:modelValue': [UploadedImage[]]
+}>()
+
 const images = defineModel<UploadedImage[]>({ default: [] })
 const canAddMore = computed(() => multiple || images.value.length < 1)
 const showAllItems = ref<boolean>(!itemsToShow)
@@ -15,7 +19,7 @@ const label = useId()
 const toast = useToast()
 const uploading = ref<boolean>(false)
 
-const { isOpen, open, callback } = useSelectFilesWindow(images)
+const { isOpen, open, handleSelected } = useSelectFilesWindow(images)
 
 const wannaCustomPath = ref<boolean>(false)
 const path = ref<string | undefined>()
@@ -39,6 +43,7 @@ const { handle, error: errors } = useUploadedFiles(async files => {
    for (const item of result) {
       images.value.unshift({ path: item.path })
    }
+   emit('update:modelValue', result)
 
    uploading.value = false
    toast.update(uploadingToast, {
@@ -55,10 +60,11 @@ const remove = (pathToRemove: string) => images.value = images.value.filter(({ p
 
 <template>
    <div class="grid gap-4 mx-auto text-center justify-center justify-items-center">
-      {{ images }}
       <Teleport to="#teleports">
-         <LazyMediaSelectFiles v-if="isOpen" @selected="callback" :multiple="multiple"
-            class="fixed inset-0 w-full h-full z-10 bg-slate-400 overflow-y-auto [scroll-behavior:none]" />
+         <LazyMediaSelectFiles v-if="isOpen" :multiple="multiple" @selected="imageList => {
+            handleSelected(imageList)
+            emit('update:modelValue', imageList.map(item => ({ path: item })))
+         }" class="fixed inset-0 w-full h-full z-10 bg-slate-400 overflow-y-auto [scroll-behavior:none]" />
       </Teleport>
 
       <button v-if="!wannaCustomPath && upload" type="button" @click="wannaCustomPath = true" class="text-base mb-2">
@@ -86,8 +92,7 @@ const remove = (pathToRemove: string) => images.value = images.value.filter(({ p
       <div class="text-red-500" v-if="errors">
          <p v-html="errors"></p>
       </div>
-      <draggable v-if="images" class="grid xs:grid-cols-3 2xl:grid-cols-6 gap-3 relative" v-model="images"
-         handle=".drag-handle">
+      <draggable class="grid xs:grid-cols-3 2xl:grid-cols-6 gap-3 relative" v-model="images" handle=".drag-handle">
          <transition-group name="list">
             <div v-for="image, i in images" :key="image.path" class="relative group"
                v-show="itemsToShow ? showAllItems || i < itemsToShow : true">

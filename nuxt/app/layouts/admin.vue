@@ -20,7 +20,7 @@ const pages: Page[] = [
 
 <template>
    <div class="">
-      <div class="flex gap-2 items-center flex-wrap px-2 py-2 border-b-[5px] border-title">
+      <div class="flex gap-2 items-center flex-wrap px-2 py-2 border-b-[2px] xs:border-b-[5px] border-title">
          <NuxtLink :to="localPath('/')">
             <IconsHome class="icon size-12 sm:size-14 block" />
          </NuxtLink>
@@ -48,22 +48,21 @@ const pages: Page[] = [
          </div>
       </div>
       <div class="grid grid-cols-[1fr,auto] items-start">
-         <main class="border-r-[5px] border-title pt-4 px-1 xs:px-4 min-h-[92vh]">
+         <main class="border-r-[2px] xs:border-r-[5px] border-title pt-4 px-1 xs:px-4 min-h-[92vh]">
             <div class="relative">
                <slot />
             </div>
          </main>
          <aside class="group grid justify-items-center sticky top-0">
             <nav class="text-base">
-               <ul class="grid gap-3 divide-y-4 divide-fill">
-                  <!-- [&.router-link-active]:bg-red-300 -->
-                  <li v-for="page in pages" class="pt-2 px-3 text-center">
+               <ul class="grid divide-y-[2px] xs:divide-y-4 divide-fill">
+                  <li v-for="page in pages" class="py-2 px-2 xs:px-3 text-center transition-all"
+                     :class="{ '[&:has(.router-link-active)]:bg-red-800 [&:has(.router-link-active)]:text-white': page.path !== routesList.client.admin.main }">
                      <NuxtLink :to="localPath(page.path) || page.path" class="flex items-center icon-parent">
-                        <p
-                           class="block mr-0 max-w-0 md:group-hover:max-w-[40rem] md:group-hover:pr-2 overflow-hidden transition-all">
+                        <p class="block mr-0 max-w-0 md:group-hover:max-w-[40rem] md:group-hover:pr-2 overflow-hidden">
                            {{ page.title }}
                         </p>
-                        <component :is="page.icon" class="block size-12 ml-auto" />
+                        <component :is="page.icon" class="block size-8 xs:size-12 ml-auto" />
                      </NuxtLink>
                   </li>
                </ul>

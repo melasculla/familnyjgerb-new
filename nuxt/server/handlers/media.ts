@@ -25,6 +25,9 @@ export class MediaHandler {
       const directoryPath = match[1]
       const lastSegment = match[2]
 
+      // if (!/^[a-zA-Z0-9\/]*$/.test(event.context.params!.path))
+      //    throw createError({ statusCode: 400, message: 'Invalid characters in path' })
+
       const regexFilename = /\.[a-zA-Z0-9]+$/
       const isRootFilename = regexFilename.test(directoryPath)
       if ((lastSegment && regexFilename.test(lastSegment)) || isRootFilename) {

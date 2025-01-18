@@ -4,8 +4,6 @@
 
 <template>
    <div>
-      <ProjectsList admin />
+      <NuxtPage />
    </div>
 </template>
-
-<style scoped></style>
