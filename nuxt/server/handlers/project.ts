@@ -7,7 +7,8 @@ const SlugSchema = z.object({
 })
 
 const StatusSchema = z.object({
-   statuses: z.string().min(3, 'Category must be at least 3 characters long').toLowerCase().optional()
+   statuses: z.array(z.string().min(3, 'Status must be at least 3 characters long').toLowerCase()).optional()
+      .or(z.string().min(3, 'Status must be at least 3 characters long').toLowerCase().optional()),
 })
 
 const ImageJSONSchema = z.object({
@@ -16,9 +17,11 @@ const ImageJSONSchema = z.object({
 })
 
 const ProjectSchema = z.object({
-   slug: z.string().min(3).max(256),
-   title: z.string().min(3).max(256),
-   description: z.string().nullable().optional(),
+   slug: z.string().min(4).max(256, 'Slug must be at least 5 characters long')
+      .refine(slug => !['list', 'monograms', 'gerbs', 'create',].includes(slug), { message: 'This slug is restricted and cannot be used.' })
+      .refine(slug => !slug.includes('.'), { message: 'Slug cannot contain dots.' }),
+   title: z.string().min(4).max(256, 'Title must be at least 5 characters long'),
+   description: z.string().min(15, 'Description must be at least 15 characters long').nullable().optional(),
    content: z.object({
       version: z.string().optional(),
       time: z.number().optional(),
@@ -92,8 +95,8 @@ export class ProjectHandler {
          throw createError({ statusCode: 400, message: `Statuses ${statuses.filter(item => !projectsStatusList.includes(item as any)).join(' and ')} not found` })
       }
 
-      if (validStatuses.includes('hidden') || validStatuses.includes('deleted'))
-         AdminAuthHandler.checkAccess(event)
+      // if (validStatuses.includes('hidden') || validStatuses.includes('deleted'))
+      //    AdminAuthHandler.checkAccess(event)
 
       event.context.requestDTO.stasuses = validStatuses
    }

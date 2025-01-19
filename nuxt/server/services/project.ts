@@ -48,7 +48,7 @@ export class ProjectService implements IProjectService {
             throw createError(errorsList.notFound('Project'))
 
          const newProject = new ProjectEntity({
-            ...originalProject,
+            ...Object.assign(originalProject),
             id: undefined,
             langId,
             title: `${originalProject.title} (Перевод скоро будет)`,

@@ -56,7 +56,7 @@ export class PostService implements IPostService {
             throw createError(errorsList.notFound('Post'))
 
          const newPost = new PostEntity({
-            ...originalPost,
+            ...Object.assign(originalPost),
             id: undefined,
             langId,
             title: `${originalPost.title} (Перевод скоро будет)`,

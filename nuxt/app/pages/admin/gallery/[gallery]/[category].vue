@@ -103,15 +103,20 @@ const saveData = async () => {
          body: {
             ids: imagesToRemove.value.map(item => item.id!)
          }
-      }).catch(err => toast.update(removeToast, {
-         render: 'Images wasn\'t deleted',
-         autoClose: true,
-         closeOnClick: true,
-         type: 'error',
-         isLoading: false
-      }))
+      }).catch(async err => {
+         loading.value = false
+         await nextTick()
+         toast.update(removeToast, {
+            render: 'Images wasn\'t deleted',
+            autoClose: true,
+            closeOnClick: true,
+            type: 'error',
+            isLoading: false
+         })
+      })
 
       loading.value = false
+      await nextTick()
       toast.update(removeToast, {
          render: 'Images Deleted',
          autoClose: true,
@@ -157,6 +162,7 @@ const saveData = async () => {
    })
 
    loading.value = false
+   await nextTick()
    toast.update(upsertToast, {
       render: 'Images Saved',
       type: 'success',

@@ -1,8 +1,8 @@
 export default defineEventHandler({
    onRequest: [
+      // AdminAuthHandler.checkAccess
       event => LocaleHandler.validateLocale(event, true),
       ProjectHandler.validateBody,
-      // AdminAuthHandler.checkAccess
    ],
    handler: async event => {
       const projectService = new ProjectService()

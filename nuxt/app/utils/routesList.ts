@@ -17,7 +17,8 @@ export default {
          },
          projects: {
             list: '/admin/projects',
-            single: (slug: string) => `/admin/projects/${slug}`,
+            create: '/admin/projects/create',
+            single: (slug: string, id: number) => `/admin/projects/${slug}.${id}`,
          },
          gallery: {
             list: '/admin/gallery',

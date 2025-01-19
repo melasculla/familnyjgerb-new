@@ -43,7 +43,7 @@ const { handle, error: errors } = useUploadedFiles(async files => {
    for (const item of result) {
       images.value.unshift({ path: item.path })
    }
-   emit('update:modelValue', result)
+   emit('update:modelValue', images.value)
 
    uploading.value = false
    toast.update(uploadingToast, {
@@ -63,7 +63,7 @@ const remove = (pathToRemove: string) => images.value = images.value.filter(({ p
       <Teleport to="#teleports">
          <LazyMediaSelectFiles v-if="isOpen" :multiple="multiple" @selected="imageList => {
             handleSelected(imageList)
-            emit('update:modelValue', imageList.map(item => ({ path: item })))
+            emit('update:modelValue', images)
          }" class="fixed inset-0 w-full h-full z-10 bg-slate-400 overflow-y-auto [scroll-behavior:none]" />
       </Teleport>
 
@@ -73,7 +73,7 @@ const remove = (pathToRemove: string) => images.value = images.value.filter(({ p
       <input v-if="wannaCustomPath" type="text" class="min-w-0 px-2 py-1 rounded-md text-base" placeholder="Path"
          v-model="validatePath">
 
-      <div v-if="canAddMore" class="flex flex-wrap justify-items-center gap-4">
+      <div v-if="canAddMore" class="flex flex-wrap justify-center justify-items-center gap-4">
          <ButtonsMain v-if="!upload" @click="open" class="disabled:opacity-60 disabled:cursor-not-allowed"
             :disabled="uploading">
             Select {{ title }}
@@ -92,7 +92,8 @@ const remove = (pathToRemove: string) => images.value = images.value.filter(({ p
       <div class="text-red-500" v-if="errors">
          <p v-html="errors"></p>
       </div>
-      <draggable class="grid xs:grid-cols-3 2xl:grid-cols-6 gap-3 relative" v-model="images" handle=".drag-handle">
+      <draggable class="relative grid xs:grid-cols-3 2xl:grid-cols-6 gap-3 [&.single]:grid-cols-1"
+         :class="{ 'single': !multiple }" v-model="images" handle=".drag-handle">
          <transition-group name="list">
             <div v-for="image, i in images" :key="image.path" class="relative group"
                v-show="itemsToShow ? showAllItems || i < itemsToShow : true">

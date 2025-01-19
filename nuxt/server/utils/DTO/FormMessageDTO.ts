@@ -1,4 +1,4 @@
-import { BaseEmailFormType } from "~~/server/handlers/notification";
+import { type BaseEmailFormType } from "~~/server/handlers/notification";
 import { EmailNotificationDTO } from "~~/server/utils/interfaces";
 
 const config = useRuntimeConfig()

@@ -42,6 +42,7 @@ export class PostRepository implements IPostRepository {
             slug: postsTable.slug,
             title: postsTable.title,
             thumbnail: postsTable.thumbnail,
+            status: postsTable.status,
             createdAt: postsTable.createdAt,
             lang: {
                id: langsTable.id,

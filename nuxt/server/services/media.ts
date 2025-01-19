@@ -1,5 +1,6 @@
 import { type Storage, type StorageValue, type StorageMeta } from 'unstorage'
 import { type MimeType, type MultiPartData } from 'h3'
+import { joinURL } from 'ufo'
 
 export interface IMediaService {
    getAll(
@@ -54,7 +55,7 @@ export class MediaService implements IMediaService {
             const relativeKey = key.replace(`${this.storageKey}:`, '')
             return !relativeKey.includes(':')
          })
-         .map(key => `${this.storageKey.replaceAll(':', '/')}/${key.replaceAll(':', '/')}`)
+         .map(key => joinURL('/', this.storageKey.replaceAll(':', '/'), key.replaceAll(':', '/')))
 
       let length = currentDirKeys.length
 
@@ -144,7 +145,7 @@ export class MediaService implements IMediaService {
          result.push(fileEntity.filename)
       }
 
-      return result.map(item => `${this.storageKey.replaceAll(':', '/')}/${item}`)
+      return result.map(item => joinURL('/', this.storageKey.replaceAll(':', '/'), item))
    }
 
    async delete(key: string) {

@@ -1,4 +1,10 @@
 <script setup lang="ts">
+const { provideKey } = defineProps<{
+   provideKey: keyof typeof PROVIDE_KEYS
+}>()
+
+const errors = inject(PROVIDE_KEYS[provideKey])
+
 const description = defineModel<string | null>({ default: null })
 const validatedDescription = computed<string | null>({
    get: () => description.value,
@@ -10,20 +16,21 @@ const validatedDescription = computed<string | null>({
    },
 })
 
-const error = ref<string>('')
 const validate = (string: string): string => {
-   error.value = ''
+   errors!.description = ''
 
    if (string.length <= 15 && string.length > 0)
-      error.value = 'Description must be at least 15 characters long'
+      errors!.description = 'Description must be at least 15 characters long'
 
    return string.replace(/\s+/g, ' ')
 }
 </script>
 
 <template>
-   <input type="text" v-model.trim="validatedDescription" placeholder="Description">
-   <UtilsError :error="error" />
+   <div>
+      <input type="text" v-model.trim="validatedDescription" placeholder="Description">
+      <UtilsError :error="errors!.description" />
+   </div>
 </template>
 
 <style scoped></style>

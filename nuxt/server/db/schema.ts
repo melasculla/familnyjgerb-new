@@ -49,11 +49,10 @@ export const postsTable = pgTable('posts', {
    unique().on(table.slug, table.langId)
 ])
 
-export const postsStatusList = ['hidden', 'deleted', 'published'] as const
 export type PostStatus = typeof postsStatusList[number]
 export type Post = typeof postsTable.$inferSelect
 export type PostList = Array<
-   Pick<Post, 'id' | 'slug' | 'title' | 'thumbnail' | 'createdAt'> & {
+   Pick<Post, 'id' | 'slug' | 'title' | 'thumbnail' | 'status' | 'createdAt'> & {
       lang: Lang | null
       category: Category | null
    }
@@ -91,7 +90,7 @@ export const categoriesRelations = relations(categoriesTable, ({ many }) => ({
 
 export const projectsTable = pgTable('projects', {
    id: serial('id').primaryKey(),
-   slug: varchar('slug', { length: 256 }).notNull().unique(),
+   slug: varchar('slug', { length: 256 }).notNull(),
    title: varchar('title', { length: 256 }).notNull(),
    description: varchar('description', { length: 256 }),
    content: json('content').$type<OutputData>(),
@@ -111,12 +110,11 @@ export const projectsTable = pgTable('projects', {
 ])
 // Похожие
 
-export const projectsStatusList = ['hidden', 'deleted', 'published'] as const
 export type ProjectStatus = typeof projectsStatusList[number]
 export type Project = typeof projectsTable.$inferSelect
 export type NewProject = typeof projectsTable.$inferInsert
 export type ProjectList = Array<
-   Pick<Project, 'id' | 'slug' | 'title' | 'description' | 'thumbnail' | 'createdAt'> & {
+   Pick<Project, 'id' | 'slug' | 'title' | 'description' | 'thumbnail' | 'status' | 'createdAt'> & {
       lang: Lang | null
    }
 >

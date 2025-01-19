@@ -1,4 +1,5 @@
 <script setup lang="ts">
+const { locale } = useI18n()
 const { category } = defineProps<{
    category?: Category['slug']
 }>()
@@ -9,7 +10,7 @@ const { currentPage, pages, totaItems } = usePagination(perPage, 'page', 'blogPa
 
 const { data: posts, status, error } = await useLazyFetch<{ posts: PostList, total?: number }>(routesList.api.posts.getAll, {
    query: {
-      locale: 'ru',
+      locale,
       category,
       perPage,
       page: currentPage
@@ -22,7 +23,7 @@ const { data: posts, status, error } = await useLazyFetch<{ posts: PostList, tot
       totaItems.value = data.total
       return data
    },
-   key: `ru:blog_posts:${currentPage.value}:${category}`,
+   key: `${locale.value}:blog_posts:${currentPage.value}:${category}`,
    onResponseError: ({ response, error }) => {
       if (error)
          return showError(error)

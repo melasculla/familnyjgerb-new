@@ -11,8 +11,8 @@ const CategorySchema = z.object({
 })
 
 const StatusSchema = z.object({
-   statuses: z.array(z.string().min(3, 'Category must be at least 3 characters long').toLowerCase()).optional()
-      .or(z.string().min(3, 'Category must be at least 3 characters long').toLowerCase().optional()),
+   statuses: z.array(z.string().min(3, 'Status must be at least 3 characters long').toLowerCase()).optional()
+      .or(z.string().min(3, 'Status must be at least 3 characters long').toLowerCase().optional()),
 })
 
 const ImageJSONSchema = z.object({

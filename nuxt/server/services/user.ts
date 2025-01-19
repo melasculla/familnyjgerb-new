@@ -32,11 +32,7 @@ export class UserService implements IUserService {
    async getUsers(
       pagination: { page: number | undefined, perPage: number | undefined } = { page: undefined, perPage: undefined }
    ) {
-      const userList = await this.repository.findAll(pagination)
-      if (!userList.length)
-         throw createError(errorsList.notFound(`${pagination.page ? 'On page ' + pagination.page + ' ' : ''} Users`))
-
-      return userList
+      return await this.repository.findAll(pagination)
    }
 
    async getUserBy(by: 'email' | 'uid', emailOrUID: string) {

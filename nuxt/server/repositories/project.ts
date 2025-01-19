@@ -39,6 +39,7 @@ export class ProjectRepository implements IProjectRepository {
             title: projectsTable.title,
             description: projectsTable.description,
             thumbnail: projectsTable.thumbnail,
+            status: projectsTable.status,
             createdAt: projectsTable.createdAt,
             lang: {
                id: langsTable.id,
