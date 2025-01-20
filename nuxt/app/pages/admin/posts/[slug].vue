@@ -5,7 +5,7 @@ const { data, status, error } = await useLazyFetch<any>(
    routesList.api.posts.getSingle(Array.isArray(route.params.slug) ? route.params.slug[0]! : route.params.slug!),
    {
       query: {
-         locale,
+         locale: locale.value,
       }
    }
 )

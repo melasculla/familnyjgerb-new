@@ -173,7 +173,7 @@ useSeoMeta({
                <template #inputs></template>
             </MediaUploadFiles>
          </div>
-         <input type="text" v-model="project.seoKeys" placeholder="Keys">
+         <UtilsKeys v-model="project.seoKeys" />
          <select v-model="project.status">
             <option class="capitalize" v-for="status in projectsStatusList" :value="status">{{ status }}</option>
          </select>

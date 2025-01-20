@@ -10,7 +10,7 @@ const { currentPage, pages, totaItems } = usePagination(perPage, 'page', 'blogPa
 
 const { data: posts, status, error } = await useLazyFetch<{ posts: PostList, total?: number }>(routesList.api.posts.getAll, {
    query: {
-      locale,
+      locale: locale.value,
       category,
       perPage,
       page: currentPage

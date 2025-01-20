@@ -6,7 +6,7 @@ const { data, status, error } = await useLazyFetch<{ post: Post, category: Categ
    routesList.api.posts.getSingle(slug.value),
    {
       query: {
-         locale,
+         locale: locale.value,
       },
       getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] || nuxtApp.static.data[key],
       key: `${locale.value}:blog_posts:${slug.value}`

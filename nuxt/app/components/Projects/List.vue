@@ -21,7 +21,7 @@ const toggleStatus = (_status: ProjectStatus) => {
 
 const { data, status, error, refresh } = await useLazyFetch<{ projects: ProjectList, total?: number }>(routesList.api.projects.getAll, {
    query: {
-      locale,
+      locale: locale.value,
       perPage,
       page: currentPage,
       statuses
