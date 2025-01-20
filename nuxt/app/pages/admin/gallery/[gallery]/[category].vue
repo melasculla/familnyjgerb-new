@@ -66,7 +66,7 @@ const { handle, error: uploadError } = useUploadedFiles(async files => {
    uploading.value = true
    const uploadingToast = toast.loading('Uploading images...')
 
-   const result = await uploadImages(toRef(files))
+   const result = await uploadFiles(toRef(files))
    for (const item of result) {
       images.value.unshift({ image: item.path, order: images.value.length + 1 })
    }

@@ -9,10 +9,10 @@ const { multiple, itemsToShow } = defineProps<{
 }>()
 
 const emit = defineEmits<{
-   'update:modelValue': [UploadedImage[]]
+   'update:modelValue': [UploadedFile[]]
 }>()
 
-const images = defineModel<UploadedImage[]>({ default: [] })
+const images = defineModel<UploadedFile[]>({ default: [] })
 const canAddMore = computed(() => multiple || images.value.length < 1)
 const showAllItems = ref<boolean>(!itemsToShow)
 const label = useId()
@@ -39,7 +39,7 @@ const { handle, error: errors } = useUploadedFiles(async files => {
    uploading.value = true
    const uploadingToast = toast.loading('Uploading images...')
 
-   const result = await uploadImages(toRef(files), path.value)
+   const result = await uploadFiles(toRef(files), path.value)
    for (const item of result) {
       images.value.unshift({ path: item.path })
    }

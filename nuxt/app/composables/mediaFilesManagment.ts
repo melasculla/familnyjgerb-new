@@ -1,17 +1,17 @@
 import type { ModelRef } from "vue"
 
-export type UploadedImage = {
+export type UploadedFile = {
    path: string
    alt?: string
    file?: File
 }
 
 export const useSelectFilesWindow = (
-   images?: ModelRef<UploadedImage[] | undefined>
+   files?: ModelRef<UploadedFile[] | undefined>
 ): {
    isOpen: Ref<boolean>,
    open: () => void,
-   handleSelected: (imageList: string[]) => void
+   handleSelected: (fileList: string[]) => void
 } => {
    const isOpen = ref<boolean>(false)
 
@@ -28,16 +28,16 @@ export const useSelectFilesWindow = (
       isOpen.value = true
    }
 
-   const filesSelectedFromFS = (imageList: string[]) => {
-      if (!images)
+   const filesSelectedFromFS = (fileList: string[]) => {
+      if (!files)
          return
 
-      for (const item of imageList) {
-         const isImageExist = images.value?.find(({ path }) => item === path)
-         if (isImageExist)
+      for (const item of fileList) {
+         const isFileExist = files.value?.find(({ path }) => item === path)
+         if (isFileExist)
             continue
 
-         images.value?.push({ path: item })
+         files.value?.push({ path: item })
       }
 
       isOpen.value = false
@@ -51,8 +51,8 @@ export const useSelectFilesWindow = (
 }
 
 
-export const uploadImages = async (
-   imageList: Ref<UploadedImage[]>, baseUrl?: string, types?: string[]
+export const uploadFiles = async (
+   fileList: Ref<UploadedFile[]>, baseUrl?: string, types?: string[]
 ) => {
    const chunkArray = <T>(arr: T[], size: number): T[][] => {
       const chunks = []
@@ -62,14 +62,14 @@ export const uploadImages = async (
       return chunks
    }
 
-   const imagesToUpload = imageList.value.filter(({ file }) => file)
-   if (!imagesToUpload.length)
-      return imageList.value
+   const filesToUpload = fileList.value.filter(({ file }) => file)
+   if (!filesToUpload.length)
+      return fileList.value
 
-   const imageChunks = chunkArray(imagesToUpload, 5)
+   const fileChunks = chunkArray(filesToUpload, 5)
    const urls: string[] = []
 
-   for (const chunk of imageChunks) {
+   for (const chunk of fileChunks) {
       const body = new FormData()
       for (const { file } of chunk) {
          body.append('images', file!)
@@ -90,13 +90,13 @@ export const uploadImages = async (
       }
    }
 
-   return replaceBlobUrls(imageList, urls)
+   return replaceBlobUrls(fileList, urls)
 }
 
-const replaceBlobUrls = (imageList: Ref<UploadedImage[]>, urls: string[]) => {
+const replaceBlobUrls = (fileList: Ref<UploadedFile[]>, urls: string[]) => {
    let index = 0
 
-   for (const item of imageList.value) {
+   for (const item of fileList.value) {
       if (!item.file)
          continue
 
@@ -105,19 +105,24 @@ const replaceBlobUrls = (imageList: Ref<UploadedImage[]>, urls: string[]) => {
       index++
    }
 
-   return imageList.value
+   return fileList.value
 }
 
+
+type MimeTypes = 'image' | 'video'
 
 /**
  * 
  * @param afterHandle Hook for handling uploaded Files
  * @returns 
  */
-export const useUploadedFiles = (afterHandle?: (images: UploadedImage[]) => void) => {
-   const MAX_FILE_SIZE = 5 // Mb
+export const useUploadedFiles = (afterHandle?: (fileList: UploadedFile[]) => void, type: MimeTypes = 'image') => {
+   const MAX_FILE_SIZE: Record<MimeTypes, number> = {
+      image: 5,
+      video: 20
+   }
 
-   const files = ref<UploadedImage[]>([])
+   const files = ref<UploadedFile[]>([])
    const error = ref<string>('')
 
    const handle = (e: Event) => {
@@ -131,16 +136,16 @@ export const useUploadedFiles = (afterHandle?: (images: UploadedImage[]) => void
 
       for (let file of filesInput) {
          const isFileExists = files.value.find(({ file: loopFile }) => (file.name === loopFile?.name && file.size === loopFile?.size))
-         const isSupportedFormat = file.type.includes('image')
-         const isAllowedSize = file.size <= (MAX_FILE_SIZE * 1024 * 1024)
+         const isSupportedFormat = file.type.includes(type)
+         const isAllowedSize = file.size <= (MAX_FILE_SIZE[type] * 1024 * 1024)
          const size = (file.size / 1024 / 1024).toFixed(2)
 
          if (!isSupportedFormat) {
-            error.value += `File ${file.name} have unsupported format ${file.type} (supported only images)<br>`
+            error.value += `File ${file.name} have unsupported format ${file.type} (supported only ${type})<br>`
             continue
          }
          if (isFileExists || !isAllowedSize) {
-            if (!isAllowedSize) error.value += `File ${file.name} too large: ${size} Mb (max size ${MAX_FILE_SIZE} Mb)<br>`
+            if (!isAllowedSize) error.value += `File ${file.name} too large: ${size} Mb (max size ${MAX_FILE_SIZE[type]} Mb)<br>`
             if (isFileExists) error.value += `File ${file.name} already exists<br>`
             continue
          }

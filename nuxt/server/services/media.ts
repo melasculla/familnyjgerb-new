@@ -152,3 +152,5 @@ export class MediaService implements IMediaService {
       await this.repositroy.removeItem(key)
    }
 }
+
+// TODO: make chunk upload method for large files
