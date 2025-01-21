@@ -1,3 +1,5 @@
+import { BodySchema } from "~~/server/handlers/media"
+
 export default defineEventHandler({
    onRequest: [
       MediaHandler.validatePath,
@@ -39,12 +41,39 @@ export default defineEventHandler({
 
       else if (event.method === 'POST') {
          const files = await readMultipartFormData(event)
-         if (!files || event.context.requestDTO.filename || event.context.requestDTO.storageKey === 'index')
-            throw createError(errorsList.badRequest)
+         await MediaHandler.validateOptions(event)
 
-         MediaHandler.validateTypes(event)
+         const mediaService = new MediaService(event.context.requestDTO.storageKey)
 
-         return await new MediaService(event.context.requestDTO.storageKey).create(files, event.context.requestDTO.acceptedTypes)
+         if (files && !event.context.requestDTO.filename && event.context.requestDTO.storageKey !== 'index') {
+            MediaHandler.validateTypes(event)
+
+            if (event.context.requestDTO.options.chunks) {
+               await MediaHandler.validateBody(event)
+               return await mediaService.createChunk(
+                  files[0], // TODO: add multifiles support
+                  event.context.requestDTO.body.filename,
+                  event.context.requestDTO.body.index,
+                  event.context.requestDTO.acceptedTypes
+               )
+            }
+
+            return await mediaService.create(files, event.context.requestDTO.acceptedTypes)
+         }
+
+         if (event.context.requestDTO.options.chunks && event.context.requestDTO.options.final) {
+            const body = BodySchema.safeParse(await readBody(event))
+            if (body.error)
+               throw createError({
+                  statusCode: 400,
+                  message: JSON.parse(body.error.message)[0].message,
+                  data: body.error
+               })
+
+            return await mediaService.finalizeChunk(body.data.filename)
+         }
+
+         throw createError(errorsList.badRequest)
       }
    }
 })

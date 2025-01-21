@@ -11,8 +11,15 @@ const OptionsSchema = z.object({
    }, z.object({
       depth: z.boolean().default(false),
       folders: z.boolean().default(false),
+      chunks: z.boolean().default(false),
+      final: z.boolean().default(false),
    })).optional(),
-});
+})
+
+export const BodySchema = z.object({
+   filename: z.string(),
+   index: z.preprocess((val: any) => parseInt(val), z.number())
+}).strict()
 
 export class MediaHandler {
    public static validatePath(event: H3Event<EventHandlerRequest>) {
@@ -75,5 +82,26 @@ export class MediaHandler {
          })
 
       event.context.requestDTO.options = query.data.options || {}
+   }
+
+   public static async validateBody(event: H3Event<EventHandlerRequest>) {
+      const plainObject: Record<string, any> = {}
+      const rawBody = await readFormData(event)
+      for (const [key, value] of rawBody.entries()) {
+         if (value instanceof File)
+            continue
+
+         plainObject[key] = value
+      }
+
+      const body = BodySchema.safeParse(plainObject)
+      if (body.error)
+         throw createError({
+            statusCode: 400,
+            message: JSON.parse(body.error.message)[0].message,
+            data: body.error
+         })
+
+      event.context.requestDTO.body = body.data
    }
 }

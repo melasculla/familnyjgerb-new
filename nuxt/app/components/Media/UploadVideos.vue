@@ -24,7 +24,7 @@ const { handle, error: errors } = useUploadedFiles(async files => {
    uploading.value = true
    const uploadingToast = toast.loading('Uploading videos...')
 
-   const result = await uploadFiles(toRef(files), 'videos', ['video/']).catch(async err => {
+   const result = await uploadFilesByChunks(toRef(files), 'videos', ['video/']).catch(async err => {
       uploading.value = false
       toast.update(uploadingToast, {
          render: err?.data?.message || err?.message || 'Videos havent uploaded',
@@ -98,7 +98,7 @@ const remove = (pathToRemove: string) => videos.value = videos.value.filter(({ p
          <transition-group name="list">
             <div v-for="video, i in videos" :key="video.path" class="relative group"
                v-show="itemsToShow ? showAllItems || i < itemsToShow : true">
-               <video v-if="video.path" class="drag-handle w-full min-h-10">
+               <video v-if="video.path" class="drag-handle w-full min-h-10" controls>
                   <source :src="video.path.startsWith('blob:') ? video.path : routesList.api.media.getFile(video.path)">
                </video>
                <button v-if="!upload" @click="remove(video.path)" type="button"

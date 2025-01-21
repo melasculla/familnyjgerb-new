@@ -14,7 +14,7 @@ export class FileEntity {
    public type
    public data
 
-   constructor({ file, acceptedTypes = ['image/'] }: FileEntityType) {
+   constructor({ file, acceptedTypes = ['image/'] }: FileEntityType, chunk?: boolean) {
       this.acceptedTypes = acceptedTypes || []
 
       this.initialFilename = file.filename || file.name
@@ -23,7 +23,8 @@ export class FileEntity {
 
       this.extenstion = this.exctractType(file.type)
       this.type = file.type!
-      this.checkFileType()
+      if (chunk)
+         this.checkFileType()
 
       this.filename = this.genereateRandomSuffix()
    }

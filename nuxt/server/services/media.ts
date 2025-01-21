@@ -1,6 +1,8 @@
 import { type Storage, type StorageValue, type StorageMeta } from 'unstorage'
 import { type MimeType, type MultiPartData } from 'h3'
 import { joinURL } from 'ufo'
+import path from 'path'
+import fs from 'fs'
 
 export interface IMediaService {
    getAll(
@@ -28,7 +30,9 @@ export interface IMediaService {
 
 export class MediaService implements IMediaService {
    private repositroy: Storage<StorageValue>
-   protected storageKey
+   private storageKey
+   private uploadDir
+   private tempDir
 
    /** Constructor for MediaService.
     * 
@@ -38,6 +42,8 @@ export class MediaService implements IMediaService {
    constructor(storageKey: string | null) {
       this.repositroy = useStorage(storageKey ? `media:${storageKey}` : 'media')
       this.storageKey = storageKey || ''
+      this.uploadDir = joinURL('/app/media', this.storageKey.replaceAll(':', '/'))
+      this.tempDir = '/app/media/temp'
    }
 
    async getAll(
@@ -45,7 +51,7 @@ export class MediaService implements IMediaService {
       searchParam?: string,
       options?: { depth?: boolean }
    ) {
-      const allKeys = await this.repositroy.getKeys()
+      const allKeys = await this.repositroy.getKeys() // TODO: allow only exact type to read
 
       let currentDirKeys = allKeys
          .filter(key => {
@@ -68,8 +74,8 @@ export class MediaService implements IMediaService {
       }
 
       if (pagination.page !== undefined && pagination.perPage !== undefined) {
-         const start = (pagination.page - 1) * pagination.perPage;
-         const end = start + pagination.perPage;
+         const start = (pagination.page - 1) * pagination.perPage
+         const end = start + pagination.perPage
          currentDirKeys = currentDirKeys.slice(start, end)
          if (!currentDirKeys.length)
             throw createError({ ...errorsList.notFound(`Page ${pagination.page}`), data: { total: length } })
@@ -91,7 +97,7 @@ export class MediaService implements IMediaService {
             if (!part)
                return
 
-            currentPath += `/${part}`;
+            currentPath += `/${part}`
             folders.add(currentPath.replaceAll(':', '/'))
          })
       })
@@ -146,6 +152,58 @@ export class MediaService implements IMediaService {
       }
 
       return result.map(item => joinURL('/', this.storageKey.replaceAll(':', '/'), item))
+   }
+
+   async createChunk(input: MultiPartData, filename: string, index: number, acceptedTypes?: string[]) {
+      const entity = new FileEntity({ file: input, acceptedTypes })
+      const chunkDir = path.join(this.tempDir, filename)
+      if (!fs.existsSync(chunkDir)) {
+         fs.mkdirSync(chunkDir, { recursive: true })
+      }
+
+      const chunkPath = path.join(chunkDir, `chunk_${String(index).padStart(5, '0')}`)
+      return new Promise((resolve, reject) => {
+         fs.writeFile(chunkPath, entity.data, err => {
+            if (err)
+               reject(createError({ statusCode: 500, message: 'Failed to save chunk' }))
+
+            resolve({ path: chunkPath })
+         })
+      }) as Promise<{ path: string }>
+   }
+
+   async finalizeChunk(filename: string) {
+      const chunkDir = path.join(this.tempDir, filename)
+      const finalPath = path.join(this.uploadDir, filename)
+
+      if (!fs.existsSync(chunkDir)) {
+         throw createError({ statusCode: 400, message: 'Chunks not found' })
+      }
+
+      const chunkFiles = fs.readdirSync(chunkDir).sort()
+      const writeStream = fs.createWriteStream(finalPath)
+
+      return new Promise((resolve, reject) => {
+         try {
+            for (const chunkFile of chunkFiles) {
+               const chunkPath = path.join(chunkDir, chunkFile)
+               const data = fs.readFileSync(chunkPath)
+               writeStream.write(data)
+            }
+
+            writeStream.end()
+            writeStream.on('finish', () => {
+               fs.rmdirSync(chunkDir, { recursive: true }) // Clean up
+               resolve({ path: joinURL('/', this.storageKey.replaceAll(':', '/'), filename) })
+            })
+
+            writeStream.on('error', (err) => {
+               reject(createError({ statusCode: 500, message: 'Failed to write final file' }))
+            })
+         } catch (err) {
+            reject(createError({ statusCode: 500, message: 'Error finalizing chunks' }))
+         }
+      }) as Promise<{ path: string }>
    }
 
    async delete(key: string) {
