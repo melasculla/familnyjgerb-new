@@ -4,7 +4,7 @@ export interface IPostService {
       categorySlug?: string,
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
-      isAdmin?: boolean,
+      showPlanned?: boolean,
       statuses?: PostStatus[],
    ): Promise<PostList>
 
@@ -16,7 +16,7 @@ export interface IPostService {
       lang?: Langs,
       categorySlug?: string,
       searchParam?: string,
-      isAdmin?: boolean,
+      showPlanned?: boolean,
       statuses?: PostStatus[],
    ): Promise<number>
 
@@ -41,10 +41,10 @@ export class PostService implements IPostService {
       categorySlug?: string,
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
-      isAdmin?: boolean,
+      showPlanned?: boolean,
       statuses?: PostStatus[],
    ) {
-      return await this.repository.findAll(lang, categorySlug, searchParam, pagination, isAdmin, statuses)
+      return await this.repository.findAll(lang, categorySlug, searchParam, pagination, showPlanned, statuses)
    }
 
    async getPostBy(by: 'slug' | 'id', slugOrId: string | number, langId: number) {
@@ -72,10 +72,10 @@ export class PostService implements IPostService {
       lang?: Langs,
       categorySlug?: string,
       searchParam?: string,
-      isAdmin?: boolean,
+      showPlanned?: boolean,
       statuses?: PostStatus[],
    ) {
-      return await this.repository.count(lang, categorySlug, searchParam, isAdmin, statuses)
+      return await this.repository.count(lang, categorySlug, searchParam, showPlanned, statuses)
    }
 
    async getAdjacents(id: number, langId: number) {

@@ -8,21 +8,21 @@ export default defineEventHandler({
    ],
    handler: async event => {
       const postService = new PostService()
-
+      // TODO: make option for show planned
       const [posts, total] = await Promise.all([
          postService.getPosts(
             event.context.requestDTO.locale,
             event.context.requestDTO.category,
             event.context.requestDTO.searchParam,
             event.context.requestDTO.pagination,
-            event.context.role === 'admin',
+            false,
             event.context.requestDTO.stasuses
          ),
          postService.getTotalPosts(
             event.context.requestDTO.locale,
             event.context.requestDTO.category,
             event.context.requestDTO.searchParam,
-            event.context.role === 'admin',
+            false,
             event.context.requestDTO.stasuses
          ),
       ])

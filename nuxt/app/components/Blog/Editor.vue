@@ -7,6 +7,11 @@ const { postData } = defineProps<{
    postData?: Post
 }>()
 
+const { data: categoties, status: categoryStatus, error } = await useLazyFetch(routesList.api.categories.getAll, {
+   getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] || nuxtApp.static.data[key],
+   key: 'categories'
+})
+
 const isEditPage = computed(() => !!postData)
 
 const post = reactive<NewPost>({
@@ -23,7 +28,7 @@ const post = reactive<NewPost>({
    plannedAt: postData?.plannedAt || null,
 })
 
-// TODO: fetch category list and make selection for that
+// TODO: add planned at field
 
 const gallery = computed<ImageJSON[]>({
    get: () => post.gallery || [],
@@ -145,9 +150,27 @@ useSeoMeta({
          <select v-model="post.status">
             <option class="capitalize" v-for="status in postsStatusList" :value="status">{{ status }}</option>
          </select>
-         <ButtonsMain @click="saveData"
-            class="w-max mx-auto text-xl mt-10 mb-5 disabled:opacity-50 disabled:cursor-not-allowed bg-green-500"
-            :disabled="loading">
+         <div>
+            <div v-if="categoryStatus === 'success' && categoties">
+               <select v-model="post.categoryId">
+                  <option v-for="category in categoties" :key="category.id" class="capitalize" :value="category.id">
+                     {{ category[`name${locale.charAt(0).toUpperCase() + locale.slice(1)}` as keyof Category] }}
+                  </option>
+               </select>
+            </div>
+            <div v-else-if="categoryStatus === 'pending' || categoryStatus === 'idle'">
+               <select class="animate-pulse">
+                  <option v-for="category in 5" :key="category" disabled selected>
+                     Loading...
+                  </option>
+               </select>
+            </div>
+            <div v-else-if="categoryStatus === 'error'" class="text-center text-red-500 font-bold text-lg">
+               {{ `Error: ${error?.statusMessage || error?.message || error?.data?.message}` }}
+            </div>
+         </div>
+         <ButtonsMain @click="saveData" :disabled="loading"
+            class="w-max mx-auto text-xl mt-10 mb-5 disabled:opacity-50 disabled:cursor-not-allowed bg-green-500">
             {{ isEditPage ? 'Save' : 'Create' }}
          </ButtonsMain>
       </div>

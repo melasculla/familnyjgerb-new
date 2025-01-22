@@ -190,9 +190,8 @@ useSeoMeta({
             <option class="capitalize" v-for="status in projectsStatusList" :value="status">{{ status }}</option>
          </select>
          <!-- <p class="mt-5">test: {{ project.ogImage }}</p> -->
-         <ButtonsMain @click="saveData"
-            class="w-max mx-auto text-xl mt-10 mb-5 disabled:opacity-50 disabled:cursor-not-allowed bg-green-500"
-            :disabled="loading">
+         <ButtonsMain @click="saveData" :disabled="loading"
+            class="w-max mx-auto text-xl mt-10 mb-5 disabled:opacity-50 disabled:cursor-not-allowed bg-green-500">
             {{ isEditPage ? 'Save' : 'Create' }}
          </ButtonsMain>
       </div>

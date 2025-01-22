@@ -20,6 +20,8 @@ const toggleStatus = (_status: PostStatus) => {
       statuses.value.push(_status)
 }
 
+// TODO: make filter for planned posts
+
 const { data: posts, status, error, refresh } = await useLazyFetch<{ posts: PostList, total?: number }>(routesList.api.posts.getAll, {
    query: {
       locale: locale.value,

@@ -25,6 +25,10 @@ export interface IMediaService {
 
    create(file: MultiPartData, acceptedTypes?: string[]): Promise<string[]>
 
+   createChunk(input: MultiPartData, filename: string, index: number, acceptedTypes?: string[]): Promise<string[]>
+
+   finalizeChunk(filename: string): Promise<string[]>
+
    delete(key: string): Promise<void>
 }
 

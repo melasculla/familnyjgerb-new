@@ -11,7 +11,7 @@ const { data: categoties, status, error } = await useLazyFetch(routesList.api.ca
 
 <template>
    <div>
-      <div v-if="status === 'success' && categoties" class="flex justify-between text-center my-8 px-5 text-base">
+      <div v-if="status === 'success' && categoties" class="flex flex-wrap gap-4 justify-between text-center my-8 px-5 text-base">
          <NuxtLink v-if="current" :to="routesList.client.posts.list">
             Blog
          </NuxtLink>
