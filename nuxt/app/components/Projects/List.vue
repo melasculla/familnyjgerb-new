@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{
+const { admin } = defineProps<{
    admin?: boolean
 }>()
 
@@ -36,6 +36,9 @@ const { data, status, error, refresh } = await useLazyFetch<{ projects: ProjectL
    },
    key: `${locale.value}:projects:${currentPage.value}`,
    onResponseError: ({ response, error }) => {
+      if (admin)
+         return
+
       if (error)
          return showError(error)
       showError({ statusCode: response.status, message: response.statusText })
@@ -67,7 +70,7 @@ useSeoMeta({
             </div>
          </div>
       </div>
-      <Pagination class="mt-5" v-if="totaItems"
+      <Pagination class="mt-5" @page-changed="page => currentPage = page" v-if="totaItems"
          :class="{ 'select-none pointer-events-none': (status === 'pending' || status === 'idle') }" v-bind="{
             pages,
             currentPage,

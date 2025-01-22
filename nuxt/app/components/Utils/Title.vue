@@ -44,7 +44,7 @@ const validate = (string: string): string => {
    if (string.length <= 3)
       errors!.title = 'Title must be at least 4 characters long'
 
-   if (['list', 'monograms', 'gerbs', 'create'].includes(slug.value)) {
+   if (['list', 'monograms', 'gerbs', 'create'].includes(slug.value) || slug.value.includes('__')) {
       errors!.title = 'Slug cannot be like this'
    }
 

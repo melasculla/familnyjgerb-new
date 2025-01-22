@@ -34,7 +34,7 @@ useSeoMeta({
          </a>
          <NuxtLink v-if="route.params.slug && !Array.isArray(route.params.slug)"
             class="underline text-base text-purple-600 my-5 block text-center"
-            :href="routesList.client.admin.posts.single(route.params.slug)">
+            :href="routesList.client.admin.posts.single(route.params.slug, data?.post.id!)">
             Edit
          </NuxtLink>
       </div>

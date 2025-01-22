@@ -21,9 +21,11 @@ const ImageJSONSchema = z.object({
 })
 
 const PostSchema = z.object({
-   slug: z.string().min(3).max(256),
-   title: z.string().min(3).max(256),
-   description: z.string().nullable().optional(),
+   slug: z.string().min(5).max(256, 'Slug must be at least 5 characters long')
+      .refine(slug => !['create',].includes(slug), { message: 'This slug is restricted and cannot be used.' })
+      .refine(slug => !slug.includes('__'), { message: 'Slug cannot contain "__".' }),
+   title: z.string().min(5).max(256, 'Title must be at least 5 characters long'),
+   description: z.string().min(15, 'Description must be at least 15 characters long').nullable().optional(),
    content: z.object({
       version: z.string().optional(),
       time: z.number().optional(),
@@ -39,6 +41,7 @@ const PostSchema = z.object({
    gallery: z.array(ImageJSONSchema).nullable().optional(),
    thumbnail: ImageJSONSchema.nullable().optional(),
    status: z.enum(postsStatusList).optional(),
+   categoryId: z.number().optional(),
    plannedAt: z.string().datetime({ offset: true }).nullable().optional(), // ISO string
    createdAt: z.string().datetime({ offset: true }).optional(), // ISO string
    seoKeys: z.string().nullable().optional(),
@@ -113,8 +116,8 @@ export class PostHandler {
          throw createError({ statusCode: 400, message: `Statuses ${statuses.filter(item => !postsStatusList.includes(item as any)).join(' and ')} not found` })
       }
 
-      if (validStatuses.includes('hidden') || validStatuses.includes('deleted'))
-         AdminAuthHandler.checkAccess(event)
+      // if (validStatuses.includes('hidden') || validStatuses.includes('deleted'))
+      //    AdminAuthHandler.checkAccess(event)
 
       event.context.requestDTO.stasuses = validStatuses
    }

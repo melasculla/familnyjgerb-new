@@ -13,12 +13,12 @@ export default {
          },
          posts: {
             list: '/admin/posts',
-            single: (slug: string) => `/admin/posts/${slug}`,
+            single: (slug: string, id: number) => `/admin/posts/${slug}__${id}`,
          },
          projects: {
             list: '/admin/projects',
             create: '/admin/projects/create',
-            single: (slug: string, id: number) => `/admin/projects/${slug}.${id}`,
+            single: (slug: string, id: number) => `/admin/projects/${slug}__${id}`,
          },
          gallery: {
             list: '/admin/gallery',
@@ -101,7 +101,7 @@ export default {
             list: '/api/media/images/',
             upload: '/api/media/images/',
          },
-         match: (route: string) => `/api/media/${route}` as const,
+         match: (route: string) => joinURL('/api/media/', route) as `/api/media/${string}`,
          getFile: (file: string) => joinURL('/api/media/', file) as `/api/media/${string}`,
       },
 

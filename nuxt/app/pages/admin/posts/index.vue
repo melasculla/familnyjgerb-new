@@ -4,7 +4,7 @@
 
 <template>
    <div>
-      
+      <BlogList admin />
    </div>
 </template>
 

@@ -1,12 +1,14 @@
 <script setup lang="ts">
 defineProps<{
    post: PostList[0]
+   admin?: boolean
 }>()
 </script>
 
 <template>
    <div class="grid">
-      <NuxtLink class="text-center text-sm overflow-hidden" :to="routesList.client.posts.single(post.slug)">
+      <NuxtLink class="text-center text-sm overflow-hidden"
+         :to="admin ? routesList.client.admin.posts.single(post.slug, post.id) : routesList.client.posts.single(post.slug)">
          <NuxtImg v-if="post.thumbnail && post.thumbnail.path" class="aspect-square object-cover w-full"
             :src="'/fs/' + post.thumbnail.path" :alt="post.thumbnail?.alt" :title="post.thumbnail?.alt"
             placeholder="/loader.svg" loading="lazy" />

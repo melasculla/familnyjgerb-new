@@ -23,7 +23,6 @@ const project = reactive<NewProject>({
    seoKeys: projectData?.seoKeys || null,
    ogImage: projectData?.ogImage || null,
 })
-// TODO: make video upload
 
 const usage = computed<ImageJSON[]>({
    get: () => project.usage || [],

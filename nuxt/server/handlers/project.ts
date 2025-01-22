@@ -19,7 +19,7 @@ const ImageJSONSchema = z.object({
 const ProjectSchema = z.object({
    slug: z.string().min(4).max(256, 'Slug must be at least 5 characters long')
       .refine(slug => !['list', 'monograms', 'gerbs', 'create',].includes(slug), { message: 'This slug is restricted and cannot be used.' })
-      .refine(slug => !slug.includes('.'), { message: 'Slug cannot contain dots.' }),
+      .refine(slug => !slug.includes('__'), { message: 'Slug cannot contain "__".' }),
    title: z.string().min(4).max(256, 'Title must be at least 5 characters long'),
    description: z.string().min(15, 'Description must be at least 15 characters long').nullable().optional(),
    content: z.object({

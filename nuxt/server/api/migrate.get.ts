@@ -99,7 +99,7 @@ export default defineEventHandler(async event => {
       fill && await db.insert(postsTable).values({
          slug,
          title: he.decode(post.post_title),
-         description: post.seo_description || null,
+         description: post.seo_description ? he.decode(post.seo_description) : null,
          content,
          thumbnail,
          status: statuses[post.post_status],
@@ -179,7 +179,7 @@ function convertHtmlToOutputData(html: string, title: string) {
                      name: "Main",
                      props: {
                         text: innerContent,
-                        href: attrObj.link.replace('/category/geraldika-v-zhizni', '/blog_o_geraldike/geraldika-v-zhizni')
+                        href: attrObj.link?.replace('/category/geraldika-v-zhizni', '/blog_o_geraldike/geraldika-v-zhizni')
                      }
                   }
                })
