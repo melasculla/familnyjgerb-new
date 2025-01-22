@@ -62,10 +62,10 @@ export const uploadFilesByChunks = async (
    const CHUNK_SIZE = MAX_FILE_SIZE * 1024 * 1024
    const urls: string[] = []
 
-   const uploadChunk = async (file: File, chunk: Blob, index: number) => {
+   const uploadChunk = async (file: File, chunk: Blob, name: string, index: number) => {
       const body = new FormData()
       body.append('file', chunk)
-      body.append('filename', file.name)
+      body.append('filename', name)
       body.append('index', `${index}`)
 
       try {
@@ -86,19 +86,22 @@ export const uploadFilesByChunks = async (
 
    for (const item of filesToUpload) {
       const totalChunks = Math.ceil(item.file!.size / CHUNK_SIZE);
+      const extension = item.file?.name.split('.').pop()
+      const name = item.file?.name.split('.').slice(0, -1).join('.').replaceAll(':', '')
+      const tempName = name + '__' + String(Math.floor(Math.random() * 9e15)) + '.' + extension
 
       for (let i = 0; i < totalChunks; i++) {
          const chunk = item.file!.slice(i * CHUNK_SIZE, (i + 1) * CHUNK_SIZE);
-         await uploadChunk(item.file!, chunk, i)
+         await uploadChunk(item.file!, chunk, tempName, i)
       }
 
       try {
-         const { url } = await $fetch<{ url: string }>(routesList.api.media.match(baseUrl.replace('/api/media/', '')), {
+         const result = await $fetch<string[]>(routesList.api.media.match(baseUrl.replace('/api/media/', '')), {
             method: 'POST',
-            body: { filename: item.file!.name, index: -1 },
+            body: { filename: tempName, index: -1 },
             query: { types, options: { chunks: true, final: true } }
          })
-         urls.push(url)
+         urls.push(...result)
       } catch (err: any) {
          console.error(`Failed to finalize upload for ${item.file!.name}`, err);
          throw createError({ statusCode: err.code, message: err?.data?.message || err.message })

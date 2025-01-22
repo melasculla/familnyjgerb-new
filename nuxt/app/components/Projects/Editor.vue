@@ -70,6 +70,18 @@ const ogImage = computed<ImageJSON[]>({
    }
 })
 
+const video = computed<ImageJSON[]>({
+   get: () => project.video ? [{ path: project.video }] : [],
+   set: (newValue: ImageJSON[]) => {
+      if (!newValue || !newValue.length) {
+         project.video = null
+         return []
+      }
+
+      return project.video = newValue[0]!.path
+   }
+})
+
 const errors = reactive<ProjectErrors>({
    slug: '',
    title: '',
@@ -173,11 +185,11 @@ useSeoMeta({
                <template #inputs></template>
             </MediaUploadFiles>
          </div>
+         <MediaUploadVideos v-model="video" title="Video" :multiple="false" />
          <UtilsKeys v-model="project.seoKeys" />
          <select v-model="project.status">
             <option class="capitalize" v-for="status in projectsStatusList" :value="status">{{ status }}</option>
          </select>
-         <!-- TODO: make array of keys -->
          <!-- <p class="mt-5">test: {{ project.ogImage }}</p> -->
          <ButtonsMain @click="saveData"
             class="w-max mx-auto text-xl mt-10 mb-5 disabled:opacity-50 disabled:cursor-not-allowed bg-green-500"

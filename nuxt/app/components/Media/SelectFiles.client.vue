@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { joinURL } from 'ufo'
 
-const { multiple } = defineProps<{
+const { multiple, video } = defineProps<{
    multiple?: boolean
+   video?: boolean
 }>()
 
 const emit = defineEmits<{
-   selected: [image: string[]]
+   selected: [string[]]
 }>()
 
 const { perPage, currentPage, pages, totaItems } = usePagination(32, 'state', 'selectFilesPage')
@@ -42,7 +43,7 @@ const { data, status, refresh, error } = await useLazyFetch<{ data: string[], to
       page: currentPage,
       perPage: perPage,
       searchParam: searchParam,
-      options: { depth }
+      options: { depth, types: video ? ['webm, mp4'] : ['webp', 'jpg', 'png', 'jpeg', 'gif'] }
    },
    onResponse({ response }) {
       totaItems.value = response._data.total ?? response._data?.data?.total ?? 1
@@ -51,17 +52,17 @@ const { data, status, refresh, error } = await useLazyFetch<{ data: string[], to
 
 const changePage = (page: number) => currentPage.value = page
 
-const selectedImages = ref<string[]>([])
-const selectMultiple = (image: string) => {
-   const isImageExists = selectedImages.value.find((_image) => image === _image)
-   if (isImageExists) {
-      selectedImages.value = selectedImages.value.filter((_image) => image !== _image)
+const selectedFiles = ref<string[]>([])
+const selectMultiple = (file: string) => {
+   const isFileExists = selectedFiles.value.find(_file => file === _file)
+   if (isFileExists) {
+      selectedFiles.value = selectedFiles.value.filter(_file => file !== _file)
    } else {
-      selectedImages.value.push(image)
+      selectedFiles.value.push(file)
    }
 
    if (!multiple)
-      emit('selected', selectedImages.value)
+      emit('selected', selectedFiles.value)
 }
 </script>
 
@@ -78,7 +79,7 @@ const selectMultiple = (image: string) => {
             <input type="checkbox" v-model="depth" class="size-10" title="Depth">
          </div>
       </div>
-      <div class="grid grid-cols-2 xs:grid-cols-3 sm:grid-cols-5 lg:grid-cols-8 gap-4 px-2">
+      <div class="grid grid-cols-2 xs:grid-cols-3 gap-4 px-2" :class="{ 'sm:grid-cols-5 lg:grid-cols-8': !video }">
          <div class="col-span-full flex items-center gap-4 max-w-full flex-wrap">
             <div class="flex-shrink-0 flex gap-2">
                <svg class="max-xs:hidden size-12" xmlns="http://www.w3.org/2000/svg" width="32" height="32"
@@ -99,17 +100,21 @@ const selectMultiple = (image: string) => {
                Refresh
             </button>
             <button class="uppercase text-lg px-4 py-2 bg-teal-500 border-none outline-none rounded-md ml-auto"
-               v-if="multiple && selectedImages.length" @click="emit('selected', selectedImages)" type="button">
+               v-if="multiple && selectedFiles.length" @click="emit('selected', selectedFiles)" type="button">
                Apply
             </button>
          </div>
-         <div v-if="status === 'success' && data" v-for="image in data.data" :key="image"
+         <div v-if="status === 'success' && data" v-for="file in data.data" :key="file"
             class="transform hover:scale-105 transition-all cursor-pointer flex items-center"
-            :class="{ 'outline outline-4 outline-sky-600': selectedImages.find((_image) => _image === image) }"
-            @click="selectMultiple(image)">
-            <NuxtImg :src="joinURL('/fs/', image)" loading="lazy" class="w-full" placeholder="/loader.svg" />
+            :class="{ 'outline outline-4 outline-sky-600': selectedFiles.find((_file) => _file === file), 'outline outline-1 outline-red-300 p-10': video }"
+            @click="selectMultiple(file)">
+            <NuxtImg v-if="!video" :src="joinURL('/fs/', file)" loading="lazy" class="w-full"
+               placeholder="/loader.svg" />
+            <video v-else controls preload="metadata">
+               <source :src="routesList.api.media.getFile(file)">
+            </video>
          </div>
-         <div v-else-if="status === 'pending' || status === 'idle'" v-for="image in 48" class="flex">
+         <div v-else-if="status === 'pending' || status === 'idle'" v-for="file in 48" class="flex">
             <img src="/loader.svg" loading="lazy" class="w-full" />
          </div>
          <div v-else-if="status === 'error'"

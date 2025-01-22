@@ -13,6 +13,7 @@ const OptionsSchema = z.object({
       folders: z.boolean().default(false),
       chunks: z.boolean().default(false),
       final: z.boolean().default(false),
+      types: z.array(z.string()).optional(),
    })).optional(),
 })
 

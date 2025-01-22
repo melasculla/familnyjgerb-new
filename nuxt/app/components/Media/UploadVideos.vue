@@ -68,7 +68,7 @@ const remove = (pathToRemove: string) => videos.value = videos.value.filter(({ p
 <template>
    <div class="grid gap-4 mx-auto text-center justify-center justify-items-center">
       <Teleport to="#teleports">
-         <LazyMediaSelectFiles v-if="isOpen" :multiple="multiple" @selected="videoList => {
+         <LazyMediaSelectFiles v-if="isOpen" video :multiple="multiple" @selected="videoList => {
             handleSelected(videoList)
             emit('update:modelValue', videos)
          }" class="fixed inset-0 w-full h-full z-10 bg-slate-400 overflow-y-auto [scroll-behavior:none]" />
@@ -93,8 +93,8 @@ const remove = (pathToRemove: string) => videos.value = videos.value.filter(({ p
       <div class="text-red-500" v-if="errors">
          <p v-html="errors"></p>
       </div>
-      <draggable class="relative grid xs:grid-cols-3 2xl:grid-cols-6 gap-3 [&.single]:grid-cols-1"
-         :class="{ 'single': !multiple }" v-model="videos" handle=".drag-handle">
+      <draggable class="relative grid xs:grid-cols-3 gap-3 [&.single]:grid-cols-1" :class="{ 'single': !multiple }"
+         v-model="videos" handle=".drag-handle">
          <transition-group name="list">
             <div v-for="video, i in videos" :key="video.path" class="relative group"
                v-show="itemsToShow ? showAllItems || i < itemsToShow : true">
@@ -108,7 +108,7 @@ const remove = (pathToRemove: string) => videos.value = videos.value.filter(({ p
                         d="m8.054 16.673l-.727-.727L11.273 12L7.327 8.079l.727-.727L12 11.298l3.921-3.946l.727.727L12.702 12l3.946 3.946l-.727.727L12 12.727z" />
                   </svg>
                </button>
-               <div v-if="!upload" class="mt-3 sm:absolute bottom-2 grid gap-2 sm:w-11/12 mx-auto sm:left-1/2 sm:-translate-x-1/2
+               <div v-if="!upload" class="mt-3 grid gap-2 sm:w-11/12 mx-auto
                   [&_input]:min-w-0 [&_input]:sm:opacity-0 [&_input]:group-hover:opacity-100
                   [&_input]:focus-within:opacity-100 [&_input]:border [&_input]:border-orange-400 [&_input]:bg-white
                   [&_input]:px-2 [&_input]:py-2 [&_input]:rounded-md [&_input]:text-base">

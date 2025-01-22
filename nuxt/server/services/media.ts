@@ -49,7 +49,7 @@ export class MediaService implements IMediaService {
    async getAll(
       pagination: { page: number | undefined, perPage: number | undefined } = { page: undefined, perPage: undefined },
       searchParam?: string,
-      options?: { depth?: boolean }
+      options?: { depth?: boolean, types?: string[] }
    ) {
       const allKeys = await this.repositroy.getKeys() // TODO: allow only exact type to read
 
@@ -60,6 +60,16 @@ export class MediaService implements IMediaService {
 
             const relativeKey = key.replace(`${this.storageKey}:`, '')
             return !relativeKey.includes(':')
+         })
+         .filter(key => {
+            if (!options?.types)
+               return true
+
+            const ext = key.split('.').pop()
+            if (!ext)
+               return
+
+            return options?.types?.some(item => item.includes(ext))
          })
          .map(key => joinURL('/', this.storageKey.replaceAll(':', '/'), key.replaceAll(':', '/')))
 
@@ -89,6 +99,9 @@ export class MediaService implements IMediaService {
 
       const folders = new Set<string>()
       allKeys.forEach(item => {
+         if (item.startsWith('temp'))
+            return
+
          const parts = item.split(':')
          parts.pop()
 
@@ -167,18 +180,23 @@ export class MediaService implements IMediaService {
             if (err)
                reject(createError({ statusCode: 500, message: 'Failed to save chunk' }))
 
-            resolve({ path: chunkPath })
+            resolve([chunkPath])
          })
-      }) as Promise<{ path: string }>
+      }) as Promise<string[]>
    }
 
    async finalizeChunk(filename: string) {
       const chunkDir = path.join(this.tempDir, filename)
       const finalPath = path.join(this.uploadDir, filename)
 
-      if (!fs.existsSync(chunkDir)) {
+      if (fs.existsSync(finalPath))
+         throw createError({
+            statusCode: 400,
+            message: 'File already exists',
+         })
+
+      if (!fs.existsSync(chunkDir))
          throw createError({ statusCode: 400, message: 'Chunks not found' })
-      }
 
       const chunkFiles = fs.readdirSync(chunkDir).sort()
       const writeStream = fs.createWriteStream(finalPath)
@@ -194,7 +212,7 @@ export class MediaService implements IMediaService {
             writeStream.end()
             writeStream.on('finish', () => {
                fs.rmdirSync(chunkDir, { recursive: true }) // Clean up
-               resolve({ path: joinURL('/', this.storageKey.replaceAll(':', '/'), filename) })
+               resolve([joinURL('/', this.storageKey.replaceAll(':', '/'), filename)])
             })
 
             writeStream.on('error', (err) => {
@@ -203,7 +221,7 @@ export class MediaService implements IMediaService {
          } catch (err) {
             reject(createError({ statusCode: 500, message: 'Error finalizing chunks' }))
          }
-      }) as Promise<{ path: string }>
+      }) as Promise<string[]>
    }
 
    async delete(key: string) {
