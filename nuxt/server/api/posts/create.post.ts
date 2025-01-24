@@ -2,20 +2,18 @@ export default defineEventHandler({
    onRequest: [
       event => LocaleHandler.validateLocale(event, true),
       PostHandler.validateBody,
-      PostHandler.validateCategory,
       // AdminAuthHandler.checkAccess
    ],
    handler: async event => {
       const postService = new PostService()
       const body = event.context.requestDTO.body as Omit<NewPost, 'langId' | 'langGroup' | 'categoryId'>
 
-      const category = await new CategoryService().getCategoryBy('slug', event.context.requestDTO.category)
-      const categoryId = category.id
+      // const category = await new CategoryService().getCategoryBy('slug', event.context.requestDTO.category)
+      // const categoryId = category.id
 
       try {
          const post = await postService.upsertPost({
             ...body,
-            categoryId,
             langId: event.context.requestDTO.langId
          })
          return { post }

@@ -207,6 +207,6 @@ h3 {
 }
 
 .ce-paragraph {
-   @apply text-base
+   @apply text-xs md:text-sm
 }
 </style>

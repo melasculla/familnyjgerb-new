@@ -7,6 +7,10 @@ export default defineEventHandler({
       const postService = new PostService()
 
       const post = await postService.getPostBy('slug', event.context.requestDTO.slug, event.context.requestDTO.langId)
+
+      // if (post.plannedAt && post.plannedAt > new Date())
+      //    AdminAuthHandler.checkAccess(event)
+
       const category = post.categoryId
          ? await new CategoryService().getCategoryBy('id', post.categoryId).catch(() => { })
          : undefined

@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import VueDatePicker from '@vuepic/vue-datepicker';
+import '@vuepic/vue-datepicker/dist/main.css'
 import type { Editor } from '#components'
 const route = useRoute()
 const { locale } = useI18n()
@@ -27,8 +29,6 @@ const post = reactive<NewPost>({
    seoKeys: postData?.seoKeys || null,
    plannedAt: postData?.plannedAt || null,
 })
-
-// TODO: add planned at field
 
 const gallery = computed<ImageJSON[]>({
    get: () => post.gallery || [],
@@ -154,7 +154,8 @@ useSeoMeta({
             <div v-if="categoryStatus === 'success' && categoties">
                <select v-model="post.categoryId">
                   <option v-for="category in categoties" :key="category.id" class="capitalize" :value="category.id">
-                     {{ category[`name${locale.charAt(0).toUpperCase() + locale.slice(1)}` as keyof Category] }}
+                     {{ category[`name${locale.charAt(0).toUpperCase() + locale.slice(1)}` as keyof Category] ||
+                        category.nameRu }}
                   </option>
                </select>
             </div>
@@ -168,6 +169,10 @@ useSeoMeta({
             <div v-else-if="categoryStatus === 'error'" class="text-center text-red-500 font-bold text-lg">
                {{ `Error: ${error?.statusMessage || error?.message || error?.data?.message}` }}
             </div>
+         </div>
+         <div class="flex gap-4">
+            <VueDatePicker v-model="post.plannedAt" />
+            <button type="button" @click="post.plannedAt = null">Reset</button>
          </div>
          <ButtonsMain @click="saveData" :disabled="loading"
             class="w-max mx-auto text-xl mt-10 mb-5 disabled:opacity-50 disabled:cursor-not-allowed bg-green-500">

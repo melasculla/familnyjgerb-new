@@ -7,7 +7,11 @@ const { category, admin } = defineProps<{
 
 const pageBase = category ? routesList.client.posts.categoryPage(category) : routesList.client.posts.page
 const perPage = 12
-const { currentPage, pages, totaItems } = usePagination(perPage, admin ? 'state' : 'page', 'blogPage', admin ? undefined : pageBase)
+const { currentPage, pages, totaItems } = usePagination(
+   perPage,
+   admin ? 'state' : 'page',
+   category ? `blogPage:${category}` : 'blogPage',
+   admin ? undefined : pageBase)
 
 const statuses = ref<PostStatus[]>(['published'])
 const toggleStatus = (_status: PostStatus) => {
@@ -20,7 +24,8 @@ const toggleStatus = (_status: PostStatus) => {
       statuses.value.push(_status)
 }
 
-// TODO: make filter for planned posts
+const showPlanned = ref<boolean>(false)
+// TODO: add feat to have only planned posts
 
 const { data: posts, status, error, refresh } = await useLazyFetch<{ posts: PostList, total?: number }>(routesList.api.posts.getAll, {
    query: {
@@ -28,7 +33,10 @@ const { data: posts, status, error, refresh } = await useLazyFetch<{ posts: Post
       category,
       perPage,
       page: currentPage,
-      statuses
+      statuses,
+      options: {
+         planned: showPlanned
+      }
    },
    getCachedData: (key, nuxtApp) => {
       const data = nuxtApp.payload.data[key] || nuxtApp.static.data[key]
@@ -65,12 +73,17 @@ useSeoMeta({
          <ButtonsMain @click="refresh()">
             Rerfresh
          </ButtonsMain>
-         <div class="flex gap-4 text-base">
+         <div class="flex gap-4 text-base" v-if="admin">
             <div class="flex items-center gap-2" v-for="item in postsStatusList">
                <input class="size-6" :id="`${item}-status`" type="checkbox" @change="toggleStatus(item)"
                   :checked="statuses.includes(item)"
                   :disabled="item === 'published' && statuses.length === 1 && statuses.includes('published')" />
                <label class="capitalize" :for="`${item}-status`">{{ item }}</label>
+            </div>
+            <div class="flex items-center gap-2">
+               <input class="size-6" id="planned-posts" type="checkbox" @change="showPlanned = !showPlanned"
+                  :checked="showPlanned" />
+               <label class="capitalize" for="planned-posts">Planned</label>
             </div>
          </div>
       </div>
@@ -81,7 +94,7 @@ useSeoMeta({
             urlBase: admin ? undefined : pageBase,
             pagesLoading: 11
          }" />
-      <BlogCategories :current="category" />
+      <BlogCategories :current="category" :admin="admin" />
       <div v-if="status === 'success' && posts" class="grid grid-cols-2 md:grid-cols-6 gap-4">
          <BlogCard v-for="post in posts.posts" :key="post.id" :post="post" :admin="admin" />
       </div>

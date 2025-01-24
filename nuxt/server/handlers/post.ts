@@ -15,6 +15,17 @@ const StatusSchema = z.object({
       .or(z.string().min(3, 'Status must be at least 3 characters long').toLowerCase().optional()),
 })
 
+const OptionsSchema = z.object({
+   options: z.preprocess(val => {
+      if (typeof val === 'string')
+         try { return JSON.parse(val) } catch { return undefined }
+
+      return val
+   }, z.object({
+      planned: z.boolean().default(false)
+   })).optional()
+})
+
 const ImageJSONSchema = z.object({
    path: z.string(),
    alt: z.string().optional(),
@@ -120,5 +131,22 @@ export class PostHandler {
       //    AdminAuthHandler.checkAccess(event)
 
       event.context.requestDTO.stasuses = validStatuses
+   }
+
+   public static async validateOptions(event: H3Event<EventHandlerRequest>) {
+      const query = await useSafeValidatedQuery(event, OptionsSchema)
+      if (!query.data || query.error) {
+         const error = JSON.parse(query.error.message)[0]
+         throw createError({
+            statusCode: 400,
+            message: `${error.message}`,
+            data: query.error
+         })
+      }
+
+      // if (query.data.options.planned)
+      //    AdminAuthHandler.checkAccess(event)
+
+      event.context.requestDTO.options = query.data.options || {}
    }
 }

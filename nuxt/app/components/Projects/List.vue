@@ -61,7 +61,7 @@ useSeoMeta({
          <ButtonsMain @click="refresh()">
             Rerfresh
          </ButtonsMain>
-         <div class="flex gap-4 text-base">
+         <div class="flex gap-4 text-base" v-if="admin">
             <div class="flex items-center gap-2" v-for="item in projectsStatusList">
                <input class="size-6" :id="`${item}-status`" type="checkbox" @change="toggleStatus(item)"
                   :checked="statuses.includes(item)"

@@ -13,6 +13,8 @@ export default {
          },
          posts: {
             list: '/admin/posts',
+            create: '/admin/posts/create',
+            category: (category: string) => `/admin/posts/${category}`,
             single: (slug: string, id: number) => `/admin/posts/${slug}__${id}`,
          },
          projects: {

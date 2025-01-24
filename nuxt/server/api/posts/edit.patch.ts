@@ -5,9 +5,22 @@ export default defineEventHandler({
       event => PostHandler.validateBody(event, true),
    ],
    handler: async event => {
-      return await new PostService().upsertPost({
-         ...event.context.requestDTO.body,
-         langId: event.context.requestDTO.langId
-      })
+      try {
+         const post = await new PostService().upsertPost({
+            ...event.context.requestDTO.body,
+            langId: event.context.requestDTO.langId
+         })
+
+         return { post }
+      } catch (err: any) {
+         let message = err.message;
+         let code = err.status;
+         if (err.message.includes('slug_unique')) {
+            code = 409
+            message = 'Slug is taken'
+         }
+
+         throw createError({ statusCode: code, message: message })
+      }
    }
 })

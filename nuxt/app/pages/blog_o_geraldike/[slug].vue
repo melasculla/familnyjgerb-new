@@ -9,7 +9,12 @@ const { data, status, error } = await useLazyFetch<{ post: Post, category: Categ
          locale: locale.value,
       },
       getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] || nuxtApp.static.data[key],
-      key: `${locale.value}:blog_posts:${slug.value}`
+      key: `${locale.value}:blog_posts:${slug.value}`,
+      onResponseError: ({ response, error }) => {
+         if (error)
+            return showError(error)
+         showError({ statusCode: response.status, message: response.statusText })
+      }
    },
 )
 

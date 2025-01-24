@@ -1,7 +1,10 @@
 <script setup lang="ts">
 defineProps<{
    current?: string
+   admin?: boolean
 }>()
+
+const { locale } = useI18n()
 
 const { data: categoties, status, error } = await useLazyFetch(routesList.api.categories.getAll, {
    getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] || nuxtApp.static.data[key],
@@ -11,14 +14,17 @@ const { data: categoties, status, error } = await useLazyFetch(routesList.api.ca
 
 <template>
    <div>
-      <div v-if="status === 'success' && categoties" class="flex flex-wrap gap-4 justify-between text-center my-8 px-5 text-base">
-         <NuxtLink v-if="current" :to="routesList.client.posts.list">
+      <div v-if="status === 'success' && categoties"
+         class="flex flex-wrap gap-4 justify-between text-center my-8 px-5 text-base">
+         <NuxtLink v-if="current" :to="admin ? routesList.client.admin.posts.list : routesList.client.posts.list">
             Blog
          </NuxtLink>
          <template v-for="category in categoties" :key="category.id">
-            <NuxtLink :to="routesList.client.posts.category(category.slug)"
+            <NuxtLink
+               :to="admin ? routesList.client.admin.posts.category(category.slug) : routesList.client.posts.category(category.slug)"
                :class="{ 'outline outline-1 outline-offset-4 outline-orange-500': current === category.slug }">
-               {{ category.nameRu }}
+               {{ category[`name${locale.charAt(0).toUpperCase() + locale.slice(1)}` as keyof Category] ||
+                  category.nameRu }}
             </NuxtLink>
          </template>
       </div>
