@@ -1,3 +1,5 @@
+import PrimeTheme from '@primevue/themes/lara';
+
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
@@ -13,6 +15,7 @@ export default defineNuxtConfig({
     '@nuxtjs/google-fonts',
     '@nuxt/scripts',
     '@sidebase/nuxt-auth',
+    '@primevue/nuxt-module'
   ],
 
   auth: {
@@ -48,6 +51,27 @@ export default defineNuxtConfig({
       }
     ],
     detectBrowserLanguage: false,
+  },
+
+  primevue: {
+    components: {
+      prefix: 'Prime'
+    },
+    directives: {
+      prefix: 'prime'
+    },
+    options: {
+      ripple: true,
+      inputVariant: 'filled',
+      theme: {
+        preset: PrimeTheme,
+        options: {
+          prefix: 'p',
+          darkModeSelector: '.dark',
+          cssLayer: false
+        }
+      }
+    }
   },
 
   postcss: {

@@ -50,16 +50,22 @@ const validate = (string: string): string => {
 
    return string.replace(/\s+/g, ' ')
 }
+
+const id = useId()
 </script>
 
 <template>
-   <div>
-      <input type="text" v-model.trim="validatedTitle" placeholder="Title">
-      <p class="flex gap-4 items-center">
-         {{ slug }}
-         <span class="flex gap-2 items-center">
-            Edit slug? <input class="size-6" type="checkbox" v-model="editSlug">
+   <div class="[&[class*='contents']_.slug]:row-start-2 [&[class*='contents']_.slug]:col-span-full">
+      <PrimeFloatLabel variant="on">
+         <PrimeInputText :id="`${id}-title`" type="text" v-model.trim="validatedTitle" class="!text-base" />
+         <label class="!text-base" :for="`${id}-title`">Title</label>
+      </PrimeFloatLabel>
+      <p class="flex flex-wrap gap-4 mt-4 items-center slug">
+         <span class="flex flex-shrink-0 gap-2 items-center text-sm cursor-pointer [&_*]:cursor-pointer">
+            <label class="select-none" :for="`${id}-slug`">Edit slug?</label>
+            <input class="size-5" :id="`${id}-slug`" type="checkbox" v-model="editSlug">
          </span>
+         <span class="text-xs text-slate-500">{{ slug }}</span>
       </p>
       <UtilsError :error="errors!.title || errors!.slug" />
    </div>

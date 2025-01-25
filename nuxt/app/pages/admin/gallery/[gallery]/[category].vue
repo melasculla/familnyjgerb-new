@@ -38,7 +38,7 @@ const changeOrder = () => {
 }
 
 const label = useId()
-const toast = useToast()
+const toast = useVueToast()
 
 
 const { isOpen, open } = useSelectFilesWindow()
@@ -235,7 +235,7 @@ const { data: categories } = await useLazyFetch(routesList.api.gallery.category.
          </div>
          <div v-if="status === 'success' && data">
             <draggable class="grid xs:grid-cols-3 2xl:grid-cols-6 gap-3 relative" v-model="images"
-               handle=".drag-handle">
+               handle=".drag-handle" delay="200" delayOnTouchOnly="true">
                <transition-group name="list">
                   <div v-for="image, i in images" :key="image.image!" class="relative group" :data-id="image.order"
                      v-show="showAllItems || i < 6">

@@ -36,14 +36,17 @@ const removeKey = (key: string) => model.value = (keys.value = keys.value.filter
 
 <template>
    <div>
-      <div class="flex flex-wrap gap-2">
-         <div v-for="item in keys" class="rounded-lg bg-slate-300 px-2 py-1 cursor-pointer" @click="removeKey(item)" title="Click to delete">
+      <div class="flex flex-wrap items-center gap-4 md:gap-2">
+         <div v-for="item in keys" class="rounded-lg bg-slate-300 px-6 py-4 md:px-2 md:py-1 cursor-pointer"
+            @click="removeKey(item)" title="Click to delete">
             {{ item }}
          </div>
-         <input v-if="keys.length < 20" class="min-w-0" type="text" placeholder="Add key"
-            title="press enter or , to add new key" @keydown="addKey">
+         <PrimeInputText v-if="keys.length < 20" class="min-w-0 !text-sm" type="text" placeholder="Add key"
+            title="press enter or , to add new key" @keydown="addKey" />
+         <!-- <input v-if="keys.length < 20" class="min-w-0" type="text" placeholder="Add key"
+            title="press enter or , to add new key" @keydown="addKey"> -->
       </div>
-      <UtilsError :error="error" />
+      <UtilsError class="text-center mt-4 *:text-lg" :error="error" />
    </div>
 </template>
 

@@ -24,11 +24,16 @@ const validate = (string: string): string => {
 
    return string.replace(/\s+/g, ' ')
 }
+
+const id = useId()
 </script>
 
 <template>
    <div>
-      <input type="text" v-model.trim="validatedDescription" placeholder="Description">
+      <PrimeFloatLabel variant="on">
+         <PrimeInputText :id="`${id}-title`" type="text" v-model.trim="validatedDescription" class="!text-base" />
+         <label class="!text-base" :for="`${id}-title`">Description</label>
+      </PrimeFloatLabel>
       <UtilsError :error="errors!.description" />
    </div>
 </template>

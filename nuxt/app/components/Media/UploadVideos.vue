@@ -15,7 +15,7 @@ const videos = defineModel<UploadedFile[]>({ default: [] })
 const canAddMore = computed(() => multiple || videos.value.length < 1)
 const showAllItems = ref<boolean>(!itemsToShow)
 const label = useId()
-const toast = useToast()
+const toast = useVueToast()
 const uploading = ref<boolean>(false)
 
 const { isOpen, open, handleSelected } = useSelectFilesWindow(videos)
@@ -66,7 +66,8 @@ const remove = (pathToRemove: string) => videos.value = videos.value.filter(({ p
 </script>
 
 <template>
-   <div class="grid gap-4 mx-auto text-center justify-center justify-items-center">
+   <div
+      class="w-full grid gap-4 mx-auto text-center items-start content-start justify-center justify-items-center bg-slate-300 p-4 rounded-lg border-t-8 border-sky-300">
       <Teleport to="#teleports">
          <LazyMediaSelectFiles v-if="isOpen" video :multiple="multiple" @selected="videoList => {
             handleSelected(videoList)
@@ -74,14 +75,19 @@ const remove = (pathToRemove: string) => videos.value = videos.value.filter(({ p
          }" class="fixed inset-0 w-full h-full z-10 bg-slate-400 overflow-y-auto [scroll-behavior:none]" />
       </Teleport>
 
+      <!-- v-if="title && !upload" -->
+      <div v-if="!upload" class="capitalize text-lg text-blue-500">
+         <span>Video</span>
+      </div>
+
       <div v-if="canAddMore" class="flex flex-wrap justify-center justify-items-center gap-4">
          <ButtonsMain v-if="!upload" @click="open" class="disabled:opacity-60 disabled:cursor-not-allowed"
             :disabled="uploading">
-            Select Video
+            <IconsHand />
          </ButtonsMain>
          <ButtonsMain :disabled="uploading"
             class="disabled:opacity-60 disabled:cursor-not-allowed [&:disabled>label]:cursor-not-allowed relative">
-            Upload Video
+            <IconsUpload />
             <label :for="`upload-${label}`" class="absolute inset-0 cursor-pointer" />
          </ButtonsMain>
          <ButtonsMain v-if="upload" @click="videos = []" class="bg-red-800 hover:text-black">
@@ -94,11 +100,11 @@ const remove = (pathToRemove: string) => videos.value = videos.value.filter(({ p
          <p v-html="errors"></p>
       </div>
       <draggable class="relative grid xs:grid-cols-3 gap-3 [&.single]:grid-cols-1" :class="{ 'single': !multiple }"
-         v-model="videos" handle=".drag-handle">
+         v-model="videos" handle=".drag-handle" delay="200" delayOnTouchOnly="true">
          <transition-group name="list">
             <div v-for="video, i in videos" :key="video.path" class="relative group"
                v-show="itemsToShow ? showAllItems || i < itemsToShow : true">
-               <video v-if="video.path" class="drag-handle w-full min-h-10" controls>
+               <video v-if="video.path" class="drag-handle w-full min-h-10 aspect-video" controls>
                   <source :src="video.path.startsWith('blob:') ? video.path : routesList.api.media.getFile(video.path)">
                </video>
                <button v-if="!upload" @click="remove(video.path)" type="button"
@@ -109,11 +115,9 @@ const remove = (pathToRemove: string) => videos.value = videos.value.filter(({ p
                   </svg>
                </button>
                <div v-if="!upload" class="mt-3 grid gap-2 sm:w-11/12 mx-auto
-                  [&_input]:min-w-0 [&_input]:sm:opacity-0 [&_input]:group-hover:opacity-100
-                  [&_input]:focus-within:opacity-100 [&_input]:border [&_input]:border-orange-400 [&_input]:bg-white
-                  [&_input]:px-2 [&_input]:py-2 [&_input]:rounded-md [&_input]:text-base">
+                  [&_input]:min-w-0 [&_input]:!text-base">
                   <slot v-if="$slots.inputs" name="inputs" />
-                  <input v-else placeholder="Caption" v-model="video.alt" />
+                  <PrimeInputText v-else type="text" v-model.trim="video.alt" placeholder="Caption" />
                </div>
             </div>
          </transition-group>

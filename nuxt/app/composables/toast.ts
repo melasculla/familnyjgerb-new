@@ -1,1 +1,1 @@
-export const useToast = () => useNuxtApp().$toast
+export const useVueToast = () => useNuxtApp().$toast

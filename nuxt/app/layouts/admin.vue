@@ -20,7 +20,7 @@ const pages: Page[] = [
 
 <template>
    <div class="">
-      <div class="flex gap-2 items-center flex-wrap px-2 py-2 border-b-[2px] xs:border-b-[5px] border-title">
+      <div class="flex gap-2 items-center flex-wrap px-2 py-2 border-b-[2px] sm:border-b-[5px] border-title">
          <NuxtLink :to="localPath('/')">
             <IconsHome class="icon size-12 sm:size-14 block" />
          </NuxtLink>
@@ -41,28 +41,28 @@ const pages: Page[] = [
          </div>
          <!-- <ThemeSwitcher :admin="true" /> -->
          <div class="ml-auto flex items-center gap-4" v-if="data?.user">
-            <p class="max-xs:hidden text-lg">{{ data?.user?.name }}</p>
+            <p class="max-sm:hidden text-lg">{{ data?.user?.name }}</p>
             <img class="size-10 sm:size-14 rounded-full" :src="data?.user?.image || ''" alt="">
             <IconsLogout class="icon size-10 sm:size-14 block" title="Logout"
                @click="() => signOut({ callbackUrl: '/' })" />
          </div>
       </div>
       <div class="grid grid-cols-[1fr,auto] items-start">
-         <main class="border-r-[2px] xs:border-r-[5px] border-title pt-4 px-1 xs:px-4 min-h-[92vh]">
+         <main class="border-r-[2px] sm:border-r-[5px] border-title pt-4 px-1 sm:px-4 min-h-[92vh]">
             <div class="relative">
                <slot />
             </div>
          </main>
          <aside class="group grid justify-items-center sticky top-0">
             <nav class="text-base">
-               <ul class="grid divide-y-[2px] xs:divide-y-4 divide-fill">
-                  <li v-for="page in pages" class="py-2 px-2 xs:px-3 text-center transition-all"
+               <ul class="grid divide-y-[2px] sm:divide-y-4 divide-fill">
+                  <li v-for="page in pages" class="py-2 px-2 sm:px-3 text-center transition-all"
                      :class="{ '[&:has(.router-link-active)]:bg-red-800 [&:has(.router-link-active)]:text-white': page.path !== routesList.client.admin.main }">
                      <NuxtLink :to="localPath(page.path) || page.path" class="flex items-center icon-parent">
                         <p class="block mr-0 max-w-0 md:group-hover:max-w-[40rem] md:group-hover:pr-2 overflow-hidden">
                            {{ page.title }}
                         </p>
-                        <component :is="page.icon" class="block size-8 xs:size-12 ml-auto" />
+                        <component :is="page.icon" class="block size-8 sm:size-12 ml-auto" />
                      </NuxtLink>
                   </li>
                </ul>
@@ -77,3 +77,5 @@ const pages: Page[] = [
    width: 100%;
 }
 </style>
+
+<!-- <style src="~/assets/css/base.css"></style> -->

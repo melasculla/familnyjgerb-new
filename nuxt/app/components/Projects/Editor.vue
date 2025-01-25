@@ -22,6 +22,7 @@ const project = reactive<NewProject>({
    status: projectData?.status || 'published',
    seoKeys: projectData?.seoKeys || null,
    ogImage: projectData?.ogImage || null,
+   editedAt: projectData?.editedAt && readonly(new Date(projectData?.editedAt)),
 })
 
 const usage = computed<ImageJSON[]>({
@@ -90,7 +91,7 @@ provide(PROVIDE_KEYS.projectErrors, errors)
 
 const editor = ref<InstanceType<typeof Editor>>()
 
-const toast = useToast()
+const toast = useVueToast()
 const loading = ref<boolean>(false)
 const saveData = async () => {
    const messages = {
@@ -165,35 +166,46 @@ const saveData = async () => {
 }
 
 useSeoMeta({
-   title: () => project.title
+   title: () => project.title || 'New Project'
 })
 </script>
 
 <template>
    <div>
-      <div class="grid gap-2 text-base">
-         <UtilsTitle provide-key="projectErrors" v-model="project.title" v-model:slug="project.slug"
-            :is-edit="isEditPage" />
-         <UtilsDescription provide-key="projectErrors" v-model="project.description" />
-         <MediaUploadFiles v-model="usage" title="Usage" multiple />
-         <MediaUploadFiles v-model="sketches" title="Sketches" multiple />
-         <Editor ref="editor" class="w-11/12 mx-auto" :data="project.content" />
-         <div class="grid md:grid-cols-2 gap-2 lg:w-3/5 mx-auto">
-            <MediaUploadFiles v-model="thumbnail" title="Thumbnail" :multiple="false" class="" />
-            <MediaUploadFiles v-model="ogImage" title="OG Image" :multiple="false" class="">
+      <div class="grid gap-6 xl:grid-cols-[1fr,minmax(200px,350px)] text-base items-start max-md:px-2">
+         <div class="grid gap-10">
+            <div class="grid gap-6 grid-cols-1 md:grid-cols-2 justify-between">
+               <UtilsTitle class="md:contents md:[&_p]:mt-0 [&_input[type='text']]:w-full" provide-key="projectErrors"
+                  v-model="project.title" v-model:slug="project.slug" :is-edit="isEditPage" />
+               <UtilsDescription class="[&_input[type='text']]:w-full" provide-key="projectErrors"
+                  v-model="project.description" />
+            </div>
+            <Editor ref="editor" :data="project.content" />
+            <div class="grid md:grid-cols-2 gap-4">
+               <MediaUploadFiles class="[&_.draggable]:grid-cols-1 lg:[&_.draggable]:grid-cols-2" v-model="usage"
+                  title="Usage" multiple />
+               <MediaUploadFiles class="[&_.draggable]:grid-cols-1 lg:[&_.draggable]:grid-cols-2" v-model="sketches"
+                  title="Sketches" multiple />
+            </div>
+            <MediaUploadVideos v-model="video" title="Video" :multiple="false" />
+         </div>
+         <div class="grid gap-6 xl:gap-10 content-start justify-items-center sticky top-2 max-xl:pb-5">
+            <ButtonsMain @click="saveData" :disabled="loading"
+               class="max-xl:order-10 w-full justify-center text-xl disabled:opacity-50 disabled:cursor-not-allowed bg-green-500 sticky top-2 z-10">
+               {{ isEditPage ? 'Save' : 'Create' }}
+            </ButtonsMain>
+            <div v-if="project.editedAt" class="grid gap-2">
+               <p class="text-gray-400">Edited Date:</p>
+               <PrimeDatePicker v-model="project.editedAt" showTime dateFormat="dd/mm/yy" hourFormat="24" fluid
+                  class="[&_input]:text-base" disabled />
+            </div>
+            <PrimeSelect class="max-xl:order-9" v-model="project.status" :options="(projectsStatusList as any)" />
+            <MediaUploadFiles v-model="thumbnail" title="Thumbnail" :multiple="false" input-static />
+            <MediaUploadFiles v-model="ogImage" title="OG Image" :multiple="false">
                <template #inputs></template>
             </MediaUploadFiles>
+            <UtilsKeys v-model="project.seoKeys" />
          </div>
-         <MediaUploadVideos v-model="video" title="Video" :multiple="false" />
-         <UtilsKeys v-model="project.seoKeys" />
-         <select v-model="project.status">
-            <option class="capitalize" v-for="status in projectsStatusList" :value="status">{{ status }}</option>
-         </select>
-         <!-- <p class="mt-5">test: {{ project.ogImage }}</p> -->
-         <ButtonsMain @click="saveData" :disabled="loading"
-            class="w-max mx-auto text-xl mt-10 mb-5 disabled:opacity-50 disabled:cursor-not-allowed bg-green-500">
-            {{ isEditPage ? 'Save' : 'Create' }}
-         </ButtonsMain>
       </div>
    </div>
 </template>

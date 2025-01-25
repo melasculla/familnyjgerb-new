@@ -1,7 +1,6 @@
 <script setup lang="ts">
-import VueDatePicker from '@vuepic/vue-datepicker';
-import '@vuepic/vue-datepicker/dist/main.css'
 import type { Editor } from '#components'
+
 const route = useRoute()
 const { locale } = useI18n()
 
@@ -27,7 +26,8 @@ const post = reactive<NewPost>({
    thumbnail: postData?.thumbnail || null,
    status: postData?.status || 'published',
    seoKeys: postData?.seoKeys || null,
-   plannedAt: postData?.plannedAt || null,
+   plannedAt: typeof postData?.plannedAt === 'string' ? new Date(postData?.plannedAt) : postData?.plannedAt || null,
+   editedAt: postData?.editedAt && readonly(new Date(postData?.editedAt)),
 })
 
 const gallery = computed<ImageJSON[]>({
@@ -56,13 +56,14 @@ const thumbnail = computed<ImageJSON[]>({
 const errors = reactive<PostErrors>({
    slug: '',
    title: '',
-   description: ''
+   description: '',
+   category: ''
 })
 provide(PROVIDE_KEYS.postErrors, errors)
 
 const editor = ref<InstanceType<typeof Editor>>()
 
-const toast = useToast()
+const toast = useVueToast()
 const loading = ref<boolean>(false)
 const saveData = async () => {
    const messages = {
@@ -73,6 +74,8 @@ const saveData = async () => {
 
    loading.value = true
    const savingToast = toast.loading(messages.loading)
+
+   validateFields()
 
    let error;
    if (Object.keys(errors).some(key => error = errors[key as keyof PostErrors])) {
@@ -133,53 +136,71 @@ const saveData = async () => {
       await navigateTo(routesList.client.admin.posts.single(result.post.slug, result.post.id))
 }
 
+const validateFields = () => {
+   errors.category = ''
+
+   if (!post.categoryId)
+      errors.category = 'Cannot be empty'
+}
+
 useSeoMeta({
-   title: () => post.title
+   title: () => post.title || 'New Post'
 })
 </script>
 
 <template>
    <div>
-      <div class="grid gap-2 text-base">
-         <UtilsTitle provide-key="postErrors" v-model="post.title" v-model:slug="post.slug" :is-edit="isEditPage" />
-         <UtilsDescription provide-key="postErrors" v-model="post.description" />
-         <MediaUploadFiles v-model="gallery" title="gallery" multiple />
-         <Editor ref="editor" class="w-11/12 mx-auto" :data="post.content" />
-         <MediaUploadFiles v-model="thumbnail" title="Thumbnail" :multiple="false" class="" />
-         <UtilsKeys v-model="post.seoKeys" />
-         <select v-model="post.status">
-            <option class="capitalize" v-for="status in postsStatusList" :value="status">{{ status }}</option>
-         </select>
-         <div>
-            <div v-if="categoryStatus === 'success' && categoties">
-               <select v-model="post.categoryId">
-                  <option v-for="category in categoties" :key="category.id" class="capitalize" :value="category.id">
-                     {{ category[`name${locale.charAt(0).toUpperCase() + locale.slice(1)}` as keyof Category] ||
-                        category.nameRu }}
-                  </option>
-               </select>
+      <div class="grid gap-6 xl:grid-cols-[1fr,minmax(200px,350px)] text-base items-start max-md:px-2">
+         <div class="grid gap-10">
+            <div class="grid gap-6 grid-cols-1 md:grid-cols-2 justify-between">
+               <UtilsTitle class="md:contents md:[&_p]:mt-0 [&_input[type='text']]:w-full" provide-key="postErrors"
+                  v-model="post.title" v-model:slug="post.slug" :is-edit="isEditPage" />
+               <UtilsDescription class="[&_input[type='text']]:w-full" provide-key="postErrors"
+                  v-model="post.description" />
             </div>
-            <div v-else-if="categoryStatus === 'pending' || categoryStatus === 'idle'">
-               <select class="animate-pulse">
-                  <option v-for="category in 5" :key="category" disabled selected>
-                     Loading...
-                  </option>
-               </select>
-            </div>
-            <div v-else-if="categoryStatus === 'error'" class="text-center text-red-500 font-bold text-lg">
-               {{ `Error: ${error?.statusMessage || error?.message || error?.data?.message}` }}
-            </div>
+            <Editor ref="editor" :data="post.content" />
+            <MediaUploadFiles v-model="gallery" title="gallery" multiple />
          </div>
-         <div class="flex gap-4">
-            <VueDatePicker v-model="post.plannedAt" />
-            <button type="button" @click="post.plannedAt = null">Reset</button>
+         <div class="grid gap-6 xl:gap-10 content-start justify-items-center sticky top-2 max-xl:pb-5">
+            <ButtonsMain @click="saveData" :disabled="loading"
+               class="max-xl:order-10 w-full justify-center text-xl disabled:opacity-50 disabled:cursor-not-allowed bg-green-500 sticky top-2 z-10">
+               {{ isEditPage ? 'Save' : 'Create' }}
+            </ButtonsMain>
+            <div class="max-xl:order-9 w-full grid grid-cols-2 gap-4">
+               <div v-if="categoryStatus !== 'error'">
+                  <PrimeSelect v-model="post.categoryId" class="w-full" :options="(categoties as any)"
+                     :placeholder="(categoryStatus === 'pending' || categoryStatus === 'idle' || !categoties) ? 'Loading...' : 'Category'"
+                     :loading="categoryStatus === 'pending' || categoryStatus === 'idle' || !categoties"
+                     :option-label="`name${locale.charAt(0).toUpperCase() + locale.slice(1)}` || 'nameRu'"
+                     option-value="id" :invalid="!post.categoryId" />
+                  <UtilsError v-if="errors.category" :error="errors.category" />
+               </div>
+               <div v-else class="text-center text-red-500 font-bold text-lg">
+                  {{ `Error: ${error?.statusMessage || error?.message || error?.data?.message}` }}
+               </div>
+               <PrimeSelect v-model="post.status" :options="(postsStatusList as any)" />
+            </div>
+            <div class="w-full max-xl:order-8 grid gap-2">
+               <template v-if="post.editedAt">
+                  <p class="text-gray-400">Edited Date:</p>
+                  <PrimeDatePicker v-model="post.editedAt" showTime dateFormat="dd/mm/yy" hourFormat="24" fluid class="[&_input]:text-base"
+                     disabled />
+               </template>
+               <div class="flex flex-wrap justify-between gap-2">
+                  <p class="text-gray-400">Planned Date:</p>
+                  <span class="cursor-pointer" @click="post.plannedAt = null">Reset</span>
+               </div>
+               <PrimeDatePicker v-model="post.plannedAt" showTime dateFormat="dd/mm/yy" hourFormat="24" fluid class="[&_input]:text-base" />
+            </div>
+            <MediaUploadFiles v-model="thumbnail" title="Thumbnail" :multiple="false" input-static />
+            <UtilsKeys v-model="post.seoKeys" />
          </div>
-         <ButtonsMain @click="saveData" :disabled="loading"
-            class="w-max mx-auto text-xl mt-10 mb-5 disabled:opacity-50 disabled:cursor-not-allowed bg-green-500">
-            {{ isEditPage ? 'Save' : 'Create' }}
-         </ButtonsMain>
       </div>
    </div>
 </template>
 
-<style scoped></style>
+<style scoped>
+:deep(input) {
+   min-width: 0;
+}
+</style>

@@ -2,9 +2,10 @@
 import { VueDraggableNext as draggable } from 'vue-draggable-next'
 
 const { multiple, itemsToShow } = defineProps<{
-   title: string
+   title?: string
    multiple: boolean
    itemsToShow?: number
+   inputStatic?: boolean
    upload?: boolean
 }>()
 
@@ -16,7 +17,7 @@ const images = defineModel<UploadedFile[]>({ default: [] })
 const canAddMore = computed(() => multiple || images.value.length < 1)
 const showAllItems = ref<boolean>(!itemsToShow)
 const label = useId()
-const toast = useToast()
+const toast = useVueToast()
 const uploading = ref<boolean>(false)
 
 const { isOpen, open, handleSelected } = useSelectFilesWindow(images)
@@ -59,7 +60,8 @@ const remove = (pathToRemove: string) => images.value = images.value.filter(({ p
 </script>
 
 <template>
-   <div class="grid gap-4 mx-auto text-center justify-center justify-items-center">
+   <div
+      class="w-full grid gap-4 mx-auto text-center items-start content-start justify-center justify-items-center bg-slate-300 p-4 rounded-lg border-t-8 border-sky-300">
       <Teleport to="#teleports">
          <LazyMediaSelectFiles v-if="isOpen" :multiple="multiple" @selected="imageList => {
             handleSelected(imageList)
@@ -73,14 +75,18 @@ const remove = (pathToRemove: string) => images.value = images.value.filter(({ p
       <input v-if="wannaCustomPath" type="text" class="min-w-0 px-2 py-1 rounded-md text-base" placeholder="Path"
          v-model="validatePath">
 
-      <div v-if="canAddMore" class="flex flex-wrap justify-center justify-items-center gap-4">
+      <div v-if="title && !upload" class="capitalize text-lg text-blue-500">
+         <span>{{ title }}</span>
+      </div>
+
+      <div v-if="canAddMore" class="flex flex-wrap items-start justify-center justify-items-center gap-4">
          <ButtonsMain v-if="!upload" @click="open" class="disabled:opacity-60 disabled:cursor-not-allowed"
             :disabled="uploading">
-            Select {{ title }}
+            <IconsHand />
          </ButtonsMain>
          <ButtonsMain :disabled="uploading"
             class="disabled:opacity-60 disabled:cursor-not-allowed [&:disabled>label]:cursor-not-allowed relative">
-            Upload {{ title }}
+            <IconsUpload />
             <label :for="`upload-${label}`" class="absolute inset-0 cursor-pointer" />
          </ButtonsMain>
          <ButtonsMain v-if="upload" @click="images = []" class="bg-red-800 hover:text-black">
@@ -92,8 +98,9 @@ const remove = (pathToRemove: string) => images.value = images.value.filter(({ p
       <div class="text-red-500" v-if="errors">
          <p v-html="errors"></p>
       </div>
-      <draggable class="relative grid xs:grid-cols-3 2xl:grid-cols-6 gap-3 [&.single]:grid-cols-1"
-         :class="{ 'single': !multiple }" v-model="images" handle=".drag-handle">
+      <draggable class="relative grid xs:grid-cols-3 2xl:grid-cols-6 gap-3 [&.single]:grid-cols-1 draggable"
+         :class="{ 'single': !multiple }" v-model="images" v-if="images.length" handle=".drag-handle" delay="200"
+         delayOnTouchOnly="true">
          <transition-group name="list">
             <div v-for="image, i in images" :key="image.path" class="relative group"
                v-show="itemsToShow ? showAllItems || i < itemsToShow : true">
@@ -106,12 +113,12 @@ const remove = (pathToRemove: string) => images.value = images.value.filter(({ p
                         d="m8.054 16.673l-.727-.727L11.273 12L7.327 8.079l.727-.727L12 11.298l3.921-3.946l.727.727L12.702 12l3.946 3.946l-.727.727L12 12.727z" />
                   </svg>
                </button>
-               <div v-if="!upload" class="mt-3 sm:absolute bottom-2 grid gap-2 sm:w-11/12 mx-auto sm:left-1/2 sm:-translate-x-1/2
-                  [&_input]:min-w-0 [&_input]:sm:opacity-0 [&_input]:group-hover:opacity-100
-                  [&_input]:focus-within:opacity-100 [&_input]:border [&_input]:border-orange-400 [&_input]:bg-white
-                  [&_input]:px-2 [&_input]:py-2 [&_input]:rounded-md [&_input]:text-base">
+               <div v-if="!upload" class="mt-3 [&_input]:w-full [&_input]:min-w-0 [&_input]:!text-base" :class="{
+                  'sm:absolute bottom-2 grid gap-2 sm:w-11/12 mx-auto sm:left-1/2 sm:-translate-x-1/2 [&_input]:sm:opacity-0 [&_input]:group-hover:opacity-100\
+                     [&_input]:focus-within:opacity-100': !inputStatic
+               }">
                   <slot v-if="$slots.inputs" name="inputs" />
-                  <input v-else placeholder="Alt" v-model="image.alt" />
+                  <PrimeInputText v-else type="text" v-model.trim="image.alt" placeholder="Alt" />
                </div>
             </div>
          </transition-group>

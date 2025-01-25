@@ -8,6 +8,7 @@ export type PostErrors = {
    slug: string
    title: string
    description: string,
+   category: string
 }
 
 export const PROVIDE_KEYS = {

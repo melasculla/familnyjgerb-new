@@ -188,10 +188,8 @@ defineExpose({ save })
 </template>
 
 <style lang="postcss">
-@media (max-width: 650px) {
-   .ce-toolbar__actions {
-      right: auto !important;
-   }
+.ce-toolbar__actions {
+   right: -20px !important;
 }
 
 .ce-editorjsColumns_col {
