@@ -17,6 +17,7 @@ export default {
             category: (category: string) => `/admin/posts/${category}`,
             single: (slug: string, id: number) => `/admin/posts/${slug}__${id}`,
          },
+         categories: '/admin/categories',
          projects: {
             list: '/admin/projects',
             create: '/admin/projects/create',
@@ -70,7 +71,10 @@ export default {
       },
 
       categories: {
-         getAll: '/api/categories'
+         getAll: '/api/categories',
+         create: '/api/categories/create',
+         edit: '/api/categories/edit',
+         delete: '/api/categories/delete',
       },
 
       projects: {

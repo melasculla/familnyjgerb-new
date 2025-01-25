@@ -12,6 +12,7 @@ const pages: Page[] = [
    { path: routesList.client.admin.main, title: 'Admin', icon: resolveComponent('IconsDashboard') },
    // { path: routesList.client.admin.users.list, title: 'Users', icon: '/icons/admin/users.svg' },
    { path: routesList.client.admin.posts.list, title: 'Posts', icon: resolveComponent('IconsPosts') },
+   { path: routesList.client.admin.categories, title: 'Categories', icon: resolveComponent('IconsCategories') },
    { path: routesList.client.admin.projects.list, title: 'Projects', icon: resolveComponent('IconsProjects') },
    { path: routesList.client.admin.gallery.list, title: 'Gallery', icon: resolveComponent('IconsGallery') },
    { path: routesList.client.admin.images.upload, title: 'Upload', icon: resolveComponent('IconsUpload') },
@@ -19,7 +20,7 @@ const pages: Page[] = [
 </script>
 
 <template>
-   <div class="">
+   <div>
       <div class="flex gap-2 items-center flex-wrap px-2 py-2 border-b-[2px] sm:border-b-[5px] border-title">
          <NuxtLink :to="localPath('/')">
             <IconsHome class="icon size-12 sm:size-14 block" />

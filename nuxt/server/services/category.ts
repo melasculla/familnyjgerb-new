@@ -3,7 +3,9 @@ export interface ICategoryService {
 
    getCategoryBy(by: 'id' | 'slug', idOrSlug: string | number): Promise<CategoryEntity>
 
-   // TODO: add upsert and delete
+   upsertCategory(categoryObject: NewCategory): Promise<CategoryEntity>
+
+   deleteCategory(by: 'id' | 'slug', idOrSlug: string | number): Promise<void>
 }
 
 export class CategoryService implements ICategoryService {
@@ -13,7 +15,7 @@ export class CategoryService implements ICategoryService {
       this.repository = new CategoryRepository()
    }
 
-   async getCategories() {
+   async getCategories() { // TODO: add posts count
       return await this.repository.findAll()
    }
 
@@ -23,5 +25,14 @@ export class CategoryService implements ICategoryService {
          throw createError(errorsList.notFound('Category'))
 
       return category
+   }
+
+   async upsertCategory(categoryObject: NewCategory) {
+      const categoryEntity = new CategoryEntity(categoryObject)
+      return await this.repository.save(categoryEntity)
+   }
+
+   async deleteCategory(by: 'id' | 'slug', idOrSlug: string | number) {
+      await this.repository.removeBy(by, idOrSlug)
    }
 }

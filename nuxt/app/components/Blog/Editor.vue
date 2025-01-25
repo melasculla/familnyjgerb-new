@@ -8,7 +8,7 @@ const { postData } = defineProps<{
    postData?: Post
 }>()
 
-const { data: categoties, status: categoryStatus, error } = await useLazyFetch(routesList.api.categories.getAll, {
+const { data: categories, status: categoryStatus, error } = await useLazyFetch(routesList.api.categories.getAll, {
    getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] || nuxtApp.static.data[key],
    key: 'categories'
 })
@@ -168,9 +168,9 @@ useSeoMeta({
             </ButtonsMain>
             <div class="max-xl:order-9 w-full grid grid-cols-2 gap-4">
                <div v-if="categoryStatus !== 'error'">
-                  <PrimeSelect v-model="post.categoryId" class="w-full" :options="(categoties as any)"
-                     :placeholder="(categoryStatus === 'pending' || categoryStatus === 'idle' || !categoties) ? 'Loading...' : 'Category'"
-                     :loading="categoryStatus === 'pending' || categoryStatus === 'idle' || !categoties"
+                  <PrimeSelect v-model="post.categoryId" class="w-full" :options="(categories as any)"
+                     :placeholder="(categoryStatus === 'pending' || categoryStatus === 'idle' || !categories) ? 'Loading...' : 'Category'"
+                     :loading="categoryStatus === 'pending' || categoryStatus === 'idle' || !categories"
                      :option-label="`name${locale.charAt(0).toUpperCase() + locale.slice(1)}` || 'nameRu'"
                      option-value="id" :invalid="!post.categoryId" />
                   <UtilsError v-if="errors.category" :error="errors.category" />
