@@ -239,8 +239,10 @@ const { data: categories } = await useLazyFetch(routesList.api.gallery.category.
                <transition-group name="list">
                   <div v-for="image, i in images" :key="image.image!" class="relative group" :data-id="image.order"
                      v-show="showAllItems || i < 6">
-                     <img v-if="image.image" class="drag-handle w-full min-h-10" loading="lazy"
-                        :src="image.image.startsWith('blob:') ? image.image : routesList.api.media.getFile(image.image)" />
+                     <div class="drag-handle">
+                        <img v-if="image.image" class="pointer-events-none w-full min-h-10" loading="lazy"
+                           :src="image.image.startsWith('blob:') ? image.image : routesList.api.media.getFile(image.image)" />
+                     </div>
                      <button @click="removeImage(image)" type="button"
                         class="absolute top-2 right-2 bg-white/50 rounded-full p-2 backdrop-blur">
                         <svg class="size-5" width="32" height="32" viewBox="7 7 10 10">

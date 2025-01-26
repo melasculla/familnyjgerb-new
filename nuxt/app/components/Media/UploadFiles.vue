@@ -104,8 +104,10 @@ const remove = (pathToRemove: string) => images.value = images.value.filter(({ p
          <transition-group name="list">
             <div v-for="image, i in images" :key="image.path" class="relative group"
                v-show="itemsToShow ? showAllItems || i < itemsToShow : true">
-               <img v-if="image.path" class="drag-handle w-full min-h-10" loading="lazy"
-                  :src="image.path.startsWith('blob:') ? image.path : routesList.api.media.getFile(image.path)" />
+               <div class="drag-handle">
+                  <img v-if="image.path" class="pointer-events-none w-full min-h-10" loading="lazy"
+                     :src="image.path.startsWith('blob:') ? image.path : routesList.api.media.getFile(image.path)" />
+               </div>
                <button v-if="!upload" @click="remove(image.path)" type="button"
                   class="absolute top-2 right-2 bg-white/50 rounded-full p-2 backdrop-blur">
                   <svg class="size-5" width="32" height="32" viewBox="7 7 10 10">

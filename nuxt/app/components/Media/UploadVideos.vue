@@ -104,9 +104,12 @@ const remove = (pathToRemove: string) => videos.value = videos.value.filter(({ p
          <transition-group name="list">
             <div v-for="video, i in videos" :key="video.path" class="relative group"
                v-show="itemsToShow ? showAllItems || i < itemsToShow : true">
-               <video v-if="video.path" class="drag-handle w-full min-h-10 aspect-video" controls>
-                  <source :src="video.path.startsWith('blob:') ? video.path : routesList.api.media.getFile(video.path)">
-               </video>
+               <div class="drag-handle">
+                  <video v-if="video.path" class="w-full min-h-10 aspect-video pointer-events-none" controls>
+                     <source
+                        :src="video.path.startsWith('blob:') ? video.path : routesList.api.media.getFile(video.path)">
+                  </video>
+               </div>
                <button v-if="!upload" @click="remove(video.path)" type="button"
                   class="absolute top-2 right-2 bg-white/50 rounded-full p-2 backdrop-blur">
                   <svg class="size-5" width="32" height="32" viewBox="7 7 10 10">
