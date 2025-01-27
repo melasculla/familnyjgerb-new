@@ -15,12 +15,14 @@ export default defineEventHandler({
             event.context.requestDTO.searchParam,
             event.context.requestDTO.pagination,
             event.context.requestDTO.stasuses,
-            event.context.requestDTO.options.random
+            event.context.requestDTO.options.random,
+            event.context.requestDTO.options.exclude,
          ),
          projectService.getTotalProjects(
             event.context.requestDTO.locale,
             event.context.requestDTO.searchParam,
-            event.context.requestDTO.stasuses
+            event.context.requestDTO.stasuses,
+            event.context.requestDTO.options.exclude,
          ),
       ])
 

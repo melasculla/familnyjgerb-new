@@ -64,7 +64,7 @@ export class ProjectRepository implements IProjectRepository {
                   )
                   : undefined,
                inArray(projectsTable.status, statuses || ['published']),
-               exclude ? notInArray(postsTable.id, exclude) : undefined
+               exclude ? notInArray(projectsTable.id, exclude) : undefined
             )
          )
          .offset(offset ?? 0)
@@ -135,7 +135,8 @@ export class ProjectRepository implements IProjectRepository {
                      ilike(projectsTable.description, `%${searchParam}%`),
                   ) :
                   undefined,
-               inArray(projectsTable.status, statuses || ['published'])
+               inArray(projectsTable.status, statuses || ['published']),
+               exclude ? notInArray(projectsTable.id, exclude) : undefined
             )
          )
 

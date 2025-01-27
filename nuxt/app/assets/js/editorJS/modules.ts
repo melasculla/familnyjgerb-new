@@ -72,14 +72,6 @@ class CustomButtonTool {
       buttonList.style.gap = '1rem';
       buttonList.style.justifyContent = 'center'
 
-      // const title = document.createElement('h2')
-      // title.style.flexGrow = '1'
-      // title.style.flexShrink = '0'
-      // title.style.width = '100%'
-      // title.innerHTML = 'Choose button';
-
-      // buttonList.appendChild(title)
-
       const outline = '2px solid red'
 
       for (const path in buttonComponents) {

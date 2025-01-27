@@ -22,6 +22,16 @@ export class GalleryItemService implements IGalleryItemService {
          galleryCategoryId,
          galleryItemObjects.map(item => new GalleryItemEntity(item))
       )
+
+      for (const item of galleryItemEntities) {
+         if (item.order == undefined || item.image == undefined) {
+            throw createError({
+               statusCode: 400,
+               message: `Item with ID: ${item.id} is missing required fields (order or image).`,
+            })
+         }
+      }
+
       return galleryItemEntities
    }
 

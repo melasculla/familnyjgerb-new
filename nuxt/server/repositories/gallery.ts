@@ -18,15 +18,6 @@ export class GalleryItemRepository implements IGalleryItemRepository {
    }
 
    async save(galleryCategoryId: number, galleryItemEntities: GalleryItemEntity[]) {
-      for (const item of galleryItemEntities) {
-         if (item.order == undefined || item.image == undefined) {
-            throw createError({
-               statusCode: 400,
-               message: `Item with ID: ${item.id} is missing required fields (order or image).`,
-            })
-         }
-      }
-
       const itemsToUpdate = galleryItemEntities.filter(item => item.id)
       if (itemsToUpdate.length) {
          let errorCode: number = 500

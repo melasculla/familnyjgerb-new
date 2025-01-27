@@ -23,10 +23,10 @@ export abstract class EmailNotificationDTO {
       this.plainText = plainText
       this.htmlTemplate = htmlTemplate
       this.data = data
-      this.html = this.compileHTML(this.htmlTemplate)
+      this.html = this.compileHTML()
    }
 
-   private compileHTML(template: string): string {
-      return handlebars.compile(template)(this.data)
+   private compileHTML(): string {
+      return handlebars.compile(this.htmlTemplate)(this.data)
    }
 }
