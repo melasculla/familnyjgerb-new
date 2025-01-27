@@ -1,1 +1,0 @@
-ALTER TABLE "gallery_items" ALTER COLUMN "image" DROP NOT NULL;

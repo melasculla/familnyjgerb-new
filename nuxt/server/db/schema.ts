@@ -1,21 +1,46 @@
-import { pgTable, text, varchar, integer, timestamp, serial, json, primaryKey, boolean, unique, type AnyPgColumn } from 'drizzle-orm/pg-core';
-import { relations } from 'drizzle-orm';
+import { pgTable, text, varchar, integer, timestamp, serial, json, boolean, unique, type AnyPgColumn } from 'drizzle-orm/pg-core';
+import { relations, sql } from 'drizzle-orm';
 import type { OutputData } from '@editorjs/editorjs';
 
 export type ImageJSON = { path: string, alt?: string }
 
 export const usersTable = pgTable('users', {
    id: serial('id').primaryKey(),
+   email: varchar('email', { length: 256 }).notNull().unique(),
    name: varchar('name', { length: 256 }).notNull(),
-   email: varchar('email', { length: 256 }).notNull(),
    role: varchar('role', { length: 20 }).$type<Roles>().notNull().default('user'),
-   uid: varchar('uid').notNull().unique(),
+   uid: text().default(sql`gen_random_uuid()`),
 })
 
 export type Roles = 'user' | 'client' | 'admin'
 export const rolesList: Roles[] = ['user', 'client']
 export type User = typeof usersTable.$inferSelect
 export type NewUser = typeof usersTable.$inferInsert
+
+export const userRelations = relations(usersTable, ({ many }) => ({
+   accounts: many(accountsTable),
+}))
+
+
+
+export const accountsTable = pgTable('user_accounts', {
+   id: serial('id').primaryKey(),
+   userId: integer('user_id').notNull().references(() => usersTable.id),
+   provider: varchar('provider', { length: 256 }).notNull(),
+   providerAccountId: varchar('provider_account_id', { length: 256 }).notNull(),
+}, (table) => [
+   unique().on(table.provider, table.providerAccountId)
+])
+
+export type Account = typeof accountsTable.$inferSelect
+export type NewAccount = typeof accountsTable.$inferInsert
+
+export const accountRelations = relations(accountsTable, ({ one }) => ({
+   user: one(usersTable, {
+      fields: [accountsTable.userId],
+      references: [usersTable.id]
+   }),
+}))
 
 
 

@@ -13,16 +13,29 @@ export interface IUserService {
    searchUsers(param: string, pagination?: {
       page: number | undefined;
       perPage: number | undefined;
-   }): Promise<UserList>;
+   }): Promise<UserList>
 
-   deleteUser(id: number): Promise<void>;
+   deleteUser(id: number): Promise<void>
+
+   // Accounts
+   getUserAccounts(id: number): Promise<AccountList>
+
+   getUserAccountBy(by: 'id' | 'userId' | 'provider', column: number | { provider: string, providerAccountId: string }): Promise<AccountEntity>
+
+   getTotalUserAccounts(id: number): Promise<number>
+
+   upsertUserAccount(accountObject: NewAccount): Promise<AccountEntity>
+
+   deleteUserAccount(id: number): Promise<void>
 }
 
 export class UserService implements IUserService {
-   private repository: IUserRepository;
+   private repository: IUserRepository
+   private accountRepository: IAccountRepository
 
    constructor() {
       this.repository = new UserRepository()
+      this.accountRepository = new AccountRepository()
    }
 
    async getTotalUsers(searchParam?: string) {
@@ -61,5 +74,31 @@ export class UserService implements IUserService {
 
    async deleteUser(id: number) {
       await this.repository.removeBy('id', id)
+   }
+
+   // Accounts
+   async getUserAccounts(id: number) {
+      return await this.accountRepository.findAllForUser(id)
+   }
+
+   async getUserAccountBy(by: 'id' | 'userId' | 'provider', column: number | { provider: string, providerAccountId: string }) {
+      const account = await this.accountRepository.findBy(by, column)
+      if (!account)
+         throw createError(errorsList.notFound('Account'))
+
+      return account
+   }
+
+   async getTotalUserAccounts(id: number) {
+      return await this.accountRepository.countForUser(id)
+   }
+
+   async upsertUserAccount(accountObject: NewAccount) {
+      const accountEntity = new AccountEntity(accountObject)
+      return await this.accountRepository.save(accountEntity)
+   }
+
+   async deleteUserAccount(id: number) {
+      await this.accountRepository.removeBy('id', id)
    }
 }

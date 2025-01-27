@@ -1,1 +1,0 @@
-ALTER TABLE "gallery_items" ADD CONSTRAINT "gallery_items_image_unique" UNIQUE("image");

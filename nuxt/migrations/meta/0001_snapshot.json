@@ -1,9 +1,69 @@
 {
-  "id": "93c3c2a5-793b-4cff-b5c9-4f37329d37fc",
-  "prevId": "d6601e43-44ee-4e02-ab35-3b15688e807e",
+  "id": "77ecbb8a-fc23-4884-96b2-cea98efa1af9",
+  "prevId": "3acaefcd-330d-4590-90f8-8f0ee2648c19",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.user_accounts": {
+      "name": "user_accounts",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "serial",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "user_id": {
+          "name": "user_id",
+          "type": "integer",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider": {
+          "name": "provider",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "provider_account_id": {
+          "name": "provider_account_id",
+          "type": "varchar(256)",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "user_accounts_user_id_users_id_fk": {
+          "name": "user_accounts_user_id_users_id_fk",
+          "tableFrom": "user_accounts",
+          "tableTo": "users",
+          "columnsFrom": [
+            "user_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "user_accounts_provider_provider_account_id_unique": {
+          "name": "user_accounts_provider_provider_account_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "provider",
+            "provider_account_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.categories": {
       "name": "categories",
       "schema": "",
@@ -114,7 +174,16 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "gallery_categories_name_gallery_id_unique": {
+          "name": "gallery_categories_name_gallery_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "name",
+            "gallery_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -133,7 +202,7 @@
           "name": "image",
           "type": "varchar(256)",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "title": {
           "name": "title",
@@ -157,7 +226,7 @@
           "name": "order",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "category_id": {
           "name": "category_id",
@@ -183,7 +252,24 @@
         }
       },
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {},
+      "uniqueConstraints": {
+        "gallery_items_order_category_id_unique": {
+          "name": "gallery_items_order_category_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "order",
+            "category_id"
+          ]
+        },
+        "gallery_items_image_category_id_unique": {
+          "name": "gallery_items_image_category_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "image",
+            "category_id"
+          ]
+        }
+      },
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false
@@ -310,13 +396,14 @@
           "name": "lang_id",
           "type": "integer",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true,
+          "default": 1
         },
         "lang_group": {
           "name": "lang_group",
           "type": "integer",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         }
       },
       "indexes": {},
@@ -410,8 +497,8 @@
           "primaryKey": false,
           "notNull": false
         },
-        "usuage": {
-          "name": "usuage",
+        "usage": {
+          "name": "usage",
           "type": "json",
           "primaryKey": false,
           "notNull": false
@@ -471,6 +558,13 @@
           "name": "lang_id",
           "type": "integer",
           "primaryKey": false,
+          "notNull": true,
+          "default": 1
+        },
+        "lang_group": {
+          "name": "lang_group",
+          "type": "integer",
+          "primaryKey": false,
           "notNull": false
         }
       },
@@ -486,17 +580,31 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "restrict",
+          "onUpdate": "no action"
+        },
+        "projects_lang_group_projects_id_fk": {
+          "name": "projects_lang_group_projects_id_fk",
+          "tableFrom": "projects",
+          "tableTo": "projects",
+          "columnsFrom": [
+            "lang_group"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "restrict",
           "onUpdate": "no action"
         }
       },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "projects_slug_unique": {
-          "name": "projects_slug_unique",
+        "projects_slug_lang_id_unique": {
+          "name": "projects_slug_lang_id_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "slug"
+            "slug",
+            "lang_id"
           ]
         }
       },
@@ -514,14 +622,14 @@
           "primaryKey": true,
           "notNull": true
         },
-        "name": {
-          "name": "name",
+        "email": {
+          "name": "email",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
         },
-        "email": {
-          "name": "email",
+        "name": {
+          "name": "name",
           "type": "varchar(256)",
           "primaryKey": false,
           "notNull": true
@@ -535,20 +643,21 @@
         },
         "uid": {
           "name": "uid",
-          "type": "varchar",
+          "type": "text",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false,
+          "default": "gen_random_uuid()"
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "users_uid_unique": {
-          "name": "users_uid_unique",
+        "users_email_unique": {
+          "name": "users_email_unique",
           "nullsNotDistinct": false,
           "columns": [
-            "uid"
+            "email"
           ]
         }
       },

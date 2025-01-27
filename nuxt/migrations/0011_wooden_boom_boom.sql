@@ -1,1 +1,0 @@
-ALTER TABLE "projects" DROP CONSTRAINT "projects_slug_unique";

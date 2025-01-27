@@ -5,85 +5,15 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1735831282649,
-      "tag": "0000_giant_wind_dancer",
+      "when": 1737991544788,
+      "tag": "0000_long_black_knight",
       "breakpoints": true
     },
     {
       "idx": 1,
       "version": "7",
-      "when": 1735831692071,
-      "tag": "0001_opposite_ricochet",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1735832657894,
-      "tag": "0002_dizzy_tomas",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1735833249928,
-      "tag": "0003_violet_mordo",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1736715487214,
-      "tag": "0004_daffy_thunderbolt",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1736720242383,
-      "tag": "0005_cooing_tusk",
-      "breakpoints": true
-    },
-    {
-      "idx": 6,
-      "version": "7",
-      "when": 1736720422219,
-      "tag": "0006_warm_rhodey",
-      "breakpoints": true
-    },
-    {
-      "idx": 7,
-      "version": "7",
-      "when": 1736765860222,
-      "tag": "0007_lame_blackheart",
-      "breakpoints": true
-    },
-    {
-      "idx": 8,
-      "version": "7",
-      "when": 1736770187255,
-      "tag": "0008_public_cerise",
-      "breakpoints": true
-    },
-    {
-      "idx": 9,
-      "version": "7",
-      "when": 1737217175254,
-      "tag": "0009_previous_bloodaxe",
-      "breakpoints": true
-    },
-    {
-      "idx": 10,
-      "version": "7",
-      "when": 1737234676958,
-      "tag": "0010_naive_the_enforcers",
-      "breakpoints": true
-    },
-    {
-      "idx": 11,
-      "version": "7",
-      "when": 1737303742578,
-      "tag": "0011_wooden_boom_boom",
+      "when": 1737992049814,
+      "tag": "0001_hard_kulan_gath",
       "breakpoints": true
     }
   ]

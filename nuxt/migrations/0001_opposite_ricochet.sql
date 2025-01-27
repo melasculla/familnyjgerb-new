@@ -1,1 +1,0 @@
-ALTER TABLE "posts" ADD CONSTRAINT "posts_slug_lang_id_unique" UNIQUE("slug","lang_id");

@@ -3,7 +3,6 @@ import { NuxtAuthHandler } from '#auth'
 
 const config = useRuntimeConfig()
 const admins = config.adminEmails.split(', ')
-const uidTemplate = (provider: string, uid: string) => `${provider}-${uid}`
 
 export default NuxtAuthHandler({
    secret: config.auth.secret,
@@ -19,7 +18,7 @@ export default NuxtAuthHandler({
       }),
    ],
    session: {
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 4, // 4 days
    },
    callbacks: {
       signIn: async ({ user, profile, account }) => {
@@ -27,42 +26,50 @@ export default NuxtAuthHandler({
             return false
 
          const userService = new UserService()
+         const email = user.email || profile.email!
 
-         let isUserExists: boolean = false
-         const customUID = uidTemplate(account.provider, account.providerAccountId)
          try {
-            isUserExists = await userService.getUserBy('uid', customUID) ? true : false
-         } catch (err: any) { }
+            let existingUser = await userService.getUserBy('email', email)
 
-         if (!isUserExists) {
-            try {
-               await userService.upsertUser({
-                  uid: customUID,
-                  name: user.name ?? profile.name ?? '',
-                  email: user.email ?? profile.email!,
-                  role: admins.includes(user.email || profile.email!) ? 'admin' : 'user'
+            if (!existingUser)
+               existingUser = await userService.upsertUser({
+                  name: user.name || profile.name || '',
+                  email,
+                  role: admins.includes(email) ? 'admin' : 'user',
                })
-            } catch (err: any) {
-               console.error(err)
-               return false
-            }
-         }
 
-         return true
+            const existingAccount = await userService.getUserAccountBy('provider', { provider: account.provider, providerAccountId: account.providerAccountId })
+            if (!existingAccount) {
+               await userService.upsertUserAccount({
+                  userId: existingUser.id!,
+                  provider: account.provider,
+                  providerAccountId: account.providerAccountId,
+               })
+            }
+
+            return true
+         } catch (err) {
+            console.error(err)
+            return false
+         }
       },
       jwt: async ({ token, account, user }) => {
-         if (account && user)
-            token.uid = uidTemplate(account.provider, account.providerAccountId);
+         const userService = new UserService()
+
+         if (account && user) {
+            const foundedUser = await userService.getUserBy('email', user.email || token.email!)
+            token.uid = foundedUser.uid!
+         }
 
          if (token.uid && !token.role) {
-            const user = await new UserService().getUserBy('uid', token.uid)
+            const user = await userService.getUserBy('uid', token.uid)
             token.role = user?.role
          }
 
          return token
       },
       session: async ({ session, token }) => {
-         session.role = token.role ?? 'user'
+         session.role = token.role || 'user'
          if (!session.uid)
             session.uid = token.uid
 

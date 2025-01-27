@@ -1,4 +1,4 @@
-import { UserEntity } from "#imports";
+import { AccountEntity, UserEntity } from "#imports";
 import { eq, not, and, count, or, ilike } from "drizzle-orm";
 
 export type UserList = Array<UserEntity>
@@ -18,42 +18,21 @@ export interface IUserRepository {
 }
 
 export class UserRepository implements IUserRepository {
-	protected readonly userListObject = {
-		sketches: {
-			columns: {
-				id: true,
-				status: true,
-				thumbnail: true
-			}
-		},
-		beginnerForms: {
-			columns: {
-				id: true
-			}
-		},
-		clientForms: {
-			columns: {
-				id: true
-			}
-		}
-	} as const
-
 	async findAll(
 		pagination: { page: number | undefined, perPage: number | undefined } = { page: undefined, perPage: undefined }
 	) {
 		const isPaginationSetted = pagination.page && pagination.perPage
 		const offset = isPaginationSetted && (pagination.page! - 1) * pagination.perPage!
 
-		return await db.query.usersTable.findMany({
+		return (await db.query.usersTable.findMany({
 			offset: offset,
 			limit: pagination.perPage,
 			where: not(eq(usersTable.role, 'admin')),
-			with: this.userListObject,
 			orderBy: (userList, { desc }) => [desc(userList.id)]
-		})
+		})).map(item => new UserEntity(item))
 	}
 
-	async findBy(by: 'email' | 'uid', emailOrUID: string): Promise<UserEntity | null> {
+	async findBy(by: 'email' | 'uid', emailOrUID: string) {
 		const user = await db.query.usersTable.findFirst({
 			where: eq(usersTable[by], emailOrUID)
 		})
@@ -80,7 +59,6 @@ export class UserRepository implements IUserRepository {
 				),
 				not(eq(usersTable.role, 'admin'))
 			),
-			with: this.userListObject,
 			orderBy: (userList, { desc }) => [desc(userList.id)]
 		})
 	}
@@ -101,9 +79,7 @@ export class UserRepository implements IUserRepository {
 	async save(userEntity: UserEntity) {
 		if (userEntity.id) {
 			const [updated] = await db.update(usersTable)
-				.set({
-					role: userEntity.role
-				})
+				.set({ role: userEntity.role })
 				.where(eq(usersTable.id, userEntity.id)).returning()
 
 			userEntity = Object.assign(updated)
@@ -111,8 +87,7 @@ export class UserRepository implements IUserRepository {
 			const [inserted] = await db.insert(usersTable).values({
 				name: userEntity.name,
 				email: userEntity.email,
-				uid: userEntity.uid,
-				role: userEntity.role,
+				role: userEntity.role
 			}).returning()
 
 			userEntity = Object.assign(inserted)
@@ -123,5 +98,74 @@ export class UserRepository implements IUserRepository {
 
 	async removeBy(by: 'id' | 'uid', id: number | string) {
 		await db.delete(usersTable).where(eq(usersTable[by], id))
+	}
+}
+
+
+export type AccountList = Array<AccountEntity>
+
+export interface IAccountRepository {
+	findAllForUser(id: number): Promise<AccountList>
+
+	findBy(by: 'id' | 'userId' | 'provider', column: number | { provider: string, providerAccountId: string }): Promise<AccountEntity | null>
+
+	countForUser(id: number): Promise<number>
+
+	save(accountEntity: AccountEntity): Promise<AccountEntity>
+
+	removeBy(by: 'id' | 'userId', id: number): Promise<void>
+}
+
+export class AccountRepository implements IAccountRepository {
+	async findAllForUser(id: number) {
+		return (await db.query.accountsTable.findMany({
+			where: eq(accountsTable.userId, id),
+			orderBy: (table, { desc }) => [desc(table.id)]
+		})).map(item => new AccountEntity(item))
+	}
+
+	async findBy(by: 'id' | 'userId' | 'provider', column: number | { provider: string, providerAccountId: string }) {
+		const account = await db.query.accountsTable.findFirst({
+			where: by === 'provider' && typeof column === 'object'
+				? and(
+					eq(accountsTable.provider, column.provider),
+					eq(accountsTable.providerAccountId, column.providerAccountId)
+				)
+				: eq(accountsTable[by], column as number)
+		})
+		if (!account)
+			return null
+
+		return new AccountEntity(account)
+	}
+
+	async countForUser(id: number) {
+		const [total] = await db.select({ count: count() }).from(accountsTable).where(eq(accountsTable.id, id))
+		return total.count
+	}
+
+	async save(accountEntity: AccountEntity) {
+		if (accountEntity.id) {
+			// const [updated] = await db.update(accountsTable)
+			// 	.set({})
+			// 	.where(eq(accountsTable.id, accountEntity.id))
+			// 	.returning()
+
+			// accountEntity = Object.assign(updated)
+		} else {
+			const [inserted] = await db.insert(accountsTable).values({
+				userId: accountEntity.userId,
+				provider: accountEntity.provider,
+				providerAccountId: accountEntity.providerAccountId,
+			}).returning()
+
+			accountEntity = Object.assign(inserted)
+		}
+
+		return accountEntity
+	}
+
+	async removeBy(by: 'id' | 'userId', id: number) {
+		await db.delete(accountsTable).where(eq(accountsTable[by], id))
 	}
 }
