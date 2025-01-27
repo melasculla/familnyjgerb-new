@@ -13,6 +13,8 @@ export default defineEventHandler({
             ...body,
             langId: event.context.requestDTO.langId
          })
+
+         setResponseStatus(event, 201)
          return { project }
       } catch (err: any) {
          if (err.message.includes('duplicate'))

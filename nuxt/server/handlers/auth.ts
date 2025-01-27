@@ -17,9 +17,9 @@ export class AuthHandler {
    }
 }
 
-export class ClientAuthHandler {
+export class EditorAuthHandler {
    public static checkAccess(event: H3Event<EventHandlerRequest>) {
-      if (event.context.role !== 'client' && event.context.role !== 'admin')
+      if (event.context.role !== 'editor' && event.context.role !== 'admin')
          throw createError(errorsList.forbidden)
    }
 }

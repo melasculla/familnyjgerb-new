@@ -29,7 +29,7 @@ export default NuxtAuthHandler({
          const email = user.email || profile.email!
 
          try {
-            let existingUser = await userService.getUserBy('email', email)
+            let existingUser = await userService.getUserBy('email', email).catch(() => { })
 
             if (!existingUser)
                existingUser = await userService.upsertUser({
@@ -39,6 +39,7 @@ export default NuxtAuthHandler({
                })
 
             const existingAccount = await userService.getUserAccountBy('provider', { provider: account.provider, providerAccountId: account.providerAccountId })
+               .catch(() => { })
             if (!existingAccount) {
                await userService.upsertUserAccount({
                   userId: existingUser.id!,

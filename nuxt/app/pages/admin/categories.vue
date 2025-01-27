@@ -36,7 +36,6 @@ const remove = (id?: number) => {
 <template>
    <div>
       <NuxtLayout name="admin">
-         <PrimeConfirmDialog />
          <template #header>
             <PrimeButton class="sm:ml-10 !text-base [&_::before]:!text-base" label="Refresh" icon="pi pi-refresh"
                @click="refresh()" />

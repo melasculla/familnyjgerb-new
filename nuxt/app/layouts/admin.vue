@@ -8,16 +8,18 @@ const switchLocalePath = useSwitchLocalePath()
 
 const { signOut, data } = useAuth()
 
-type Page = { path: string, title: string, icon: ConcreteComponent | string }
+type Page = { path: string, title: string, icon: ConcreteComponent | string, roles?: Roles[] }
 const pages: Page[] = [
    { path: routesList.client.admin.main, title: 'Admin', icon: resolveComponent('IconsDashboard') },
    // { path: routesList.client.admin.users.list, title: 'Users', icon: '/icons/admin/users.svg' },
    { path: routesList.client.admin.posts.list, title: 'Posts', icon: resolveComponent('IconsPosts') },
    { path: routesList.client.admin.categories, title: 'Categories', icon: resolveComponent('IconsCategories') },
    { path: routesList.client.admin.projects.list, title: 'Projects', icon: resolveComponent('IconsProjects') },
-   { path: routesList.client.admin.gallery.list, title: 'Gallery', icon: resolveComponent('IconsGallery') },
+   { path: routesList.client.admin.gallery.list, title: 'Gallery', icon: resolveComponent('IconsGallery') }, // , roles: ['admin'] 
    { path: routesList.client.admin.images.upload, title: 'Upload', icon: resolveComponent('IconsUpload') },
 ]
+
+const confirm = useConfirm()
 </script>
 
 <template>
@@ -45,8 +47,18 @@ const pages: Page[] = [
          <div class="ml-auto flex items-center gap-4" v-if="data?.user">
             <p class="max-sm:hidden text-lg">{{ data?.user?.name }}</p>
             <img class="size-10 sm:size-14 rounded-full" :src="data?.user?.image || ''" alt="">
-            <IconsLogout class="icon size-10 sm:size-14 block" title="Logout"
-               @click="() => signOut({ callbackUrl: '/' })" />
+            <IconsLogout class="icon size-10 sm:size-14 block cursor-pointer" title="Logout" @click="confirm.require({
+               message: 'Are you sure you want to LogOut?',
+               header: 'Log Out?',
+               accept: () => signOut({ callbackUrl: '/' }),
+               // icon: 'pi pi-exclamation-triangle',
+               acceptProps: {
+                  severity: 'danger',
+                  icon: 'pi pi-sign-out',
+                  variant: 'outlined',
+                  size: 'large'
+               },
+            })" />
          </div>
       </div>
       <div class="grid grid-cols-[1fr,auto] items-start">
@@ -59,6 +71,7 @@ const pages: Page[] = [
             <nav class="text-base">
                <ul class="grid divide-y-[2px] sm:divide-y-4 divide-fill">
                   <li v-for="page in pages" class="py-2 px-2 sm:px-3 text-center transition-all"
+                     v-show="page.roles?.length ? page.roles?.includes(data?.role!) : true"
                      :class="{ '[&:has(.router-link-active)]:bg-red-800 [&:has(.router-link-active)]:text-white': page.path !== routesList.client.admin.main }">
                      <NuxtLink :to="localPath(page.path)" class="flex items-center icon-parent">
                         <p class="block mr-0 max-w-0 md:group-hover:max-w-[40rem] md:group-hover:pr-2 overflow-hidden">

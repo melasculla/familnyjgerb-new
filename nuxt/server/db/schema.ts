@@ -12,8 +12,8 @@ export const usersTable = pgTable('users', {
    uid: text().default(sql`gen_random_uuid()`),
 })
 
-export type Roles = 'user' | 'client' | 'admin'
-export const rolesList: Roles[] = ['user', 'client']
+export type Roles = 'user' | 'editor' | 'admin'
+export const rolesList: Roles[] = ['user', 'editor']
 export type User = typeof usersTable.$inferSelect
 export type NewUser = typeof usersTable.$inferInsert
 
@@ -133,7 +133,6 @@ export const projectsTable = pgTable('projects', {
 }, (table) => [
    unique().on(table.slug, table.langId)
 ])
-// Похожие
 
 export type ProjectStatus = typeof projectsStatusList[number]
 export type Project = typeof projectsTable.$inferSelect
@@ -201,6 +200,3 @@ export const galleryItemsRelations = relations(galleryItemsTable, ({ one }) => (
       references: [galleryCategoriesTable.id]
    }),
 }))
-
-// ### Видео
-// Отдельная страница с видео

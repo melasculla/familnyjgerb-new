@@ -40,7 +40,21 @@ const { handle, error: errors } = useUploadedFiles(async files => {
    uploading.value = true
    const uploadingToast = toast.loading('Uploading images...')
 
-   const result = await uploadFiles(toRef(files), path.value)
+   const result = await uploadFiles(toRef(files), path.value).catch(async err => {
+      uploading.value = false
+      await nextTick()
+      toast.update(uploadingToast, {
+         render: 'Images wasn\'t uploaded',
+         autoClose: true,
+         closeOnClick: true,
+         type: 'error',
+         isLoading: false
+      })
+   })
+
+   if (!result)
+      return
+
    for (const item of result) {
       images.value.unshift({ path: item.path })
    }

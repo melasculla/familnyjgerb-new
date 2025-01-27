@@ -130,7 +130,7 @@ export class PostHandler {
       }
 
       // if (validStatuses.includes('hidden') || validStatuses.includes('deleted'))
-      //    AdminAuthHandler.checkAccess(event)
+         // AdminAuthHandler.checkAccess(event)
 
       event.context.requestDTO.stasuses = validStatuses
    }
@@ -146,8 +146,8 @@ export class PostHandler {
          })
       }
 
-      // if (query.data.options.planned)
-      //    AdminAuthHandler.checkAccess(event)
+      // if (query.data.options?.planned !== 'false')
+         // AdminAuthHandler.checkAccess(event)
 
       event.context.requestDTO.options = query.data.options || {}
    }

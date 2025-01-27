@@ -11,6 +11,7 @@ export default defineEventHandler({
             langId: event.context.requestDTO.langId
          })
 
+         setResponseStatus(event, 201)
          return { post }
       } catch (err: any) {
          let message = err.message;

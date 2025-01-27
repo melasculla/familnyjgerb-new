@@ -5,6 +5,7 @@ export default defineEventHandler({
    ],
    handler: async event => {
       try {
+         setResponseStatus(event, 201)
          return { category: await new CategoryService().upsertCategory(event.context.requestDTO.body) }
       } catch (err: any) {
          let statusCode = err.status

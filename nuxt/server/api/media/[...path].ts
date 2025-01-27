@@ -50,6 +50,7 @@ export default defineEventHandler({
 
             if (event.context.requestDTO.options.chunks) {
                await MediaHandler.validateBody(event)
+               setResponseStatus(event, 201)
                return await mediaService.createChunk(
                   files[0],
                   event.context.requestDTO.body.filename,
@@ -58,6 +59,7 @@ export default defineEventHandler({
                )
             }
 
+            setResponseStatus(event, 201)
             return await mediaService.create(files, event.context.requestDTO.acceptedTypes)
          }
 
@@ -70,6 +72,7 @@ export default defineEventHandler({
                   data: body.error
                })
 
+            setResponseStatus(event, 201)
             return await mediaService.finalizeChunk(body.data.filename)
          }
 

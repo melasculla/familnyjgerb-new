@@ -23,13 +23,42 @@ const protectedRoutes: Route[] = [
          { roles: ['admin'] }
       ]
    },
-   // {
-   //    path: '/api/media',
-   //    permissions: [
-   //       { methods: ['GET'] },
-   //       { roles: ['admin'] }
-   //    ]
-   // }
+   {
+      path: '/api/posts',
+      permissions: [
+         { methods: ['GET'] },
+         { roles: ['admin'] }
+      ]
+   },
+   {
+      path: '/api/categories',
+      permissions: [
+         { methods: ['GET'] },
+         { roles: ['admin'] }
+      ]
+   },
+   {
+      path: '/api/projects',
+      permissions: [
+         { methods: ['GET'] },
+         // { methods: ['POST'], roles: ['editor'] },
+         { roles: ['admin'] }
+      ]
+   },
+   {
+      path: '/api/gallery',
+      permissions: [
+         { methods: ['GET'] },
+         { roles: ['admin'] }
+      ]
+   },
+   {
+      path: '/api/media',
+      permissions: [
+         { methods: ['GET'] },
+         { roles: ['admin'] }
+      ]
+   },
 ]
 
 export default defineEventHandler(async event => {
@@ -47,23 +76,29 @@ export default defineEventHandler(async event => {
    let isAuthorized: boolean = false
 
    for (const permission of protectedRoute.permissions) {
-      if (permission.methods) {
-         isAuthorized = permission.methods.includes(event.method)
-         if (isAuthorized)
-            break
-      }
+      let allowedMethod: boolean = false
+      let allowedRole: boolean = false
 
-      if (permission.roles && permission.roles.includes(event.context.role!)) {
-         isAuthorized = true
+      if (permission.methods?.length)
+         allowedMethod = permission.methods.includes(event.method)
+      else
+         allowedMethod = true
+
+      if (permission.roles?.length)
+         allowedRole = event.context.role ? permission.roles.includes(event.context.role) : false
+      else
+         allowedRole = true
+
+      isAuthorized = allowedMethod && allowedRole
+      if (isAuthorized)
          break
-      }
    }
 
    if (isAuthorized)
       return
 
-   if (!session)
-      throw createError(errorsList.unauthorized)
+   // if (!session)
+   //    throw createError(errorsList.unauthorized)
 
-   throw createError(errorsList.forbidden)
+   // throw createError(errorsList.forbidden)
 })

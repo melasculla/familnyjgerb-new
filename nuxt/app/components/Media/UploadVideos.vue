@@ -100,12 +100,12 @@ const remove = (pathToRemove: string) => videos.value = videos.value.filter(({ p
          <p v-html="errors"></p>
       </div>
       <draggable class="relative grid xs:grid-cols-3 gap-3 [&.single]:grid-cols-1" :class="{ 'single': !multiple }"
-         v-model="videos" handle=".drag-handle" delay="200" delayOnTouchOnly="true">
+         v-model="videos" handle=".drag-handle" delay="200">
          <transition-group name="list">
             <div v-for="video, i in videos" :key="video.path" class="relative group"
                v-show="itemsToShow ? showAllItems || i < itemsToShow : true">
                <div class="drag-handle">
-                  <video v-if="video.path" class="w-full min-h-10 aspect-video pointer-events-none" controls>
+                  <video v-if="video.path" class="w-full min-h-10 aspect-video" controls>
                      <source
                         :src="(video.path.startsWith('blob:') || video.path.startsWith('http:')) ? video.path : routesList.api.media.getFile(video.path)" />
                   </video>

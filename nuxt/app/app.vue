@@ -10,6 +10,7 @@ useHead({
    <div>
       <NuxtLayout>
          <NuxtPage />
+         <PrimeConfirmDialog />
       </NuxtLayout>
    </div>
 </template>

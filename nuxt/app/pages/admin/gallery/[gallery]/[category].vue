@@ -67,7 +67,22 @@ const { handle, error: uploadError } = useUploadedFiles(async files => {
    uploading.value = true
    const uploadingToast = toast.loading('Uploading images...')
 
-   const result = await uploadFiles(toRef(files))
+   const result = await uploadFiles(toRef(files)).catch(async err => {
+      loading.value = false
+      uploading.value = false
+      await nextTick()
+      toast.update(uploadingToast, {
+         render: 'Images wasn\'t uploaded',
+         autoClose: true,
+         closeOnClick: true,
+         type: 'error',
+         isLoading: false
+      })
+   })
+
+   if (!result)
+      return
+
    for (const item of result) {
       images.value.unshift({ image: item.path, order: images.value.length + 1 })
    }
@@ -160,7 +175,20 @@ const saveData = async () => {
       body: {
          items: itemsToUpsert
       }
+   }).catch(async err => {
+      loading.value = false
+      await nextTick()
+      toast.update(upsertToast, {
+         render: 'Images wasn\'t deleted' + ` (${err?.data?.message || err?.message})`,
+         autoClose: true,
+         closeOnClick: true,
+         type: 'error',
+         isLoading: false
+      })
    })
+
+   if (!updatedItems)
+      return
 
    loading.value = false
    await nextTick()

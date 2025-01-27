@@ -55,7 +55,7 @@ export class MediaService implements IMediaService {
       searchParam?: string,
       options?: { depth?: boolean, types?: string[] }
    ) {
-      const allKeys = await this.repositroy.getKeys() // TODO: allow only exact type to read
+      const allKeys = await this.repositroy.getKeys()
 
       let currentDirKeys = allKeys
          .filter(key => {
@@ -232,5 +232,3 @@ export class MediaService implements IMediaService {
       await this.repositroy.removeItem(key)
    }
 }
-
-// TODO: make chunk upload method for large files
