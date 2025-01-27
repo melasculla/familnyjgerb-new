@@ -5,12 +5,14 @@ defineProps<{
    post: PostList[0]
    admin?: boolean
 }>()
+
+const localPath = useLocalePath()
 </script>
 
 <template>
    <div class="grid">
-      <NuxtLink class="text-center text-sm overflow-hidden"
-         :to="admin ? routesList.client.admin.posts.single(post.slug, post.id) : routesList.client.posts.single(post.slug)">
+      <NuxtLink class="text-center text-sm overflow-hidden" prefetchedClass=""
+         :to="admin ? localPath(routesList.client.admin.posts.single(post.slug, post.id)) : localPath(routesList.client.posts.single(post.slug))">
          <NuxtImg v-if="post.thumbnail && post.thumbnail.path" class="aspect-square object-cover w-full"
             :src="joinURL('/fs/', post.thumbnail.path)" :alt="post.thumbnail?.alt" :title="post.thumbnail?.alt"
             placeholder="/loader.svg" loading="lazy" />

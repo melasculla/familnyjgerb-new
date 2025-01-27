@@ -60,7 +60,7 @@ const pages: Page[] = [
                <ul class="grid divide-y-[2px] sm:divide-y-4 divide-fill">
                   <li v-for="page in pages" class="py-2 px-2 sm:px-3 text-center transition-all"
                      :class="{ '[&:has(.router-link-active)]:bg-red-800 [&:has(.router-link-active)]:text-white': page.path !== routesList.client.admin.main }">
-                     <NuxtLink :to="localPath(page.path) || page.path" class="flex items-center icon-parent">
+                     <NuxtLink :to="localPath(page.path)" class="flex items-center icon-parent">
                         <p class="block mr-0 max-w-0 md:group-hover:max-w-[40rem] md:group-hover:pr-2 overflow-hidden">
                            {{ page.title }}
                         </p>

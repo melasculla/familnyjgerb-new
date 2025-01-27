@@ -37,7 +37,8 @@ const parseLink = async (e: MouseEvent) => {
 
 <style scoped>
 :deep(a) {
-   text-decoration: underline
+   text-decoration: underline;
+   display: inline-block;
 }
 
 :deep(.editor__columns:has(.editor__columns__child .image:only-child)) .image:only-child {

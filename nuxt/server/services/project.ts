@@ -4,6 +4,8 @@ export interface IProjectService {
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
       statuses?: ProjectStatus[],
+      random?: boolean,
+      exclude?: number[]
    ): Promise<ProjectList>
 
    getProjectBy(by: 'slug' | 'id', slugOrId: string | number, langId: number): Promise<ProjectEntity>
@@ -12,6 +14,7 @@ export interface IProjectService {
       lang?: Langs,
       searchParam?: string,
       statuses?: ProjectStatus[],
+      exclude?: number[]
    ): Promise<number>
 
    getAdjacents(id: number, langId: number): Promise<{ prev?: string, next?: string }>
@@ -35,8 +38,10 @@ export class ProjectService implements IProjectService {
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
       statuses?: ProjectStatus[],
+      random?: boolean,
+      exclude?: number[]
    ) {
-      return await this.repository.findAll(lang, searchParam, pagination, statuses)
+      return await this.repository.findAll(lang, searchParam, pagination, statuses, random, exclude)
    }
 
    async getProjectBy(by: 'slug' | 'id', slugOrId: string | number, langId: number) {
@@ -64,8 +69,9 @@ export class ProjectService implements IProjectService {
       lang?: Langs,
       searchParam?: string,
       statuses?: ProjectStatus[],
+      exclude?: number[]
    ) {
-      return await this.repository.count(lang, searchParam, statuses)
+      return await this.repository.count(lang, searchParam, statuses, exclude)
    }
 
    async getAdjacents(id: number, langId: number) {

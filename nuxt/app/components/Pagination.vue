@@ -28,13 +28,13 @@ const nuxtLinkComponent = resolveComponent('NuxtLink')
       <div class="flex flex-wrap gap-4 justify-center mb-2">
          <component :is="urlBase ? nuxtLinkComponent : 'button'" v-if="currentPage > 5"
             class="border leading-none rounded-[50%] size-10 grid place-items-center cursor-pointer transition-colors"
-            :aria-label="`Navaigate to page ${currentPage - 5}`" :to="urlBase && urlBase(currentPage - 5)"
+            :aria-label="`Navaigate to page ${currentPage - 5}`" :to="urlBase && localPath(urlBase(currentPage - 5))"
             @click="!urlBase && pageChanged(currentPage - 5)">
             &lt;&lt;
          </component>
          <component :is="urlBase ? nuxtLinkComponent : 'button'" v-if="currentPage > 1"
             class="border leading-none rounded-[50%] size-10 grid place-items-center cursor-pointer transition-colors"
-            :aria-label="`Navaigate to page ${currentPage - 1}`" :to="urlBase && urlBase(currentPage - 1)"
+            :aria-label="`Navaigate to page ${currentPage - 1}`" :to="urlBase && localPath(urlBase(currentPage - 1))"
             @click="!urlBase && pageChanged(currentPage - 1)">
             &lt;
          </component>
@@ -44,7 +44,7 @@ const nuxtLinkComponent = resolveComponent('NuxtLink')
                <component :is="urlBase ? nuxtLinkComponent : 'button'"
                   class="border leading-none rounded-[50%] size-10 grid place-items-center cursor-pointer transition-colors"
                   :class="currentPage == page ? 'border-orange-400 text-orange-400' : 'border-gray-500'"
-                  :aria-label="`Navaigate to page ${page}`" :to="urlBase && urlBase(page !== 1 ? page : undefined)"
+                  :aria-label="`Navaigate to page ${page}`" :to="urlBase && localPath(urlBase(page !== 1 ? page : undefined))"
                   @click="!urlBase && pageChanged(page)">
                   {{ page }}
                </component>
@@ -53,13 +53,13 @@ const nuxtLinkComponent = resolveComponent('NuxtLink')
          </template>
          <component :is="urlBase ? nuxtLinkComponent : 'button'" v-if="currentPage <= pages - 1"
             class="border leading-none rounded-[50%] size-10 grid place-items-center cursor-pointer transition-colors"
-            :aria-label="`Navaigate to page ${currentPage + 1}`" :to="urlBase && urlBase(currentPage + 1)"
+            :aria-label="`Navaigate to page ${currentPage + 1}`" :to="urlBase && localPath(urlBase(currentPage + 1))"
             @click="!urlBase && pageChanged(currentPage + 1)">
             &gt;
          </component>
          <component :is="urlBase ? nuxtLinkComponent : 'button'" v-if="currentPage < pages - 5"
             class="border leading-none rounded-[50%] size-10 grid place-items-center cursor-pointer transition-colors"
-            :aria-label="`Navaigate to page ${currentPage + 5}`" :to="urlBase && urlBase(currentPage + 5)"
+            :aria-label="`Navaigate to page ${currentPage + 5}`" :to="urlBase && localPath(urlBase(currentPage + 5))"
             @click="!urlBase && pageChanged(currentPage + 5)">
             &gt;&gt;
          </component>

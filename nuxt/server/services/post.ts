@@ -6,7 +6,8 @@ export interface IPostService {
       pagination?: { page: number | undefined, perPage: number | undefined },
       showPlanned?: 'false' | 'true' | 'only',
       statuses?: PostStatus[],
-      random?: boolean
+      random?: boolean,
+      exclude?: number[]
    ): Promise<PostList>
 
    getPostBy(by: 'slug' | 'id', slugOrId: string | number, langId: number): Promise<PostEntity>
@@ -17,6 +18,7 @@ export interface IPostService {
       searchParam?: string,
       showPlanned?: 'false' | 'true' | 'only',
       statuses?: PostStatus[],
+      exclude?: number[]
    ): Promise<number>
 
    getAdjacents(id: number, langId: number): Promise<{ prev?: string, next?: string }>
@@ -42,9 +44,10 @@ export class PostService implements IPostService {
       pagination?: { page: number | undefined, perPage: number | undefined },
       showPlanned?: 'false' | 'true' | 'only',
       statuses?: PostStatus[],
-      random?: boolean
+      random?: boolean,
+      exclude?: number[]
    ) {
-      return await this.repository.findAll(lang, categorySlug, searchParam, pagination, showPlanned, statuses, random)
+      return await this.repository.findAll(lang, categorySlug, searchParam, pagination, showPlanned, statuses, random, exclude)
    }
 
    async getPostBy(by: 'slug' | 'id', slugOrId: string | number, langId: number) {
@@ -74,8 +77,9 @@ export class PostService implements IPostService {
       searchParam?: string,
       showPlanned?: 'false' | 'true' | 'only',
       statuses?: PostStatus[],
+      exclude?: number[]
    ) {
-      return await this.repository.count(lang, categorySlug, searchParam, showPlanned, statuses)
+      return await this.repository.count(lang, categorySlug, searchParam, showPlanned, statuses, exclude)
    }
 
    async getAdjacents(id: number, langId: number) {

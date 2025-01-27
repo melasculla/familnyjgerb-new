@@ -11,7 +11,7 @@ const { data, status, error, refresh } = await useLazyFetch(routesList.api.categ
    }
 })
 
-const categories = ref<NewCategory[]>(deepClone(data.value) || [])
+const categories = ref<NewCategory[]>(data.value ? deepClone(data.value) : [])
 const canAddMore = computed(() => !categories.value.some(item => !item.id))
 
 const updateArray = (category: Category) => {

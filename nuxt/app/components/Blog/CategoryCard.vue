@@ -130,6 +130,10 @@ const remove = async () => {
       })
    }
 }
+
+onMounted(() => {
+   editing.value = null
+})
 </script>
 
 <template>

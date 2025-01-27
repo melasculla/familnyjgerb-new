@@ -4,6 +4,7 @@ export default defineEventHandler({
       ProjectHandler.validateStatuses,
       PaginationHandler.validatePagination,
       SearchHandler.validateSearchRequest,
+      ProjectHandler.validateOptions,
    ],
    handler: async event => {
       const projectService = new ProjectService()
@@ -13,7 +14,8 @@ export default defineEventHandler({
             event.context.requestDTO.locale,
             event.context.requestDTO.searchParam,
             event.context.requestDTO.pagination,
-            event.context.requestDTO.stasuses
+            event.context.requestDTO.stasuses,
+            event.context.requestDTO.options.random
          ),
          projectService.getTotalProjects(
             event.context.requestDTO.locale,

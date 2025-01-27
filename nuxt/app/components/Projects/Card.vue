@@ -5,12 +5,14 @@ defineProps<{
    project: ProjectList[0]
    admin?: boolean
 }>()
+
+const localPath = useLocalePath()
 </script>
 
 <template>
    <div class="grid" :class="{ 'outline outline-purple-600': project.status === 'hidden' }">
       <NuxtLink class="text-center text-sm overflow-hidden"
-         :to="admin ? routesList.client.admin.projects.single(project.slug, project.id) : routesList.client.projects.single(project.slug)">
+         :to="admin ? localPath(routesList.client.admin.projects.single(project.slug, project.id)) : localPath(routesList.client.projects.single(project.slug))">
          <NuxtImg v-if="project.thumbnail && project.thumbnail.path" class="aspect-square object-cover w-full"
             :src="joinURL('/fs/', project.thumbnail.path)" :alt="project.thumbnail?.alt" :title="project.thumbnail?.alt"
             placeholder="/loader.svg" loading="lazy" />

@@ -51,7 +51,7 @@ export default defineEventHandler({
             if (event.context.requestDTO.options.chunks) {
                await MediaHandler.validateBody(event)
                return await mediaService.createChunk(
-                  files[0], // TODO: add multifiles support
+                  files[0],
                   event.context.requestDTO.body.filename,
                   event.context.requestDTO.body.index,
                   event.context.requestDTO.acceptedTypes

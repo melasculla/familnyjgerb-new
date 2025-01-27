@@ -2,6 +2,8 @@
 const model = defineModel<boolean>({ default: false })
 const hasError = ref<boolean>(false)
 
+const localPath = useLocalePath()
+
 const label = ref<string>('')
 onMounted(() => {
    label.value = String(Math.floor(Math.random() * 9e15))
@@ -35,7 +37,7 @@ defineExpose({ validate })
                </transition>
             </div>
             <p class="text-balance text-center md:text-left">{{ $t('form.fields.policy-1') }} <NuxtLink
-                  :to="routesList.client.policy">{{ $t('form.fields.policy-2') }}</NuxtLink>
+                  :to="localPath(routesList.client.policy)">{{ $t('form.fields.policy-2') }}</NuxtLink>
             </p>
          </label>
       </div>

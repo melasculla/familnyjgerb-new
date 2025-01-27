@@ -9,6 +9,7 @@ type RequiredFields<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>;
 type ClientGalleryItem = RequiredFields<NewGalleryItem & { file?: File }, "image" | "order">
 
 const { locales } = useI18n()
+const localPath = useLocalePath()
 const route = useRoute()
 const galleryParam = route.params.gallery as string
 const categoryParam = route.params.category as string
@@ -196,7 +197,7 @@ const { data: categories } = await useLazyFetch(routesList.api.gallery.category.
          <template #header v-if="categories">
             <div class="flex flex-wrap gap-6 text-base xl:pl-20 uppercase">
                <NuxtLink class="cursor-pointer py-2 px-3 bg-lime-300 rounded-lg mr-6"
-                  :to="routesList.client.admin.gallery.category.list(galleryParam)">
+                  :to="localPath(routesList.client.admin.gallery.category.list(galleryParam))">
                   {{ galleryParam }}
                </NuxtLink>
                <p class="cursor-pointer py-2 px-3 bg-emerald-400 rounded-lg" v-for="item in categories"
@@ -234,8 +235,8 @@ const { data: categories } = await useLazyFetch(routesList.api.gallery.category.
             <p v-html="uploadError"></p>
          </div>
          <div v-if="status === 'success' && data">
-            <draggable class="grid xs:grid-cols-3 2xl:grid-cols-6 gap-3 relative" v-model="images"
-               handle=".drag-handle" delay="200" delayOnTouchOnly="true">
+            <draggable class="grid xs:grid-cols-3 2xl:grid-cols-6 gap-3 relative" v-model="images" handle=".drag-handle"
+               delay="200" delayOnTouchOnly="true">
                <transition-group name="list">
                   <div v-for="image, i in images" :key="image.image!" class="relative group" :data-id="image.order"
                      v-show="showAllItems || i < 6">

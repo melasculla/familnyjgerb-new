@@ -19,7 +19,7 @@ export default defineNuxtConfig({
   ],
 
   auth: {
-    baseURL: 'http://patrik.ml:3000/api/auth',
+    baseURL: `${process.env.NUXT_PUBLIC_BASE_URL}/api/auth` || 'http://patrik.ml:3000/api/auth',
     provider: {
       type: 'authjs',
       trustHost: false,
@@ -161,7 +161,7 @@ export default defineNuxtConfig({
     scheduledTasks: {
       // https://crontab.guru
       // '*/20 * * * *': ['posts:update']
-    }
+    },
   },
 
   app: {

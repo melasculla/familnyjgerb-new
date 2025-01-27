@@ -48,6 +48,18 @@ const PatchProjectSchema = ProjectSchema.partial().extend({
    id: z.number().int(),
 })
 
+const OptionsSchema = z.object({
+   options: z.preprocess(val => {
+      if (typeof val === 'string')
+         try { return JSON.parse(val) } catch { return undefined }
+
+      return val
+   }, z.object({
+      random: z.boolean().default(false),
+      exclude: z.array(z.number()).optional()
+   })).optional()
+})
+
 export class ProjectHandler {
    public static async validateBody(event: H3Event<EventHandlerRequest>, isPatch: boolean = false) {
       const body = await useSafeValidatedBody(event, isPatch ? PatchProjectSchema : ProjectSchema)
@@ -99,5 +111,19 @@ export class ProjectHandler {
       //    AdminAuthHandler.checkAccess(event)
 
       event.context.requestDTO.stasuses = validStatuses
+   }
+
+   public static async validateOptions(event: H3Event<EventHandlerRequest>) {
+      const query = await useSafeValidatedQuery(event, OptionsSchema)
+      if (!query.data || query.error) {
+         const error = JSON.parse(query.error.message)[0]
+         throw createError({
+            statusCode: 400,
+            message: `${error.message}`,
+            data: query.error
+         })
+      }
+
+      event.context.requestDTO.options = query.data.options || {}
    }
 }

@@ -1,5 +1,5 @@
 import { ProjectEntity } from "#imports"
-import { eq, not, and, count, or, ilike, lt, gt, isNull, inArray, desc } from "drizzle-orm";
+import { eq, sql, and, count, or, ilike, lt, gt, notInArray, inArray, desc } from "drizzle-orm";
 
 export interface IProjectRepository {
    findAll(
@@ -7,6 +7,8 @@ export interface IProjectRepository {
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
       statuses?: ProjectStatus[],
+      random?: boolean,
+      exclude?: number[]
    ): Promise<ProjectList>
 
    findAllTranslations(langGroup: number): Promise<ProjectEntity[]>
@@ -15,7 +17,7 @@ export interface IProjectRepository {
 
    findNear(id: number, langId: number): Promise<{ prev?: string, next?: string }>
 
-   count(lang?: Langs, searchParam?: string, statuses?: ProjectStatus[]): Promise<number>
+   count(lang?: Langs, searchParam?: string, statuses?: ProjectStatus[], exclude?: number[]): Promise<number>
 
    save(projectEntity: ProjectEntity): Promise<ProjectEntity>
 
@@ -28,6 +30,8 @@ export class ProjectRepository implements IProjectRepository {
       searchParam?: string,
       pagination: { page: number | undefined, perPage: number | undefined } = { page: undefined, perPage: undefined },
       statuses?: ProjectStatus[],
+      random?: boolean,
+      exclude?: number[]
    ) {
       const isPaginationSetted = pagination.page && pagination.perPage
       const offset = isPaginationSetted && (pagination.page! - 1) * pagination.perPage!
@@ -59,12 +63,13 @@ export class ProjectRepository implements IProjectRepository {
                      ilike(projectsTable.description, `%${searchParam}%`),
                   )
                   : undefined,
-               inArray(projectsTable.status, statuses || ['published'])
+               inArray(projectsTable.status, statuses || ['published']),
+               exclude ? notInArray(postsTable.id, exclude) : undefined
             )
          )
          .offset(offset ?? 0)
          .limit(pagination.perPage ?? 9999)
-         .orderBy(desc(projectsTable.createdAt))
+         .orderBy(random ? sql`RANDOM()` : desc(projectsTable.createdAt))
    }
 
    async findAllTranslations(langGroup: number) {
@@ -116,7 +121,7 @@ export class ProjectRepository implements IProjectRepository {
       }
    }
 
-   async count(lang?: Langs, searchParam?: string, statuses?: ProjectStatus[]) {
+   async count(lang?: Langs, searchParam?: string, statuses?: ProjectStatus[], exclude?: number[]) {
       const [result] = await db
          .select({ count: count() })
          .from(projectsTable)

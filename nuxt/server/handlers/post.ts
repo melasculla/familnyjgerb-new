@@ -23,7 +23,8 @@ const OptionsSchema = z.object({
       return val
    }, z.object({
       planned: z.enum(['false', 'true', 'only']).default('false'),
-      random: z.boolean().default(false)
+      random: z.boolean().default(false),
+      exclude: z.array(z.number()).optional()
    })).optional()
 })
 
