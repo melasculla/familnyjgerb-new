@@ -7,10 +7,13 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    PrimeButton: typeof import('primevue/button')['default']
+    PrimeConfirmDialog: typeof import('primevue/confirmdialog')['default']
     PrimeDatePicker: typeof import('primevue/datepicker')['default']
     PrimeFloatLabel: typeof import('primevue/floatlabel')['default']
     PrimeInputText: typeof import('primevue/inputtext')['default']
     PrimeSelect: typeof import('primevue/select')['default']
+    PrimeSelectButton: typeof import('primevue/selectbutton')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
   }

@@ -22,7 +22,7 @@ export default defineEventHandler({
          ),
       ])
 
-      if (projects.length || projects)
+      if (projects.length)
          return { total, projects }
 
       let errorMessage = []
@@ -35,11 +35,6 @@ export default defineEventHandler({
 
       const message = 'Projects ' + (errorMessage.length <= 1 ? errorMessage.join('') : errorMessage.join(' and ')) + ' Not Found'
 
-      if (
-         event.context.requestDTO.searchParam
-         || event.context.requestDTO.stasuses
-         || (event.context.requestDTO.pagination && event.context.requestDTO.pagination.page !== 1)
-      )
-         throw createError({ statusCode: 404, statusMessage: message, message: message })
+      throw createError({ statusCode: 404, statusMessage: message, message: message })
    }
 })

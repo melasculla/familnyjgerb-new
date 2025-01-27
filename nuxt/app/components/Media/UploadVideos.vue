@@ -80,7 +80,7 @@ const remove = (pathToRemove: string) => videos.value = videos.value.filter(({ p
          <span>Video</span>
       </div>
 
-      <div v-if="canAddMore" class="flex flex-wrap justify-center justify-items-center gap-4">
+      <div v-if="canAddMore" class="flex flex-wrap items-start justify-center justify-items-center gap-4">
          <ButtonsMain v-if="!upload" @click="open" class="disabled:opacity-60 disabled:cursor-not-allowed"
             :disabled="uploading">
             <IconsHand />
@@ -107,7 +107,7 @@ const remove = (pathToRemove: string) => videos.value = videos.value.filter(({ p
                <div class="drag-handle">
                   <video v-if="video.path" class="w-full min-h-10 aspect-video pointer-events-none" controls>
                      <source
-                        :src="video.path.startsWith('blob:') ? video.path : routesList.api.media.getFile(video.path)">
+                        :src="(video.path.startsWith('blob:') || video.path.startsWith('http:')) ? video.path : routesList.api.media.getFile(video.path)" />
                   </video>
                </div>
                <button v-if="!upload" @click="remove(video.path)" type="button"

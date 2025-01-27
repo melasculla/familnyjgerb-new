@@ -9,6 +9,8 @@ const { projectData } = defineProps<{
 
 const isEditPage = computed(() => !!projectData)
 
+const editedAt = computed<Date | null>(() => projectData?.editedAt ? new Date(projectData.editedAt) : null)
+
 const project = reactive<NewProject>({
    id: projectData?.id,
    slug: projectData?.slug || '',
@@ -22,7 +24,6 @@ const project = reactive<NewProject>({
    status: projectData?.status || 'published',
    seoKeys: projectData?.seoKeys || null,
    ogImage: projectData?.ogImage || null,
-   editedAt: projectData?.editedAt && readonly(new Date(projectData?.editedAt)),
 })
 
 const usage = computed<ImageJSON[]>({
@@ -194,9 +195,9 @@ useSeoMeta({
                class="max-xl:order-10 w-full justify-center text-xl disabled:opacity-50 disabled:cursor-not-allowed bg-green-500 sticky top-2 z-10">
                {{ isEditPage ? 'Save' : 'Create' }}
             </ButtonsMain>
-            <div v-if="project.editedAt" class="grid gap-2">
+            <div v-if="editedAt" class="grid gap-2 max-xl:order-7">
                <p class="text-gray-400">Edited Date:</p>
-               <PrimeDatePicker v-model="project.editedAt" showTime dateFormat="dd/mm/yy" hourFormat="24" fluid
+               <PrimeDatePicker v-model="editedAt" showTime dateFormat="dd/mm/yy" hourFormat="24" fluid
                   class="[&_input]:text-base" disabled />
             </div>
             <PrimeSelect class="max-xl:order-9" v-model="project.status" :options="(projectsStatusList as any)" />
@@ -204,7 +205,7 @@ useSeoMeta({
             <MediaUploadFiles v-model="ogImage" title="OG Image" :multiple="false">
                <template #inputs></template>
             </MediaUploadFiles>
-            <UtilsKeys v-model="project.seoKeys" />
+            <UtilsKeys class="max-xl:order-7" v-model="project.seoKeys" />
          </div>
       </div>
    </div>

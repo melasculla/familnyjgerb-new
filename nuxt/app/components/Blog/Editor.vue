@@ -8,6 +8,11 @@ const { postData } = defineProps<{
    postData?: Post
 }>()
 
+const editedAt = computed<Date | null>({
+   get: () => postData?.editedAt ? new Date(postData.editedAt) : null,
+   set: () => { }
+})
+
 const { data: categories, status: categoryStatus, error } = await useLazyFetch(routesList.api.categories.getAll, {
    getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] || nuxtApp.static.data[key],
    key: 'categories'
@@ -27,7 +32,6 @@ const post = reactive<NewPost>({
    status: postData?.status || 'published',
    seoKeys: postData?.seoKeys || null,
    plannedAt: typeof postData?.plannedAt === 'string' ? new Date(postData?.plannedAt) : postData?.plannedAt || null,
-   editedAt: postData?.editedAt && readonly(new Date(postData?.editedAt)),
 })
 
 const gallery = computed<ImageJSON[]>({
@@ -181,16 +185,17 @@ useSeoMeta({
                <PrimeSelect v-model="post.status" :options="(postsStatusList as any)" />
             </div>
             <div class="w-full max-xl:order-8 grid gap-2">
-               <template v-if="post.editedAt">
+               <template v-if="editedAt">
                   <p class="text-gray-400">Edited Date:</p>
-                  <PrimeDatePicker v-model="post.editedAt" showTime dateFormat="dd/mm/yy" hourFormat="24" fluid class="[&_input]:text-base"
-                     disabled />
+                  <PrimeDatePicker v-model="editedAt" showTime dateFormat="dd/mm/yy" hourFormat="24" fluid
+                     class="[&_input]:text-base" disabled />
                </template>
                <div class="flex flex-wrap justify-between gap-2">
                   <p class="text-gray-400">Planned Date:</p>
                   <span class="cursor-pointer" @click="post.plannedAt = null">Reset</span>
                </div>
-               <PrimeDatePicker v-model="post.plannedAt" showTime dateFormat="dd/mm/yy" hourFormat="24" fluid class="[&_input]:text-base" />
+               <PrimeDatePicker v-model="post.plannedAt" showTime dateFormat="dd/mm/yy" hourFormat="24" fluid
+                  class="[&_input]:text-base" />
             </div>
             <MediaUploadFiles v-model="thumbnail" title="Thumbnail" :multiple="false" input-static />
             <UtilsKeys v-model="post.seoKeys" />

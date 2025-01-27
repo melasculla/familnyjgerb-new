@@ -4,11 +4,10 @@ export interface IPostService {
       categorySlug?: string,
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
-      showPlanned?: boolean,
+      showPlanned?: 'false' | 'true' | 'only',
       statuses?: PostStatus[],
+      random?: boolean
    ): Promise<PostList>
-
-   // TODO: get similar by category
 
    getPostBy(by: 'slug' | 'id', slugOrId: string | number, langId: number): Promise<PostEntity>
 
@@ -16,7 +15,7 @@ export interface IPostService {
       lang?: Langs,
       categorySlug?: string,
       searchParam?: string,
-      showPlanned?: boolean,
+      showPlanned?: 'false' | 'true' | 'only',
       statuses?: PostStatus[],
    ): Promise<number>
 
@@ -41,10 +40,11 @@ export class PostService implements IPostService {
       categorySlug?: string,
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
-      showPlanned?: boolean,
+      showPlanned?: 'false' | 'true' | 'only',
       statuses?: PostStatus[],
+      random?: boolean
    ) {
-      return await this.repository.findAll(lang, categorySlug, searchParam, pagination, showPlanned, statuses)
+      return await this.repository.findAll(lang, categorySlug, searchParam, pagination, showPlanned, statuses, random)
    }
 
    async getPostBy(by: 'slug' | 'id', slugOrId: string | number, langId: number) {
@@ -72,7 +72,7 @@ export class PostService implements IPostService {
       lang?: Langs,
       categorySlug?: string,
       searchParam?: string,
-      showPlanned?: boolean,
+      showPlanned?: 'false' | 'true' | 'only',
       statuses?: PostStatus[],
    ) {
       return await this.repository.count(lang, categorySlug, searchParam, showPlanned, statuses)

@@ -68,11 +68,11 @@ const selectMultiple = (file: string) => {
 
 <template>
    <div class="py-2">
-      <div class="grid grid-cols-[120px,1fr,120px] items-start gap-5 px-2">
-         <input type="text" pattern="[0-9]" class="text-sm border border-orange-400 rounded-md px-2 py-1"
+      <div class="grid md:grid-cols-[120px,1fr,120px] items-start gap-5 pb-5 px-2">
+         <input type="text" pattern="[0-9]" class="text-sm border border-orange-400 rounded-md px-2 py-1 min-w-0"
             @change="(event) => currentPage = parseInt((event.target as HTMLInputElement).value) || 1"
             placeholder="Страница:">
-         <Pagination class="col-start-2" :pages="pages ?? null" :current-page="currentPage" :total="totaItems"
+         <Pagination class="md:col-start-2" :pages="pages ?? null" :current-page="currentPage" :total="totaItems"
             @page-changed="changePage" />
          <div class="uppercase text-lg flex items-center gap-2">
             <p>DEPTH:</p>

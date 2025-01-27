@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import 'primeicons/primeicons.css';
 import { type ConcreteComponent } from 'vue'
 
 const { locales } = useI18n()
@@ -33,7 +34,7 @@ const pages: Page[] = [
          </button>
          <div class="flex gap-2 text-lg uppercase">
             <NuxtLink v-for="locale in locales" :key="locale.code" :to="switchLocalePath(locale.code)"
-               class="cursor-pointer relative group [&.router-link-active]:bg-red-700 p-2 rounded-md">
+               class="cursor-pointer transition-colors relative group [&.router-link-active]:bg-red-700 [&.router-link-active]:text-white p-2 rounded-md">
                {{ locale.code }}
             </NuxtLink>
          </div>
@@ -78,5 +79,3 @@ const pages: Page[] = [
    width: 100%;
 }
 </style>
-
-<!-- <style src="~/assets/css/base.css"></style> -->

@@ -9,7 +9,7 @@ export default defineEventHandler({
    ],
    handler: async event => {
       const postService = new PostService()
-
+      // TODO: exclude option to exclude current post from related
       const [posts, total] = await Promise.all([
          postService.getPosts(
             event.context.requestDTO.locale,
@@ -17,7 +17,8 @@ export default defineEventHandler({
             event.context.requestDTO.searchParam,
             event.context.requestDTO.pagination,
             event.context.requestDTO.options.planned,
-            event.context.requestDTO.stasuses
+            event.context.requestDTO.stasuses,
+            event.context.requestDTO.options.random,
          ),
          postService.getTotalPosts(
             event.context.requestDTO.locale,

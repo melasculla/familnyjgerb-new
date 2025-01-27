@@ -4,11 +4,11 @@ import { z } from 'zod'
 
 const CategoryBodySchema = z.object({
    slug: z.string().min(3, 'Slug must be at least 3 characters long'),
-   nameRu: z.string().min(5, 'category must be at least 5 characters long'),
-   nameEn: z.string().optional().nullable(),
+   nameRu: z.string().min(4, 'Category name must be at least 4 characters long'),
+   nameEn: z.string().min(4, 'Category name must be at least 4 characters long').optional().nullable(),
 }).strict()
 
-const CategoryPatchBodySchema = CategoryBodySchema.partial().extend({
+const CategoryPatchBodySchema = CategoryBodySchema.omit({ slug: true }).extend({
    id: z.number().int(),
 }).strict()
 

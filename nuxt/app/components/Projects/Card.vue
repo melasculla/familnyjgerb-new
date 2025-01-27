@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { joinURL } from 'ufo'
+
 defineProps<{
    project: ProjectList[0]
    admin?: boolean
@@ -10,7 +12,7 @@ defineProps<{
       <NuxtLink class="text-center text-sm overflow-hidden"
          :to="admin ? routesList.client.admin.projects.single(project.slug, project.id) : routesList.client.projects.single(project.slug)">
          <NuxtImg v-if="project.thumbnail && project.thumbnail.path" class="aspect-square object-cover w-full"
-            :src="'/fs/' + project.thumbnail.path" :alt="project.thumbnail?.alt" :title="project.thumbnail?.alt"
+            :src="joinURL('/fs/', project.thumbnail.path)" :alt="project.thumbnail?.alt" :title="project.thumbnail?.alt"
             placeholder="/loader.svg" loading="lazy" />
          <svg v-else class="w-full aspect-square" viewBox="0 0 32 32">
             <path fill="currentColor"

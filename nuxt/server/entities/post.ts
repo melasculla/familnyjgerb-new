@@ -25,7 +25,7 @@ export class PostEntity {
       this.thumbnail = post.thumbnail || null
       this.status = post.status
       this.plannedAt = this.convertISOStringToDate(post.plannedAt) || null
-      this.editedAt = new Date()
+      this.editedAt = post.editedAt || new Date()
       this.createdAt = post.createdAt
       this.seoKeys = post.seoKeys || null
       this.categoryId = post.categoryId || null

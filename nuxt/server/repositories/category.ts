@@ -12,7 +12,9 @@ export interface ICategoryRepository {
 
 export class CategoryRepository implements ICategoryRepository {
    async findAll() {
-      return await db.query.categoriesTable.findMany()
+      return await db.query.categoriesTable.findMany({
+         orderBy: (fields, { asc }) => asc(fields.id),
+      })
    }
 
    async findBy(by: 'id' | 'slug', idOrSlug: string | number) {

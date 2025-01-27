@@ -11,21 +11,11 @@ const { currentPage, pages, totaItems } = usePagination(
    perPage,
    admin ? 'state' : 'page',
    category ? `blogPage:${category}` : 'blogPage',
-   admin ? undefined : pageBase)
+   admin ? undefined : pageBase
+)
 
-const statuses = ref<PostStatus[]>(['published'])
-const toggleStatus = (_status: PostStatus) => {
-   if (_status === 'published' && statuses.value.length === 1 && statuses.value.includes('published'))
-      return
-
-   if (statuses.value.includes(_status))
-      statuses.value = statuses.value.filter(s => s !== _status)
-   else
-      statuses.value.push(_status)
-}
-
-const showPlanned = ref<boolean>(false)
-// TODO: add feat to have only planned posts
+const statuses = useState<PostStatus[]>('blog:statuses', () => [])
+const showPlanned = useState<'false' | 'true' | 'only'>('blog:options:planned', () => 'false')
 
 const { data: posts, status, error, refresh } = await useLazyFetch<{ posts: PostList, total?: number }>(routesList.api.posts.getAll, {
    query: {
@@ -68,26 +58,28 @@ useSeoMeta({
 </script>
 
 <template>
-   <div>
-      <div class="flex flex-wrap justify-between gap-5">
+   <div class="grid gap-4">
+      <div class="flex flex-wrap items-center justify-between gap-5">
          <ButtonsMain @click="refresh()">
             Rerfresh
          </ButtonsMain>
          <div class="flex flex-wrap gap-4 text-base" v-if="admin">
-            <div class="flex items-center gap-2" v-for="item in postsStatusList">
-               <input class="size-6" :id="`${item}-status`" type="checkbox" @change="toggleStatus(item)"
-                  :checked="statuses.includes(item)"
-                  :disabled="item === 'published' && statuses.length === 1 && statuses.includes('published')" />
-               <label class="capitalize" :for="`${item}-status`">{{ item }}</label>
+            <div class="flex items-center justify-center flex-wrap gap-2">
+               <span class="capitalize text-slate-500">Status: </span>
+               <PrimeSelectButton multiple v-model="statuses" :options="(postsStatusList as any)"
+                  class="md:*:!text-base" />
             </div>
-            <div class="flex items-center gap-2">
-               <input class="size-6" id="planned-posts" type="checkbox" @change="showPlanned = !showPlanned"
-                  :checked="showPlanned" />
-               <label class="capitalize" for="planned-posts">Planned</label>
+            <div class="flex items-center justify-center flex-wrap gap-2">
+               <span class="capitalize text-slate-500">Planned: </span>
+               <PrimeSelectButton :allowEmpty="false" v-model="showPlanned" :options="[
+                  { key: 'No', value: 'false' },
+                  { key: 'Yes', value: 'true' },
+                  { key: 'Only', value: 'only' },
+               ]" optionValue="value" optionLabel="key" class="md:*:!text-base" />
             </div>
          </div>
       </div>
-      <Pagination class="mt-5" @page-changed="page => currentPage = page"
+      <Pagination v-if="totaItems > perPage" @page-changed="page => currentPage = page"
          :class="{ 'select-none pointer-events-none': (status === 'pending' || status === 'idle') }" v-bind="{
             pages,
             currentPage,
@@ -104,6 +96,13 @@ useSeoMeta({
       <div v-else-if="status === 'error'" class="text-center text-red-500 font-bold text-lg">
          {{ `Error: ${error?.statusMessage || error?.message || error?.data?.message}` }}
       </div>
+      <Pagination v-if="totaItems > perPage" @page-changed="page => currentPage = page"
+         :class="{ 'select-none pointer-events-none': (status === 'pending' || status === 'idle') }" v-bind="{
+            pages,
+            currentPage,
+            urlBase: admin ? undefined : pageBase,
+            pagesLoading: 11
+         }" />
    </div>
 </template>
 

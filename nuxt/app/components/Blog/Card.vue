@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { joinURL } from 'ufo'
+
 defineProps<{
    post: PostList[0]
    admin?: boolean
@@ -10,7 +12,7 @@ defineProps<{
       <NuxtLink class="text-center text-sm overflow-hidden"
          :to="admin ? routesList.client.admin.posts.single(post.slug, post.id) : routesList.client.posts.single(post.slug)">
          <NuxtImg v-if="post.thumbnail && post.thumbnail.path" class="aspect-square object-cover w-full"
-            :src="'/fs/' + post.thumbnail.path" :alt="post.thumbnail?.alt" :title="post.thumbnail?.alt"
+            :src="joinURL('/fs/', post.thumbnail.path)" :alt="post.thumbnail?.alt" :title="post.thumbnail?.alt"
             placeholder="/loader.svg" loading="lazy" />
          <svg v-else class="w-full aspect-square" viewBox="0 0 32 32">
             <path fill="currentColor"

@@ -1,22 +1,44 @@
 <script setup lang="ts">
 const route = useRoute()
 const { locale } = useI18n()
+
 const slug = computed(() => Array.isArray(route.params.slug) ? route.params.slug[0]! : route.params.slug!)
+
 const { data, status, error } = await useLazyFetch<{ post: Post, category: Category, prev?: string, next?: string }>(
-   routesList.api.posts.getSingle(slug.value),
-   {
-      query: {
-         locale: locale.value,
-      },
-      getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] || nuxtApp.static.data[key],
-      key: `${locale.value}:blog_posts:${slug.value}`,
-      onResponseError: ({ response, error }) => {
-         if (error)
-            return showError(error)
-         showError({ statusCode: response.status, message: response.statusText })
+   routesList.api.posts.getSingle(slug.value), {
+   query: {
+      locale: locale.value,
+   },
+   key: `${locale.value}:blog_posts:${slug.value}`,
+   getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] || nuxtApp.static.data[key],
+   onResponseError: ({ response, error }) => {
+      if (error)
+         return showError(error)
+      showError({ statusCode: response.status, message: response.statusText })
+   }
+})
+
+const categorySlug = computed<string>(() => data.value?.category.slug || '')
+const { data: related, execute } = await useLazyFetch<{ posts: PostList, total?: number }>(routesList.api.posts.getAll, {
+   query: {
+      locale: locale.value,
+      category: categorySlug,
+      perPage: 3,
+      page: 1,
+      options: {
+         random: true
       }
    },
-)
+   immediate: false
+})
+
+if (import.meta.server)
+   await execute()
+
+watch(categorySlug, newCategorySlug => {
+   if (newCategorySlug)
+      execute()
+})
 
 useSeoMeta({
    title: () => data.value?.post.title || null
@@ -45,6 +67,10 @@ useSeoMeta({
       </div>
       <div v-if="status === 'success' && data">
          <EditorContent :content="data.post.content" />
+         <p class="text-lg text-center">Related posts:</p>
+         <div v-if="related" class="grid grid-cols-3 gap-4 mt-12">
+            <BlogCard v-for="post in related?.posts" :key="post.id" :post="post" />
+         </div>
          <div
             class="flex justify-between px-10 py-2 mt-5 backdrop-brightness-125 bg-gray-200/80 text-lg uppercase sticky bottom-0 w-full">
             <NuxtLink v-if="data.prev" :to="data.prev" class="text-teal-400">

@@ -1,5 +1,5 @@
 import { PostEntity } from "#imports"
-import { eq, not, and, count, or, ilike, lt, gt, isNull, inArray, desc } from "drizzle-orm";
+import { eq, sql, and, count, or, ilike, lt, gt, isNull, inArray, desc, SQLWrapper, isNotNull } from "drizzle-orm";
 
 export interface IPostRepository {
    findAll(
@@ -7,8 +7,9 @@ export interface IPostRepository {
       categorySlug?: string,
       searchParam?: string,
       pagination?: { page: number | undefined, perPage: number | undefined },
-      showPlanned?: boolean,
+      showPlanned?: 'false' | 'true' | 'only',
       statuses?: PostStatus[],
+      random?: boolean
    ): Promise<PostList>
 
    findAllTranslations(langGroup: number): Promise<PostEntity[]>
@@ -17,7 +18,7 @@ export interface IPostRepository {
 
    findNear(id: number, langId: number): Promise<{ prev?: string, next?: string }>
 
-   count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: boolean, statuses?: PostStatus[]): Promise<number>
+   count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: 'false' | 'true' | 'only', statuses?: PostStatus[]): Promise<number>
 
    save(postEntity: PostEntity): Promise<PostEntity>
 
@@ -30,8 +31,9 @@ export class PostRepository implements IPostRepository {
       categorySlug?: string,
       searchParam?: string,
       pagination: { page: number | undefined, perPage: number | undefined } = { page: undefined, perPage: undefined },
-      showPlanned?: boolean,
+      showPlanned?: 'false' | 'true' | 'only',
       statuses?: PostStatus[],
+      random?: boolean
    ) {
       const isPaginationSetted = pagination.page && pagination.perPage
       const offset = isPaginationSetted && (pagination.page! - 1) * pagination.perPage!
@@ -72,18 +74,21 @@ export class PostRepository implements IPostRepository {
                      ilike(postsTable.description, `%${searchParam}%`),
                   )
                   : undefined,
-               showPlanned ?
-                  undefined :
-                  or(
-                     isNull(postsTable.plannedAt),
-                     lt(postsTable.plannedAt, new Date())
-                  ),
+               ((): SQLWrapper | undefined => {
+                  if (showPlanned === 'true')
+                     return undefined
+
+                  if (showPlanned === 'only')
+                     return and(isNotNull(postsTable.plannedAt), gt(postsTable.plannedAt, new Date()))
+
+                  return or(isNull(postsTable.plannedAt), lt(postsTable.plannedAt, new Date()))
+               })(),
                inArray(postsTable.status, statuses || ['published'])
             )
          )
          .offset(offset ?? 0)
          .limit(pagination.perPage ?? 9999)
-         .orderBy(desc(postsTable.createdAt))
+         .orderBy(random ? sql`RANDOM()` : desc(postsTable.createdAt))
    }
 
    async findAllTranslations(langGroup: number) {
@@ -135,7 +140,7 @@ export class PostRepository implements IPostRepository {
       }
    }
 
-   async count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: boolean, statuses?: PostStatus[]) {
+   async count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: 'false' | 'true' | 'only', statuses?: PostStatus[]) {
       const [result] = await db
          .select({ count: count() })
          .from(postsTable)
@@ -153,12 +158,15 @@ export class PostRepository implements IPostRepository {
                      ilike(postsTable.description, `%${searchParam}%`),
                   ) :
                   undefined,
-               showPlanned ?
-                  undefined :
-                  or(
-                     isNull(postsTable.plannedAt),
-                     lt(postsTable.plannedAt, new Date())
-                  ),
+               ((): SQLWrapper | undefined => {
+                  if (showPlanned === 'true')
+                     return undefined
+
+                  if (showPlanned === 'only')
+                     return and(isNotNull(postsTable.plannedAt), gt(postsTable.plannedAt, new Date()))
+
+                  return or(isNull(postsTable.plannedAt), lt(postsTable.plannedAt, new Date()))
+               })(),
                inArray(postsTable.status, statuses || ['published'])
             )
          )

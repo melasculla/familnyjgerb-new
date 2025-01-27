@@ -27,7 +27,7 @@ export class ProjectEntity {
       this.thumbnail = project.thumbnail || null
       this.video = project.video || null
       this.status = project.status
-      this.editedAt = new Date()
+      this.editedAt = project.editedAt || new Date()
       this.createdAt = project.createdAt
       this.seoKeys = project.seoKeys || null
       this.ogImage = project.ogImage || null

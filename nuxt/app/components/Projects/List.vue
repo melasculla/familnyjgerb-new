@@ -8,16 +8,7 @@ const { locale } = useI18n()
 const perPage = 12
 const { currentPage, pages, totaItems } = usePagination(perPage, 'state', 'projectsPage')
 
-const statuses = ref<ProjectStatus[]>(['published'])
-const toggleStatus = (_status: ProjectStatus) => {
-   if (_status === 'published' && statuses.value.length === 1 && statuses.value.includes('published'))
-      return
-
-   if (statuses.value.includes(_status))
-      statuses.value = statuses.value.filter(s => s !== _status)
-   else
-      statuses.value.push(_status)
-}
+const statuses = useState<ProjectStatus[]>('projects:statuses', () => [])
 
 const { data, status, error, refresh } = await useLazyFetch<{ projects: ProjectList, total?: number }>(routesList.api.projects.getAll, {
    query: {
@@ -56,21 +47,20 @@ useSeoMeta({
 </script>
 
 <template>
-   <div>
-      <div class="flex flex-wrap justify-between">
+   <div class="grid gap-4">
+      <div class="flex flex-wrap items-center justify-between gap-5">
          <ButtonsMain @click="refresh()">
             Rerfresh
          </ButtonsMain>
          <div class="flex gap-4 text-base" v-if="admin">
-            <div class="flex items-center gap-2" v-for="item in projectsStatusList">
-               <input class="size-6" :id="`${item}-status`" type="checkbox" @change="toggleStatus(item)"
-                  :checked="statuses.includes(item)"
-                  :disabled="item === 'published' && statuses.length === 1 && statuses.includes('published')" />
-               <label class="capitalize" :for="`${item}-status`">{{ item }}</label>
+            <div class="flex items-center justify-center flex-wrap gap-2">
+               <span class="capitalize text-slate-500">Status: </span>
+               <PrimeSelectButton multiple v-model="statuses" :options="(projectsStatusList as any)"
+                  class="md:*:!text-base" />
             </div>
          </div>
       </div>
-      <Pagination class="mt-5" @page-changed="page => currentPage = page" v-if="totaItems"
+      <Pagination v-if="totaItems > perPage" @page-changed="page => currentPage = page"
          :class="{ 'select-none pointer-events-none': (status === 'pending' || status === 'idle') }" v-bind="{
             pages,
             currentPage,
