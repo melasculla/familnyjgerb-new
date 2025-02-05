@@ -88,6 +88,7 @@ export class PostService implements IPostService {
    }
 
    async upsertPost(postObject: NewPost) {
+      // TODO: sync category across translations
       const post = new PostEntity(postObject)
       if (!post.id)
          await post.assignLangGroup(this.repository)
@@ -97,8 +98,7 @@ export class PostService implements IPostService {
       if (postObject.id)
          this.translationService
             .syncPostSlugIfNeeded(upsertedPost.slug, upsertedPost.langGroup!).catch(err => console.warn(`[POSTS]: Sync slug failed: ${err}`))
-
-      if (!postObject.id)
+      else
          this.translationService
             .createPostTranslations(upsertedPost).catch(err => console.warn(`[POSTS]: Creating translations failed: ${err}`))
 

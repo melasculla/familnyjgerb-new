@@ -54,7 +54,27 @@ export default {
          single: (slug: string) => `/portfolio/${slug}`
       },
 
-      policy: '/policy'
+      static: {
+         survey: '/anketirovanie',
+         contacts: '/nashi-kontakty',
+         services: {
+            home: '/o-sajte',
+            gerb: '/o-sajte/razrabotka-gerba-2',
+            korp_gerbs: '/o-sajte/razrabotka-korporativnyih-gerbov',
+            ter_gerbs: '/o-sajte/razrabotka-territorialnoy-geraldiki',
+            gerb_restore: '/o-sajte/vosstanovlenie-izobrazheniya-gerba',
+            graphic: '/o-sajte/cennye-bumagi',
+            tree: '/o-sajte/genealogicheskoe-drevo',
+            monograms: '/o-sajte/razrabotka-monogramm',
+            wedding_monograms: '/o-sajte/razrabotka-monogramm/razrabotka-svadebnyih-monogramm',
+            noble_restore: '/o-sajte/vosstanovlenie-dvoryanstva',
+         },
+         reviews: '/otzyivyi',
+         cert: '/sertifikat-geraldicheskoy-masterskoy',
+         souvenirs: '/suvenirnaya-i-podarochnaya-geraldika',
+         policy: '/policy',
+         terms: '/terms',
+      },
    } as const,
 
    /**
@@ -63,6 +83,7 @@ export default {
    api: {
 
       posts: {
+         // getAll: 'http://patrik.ml:8080/posts',
          getAll: '/api/posts',
          getSingle: (slug: string) => `/api/posts/${slug}` as const,
          create: '/api/posts/create',

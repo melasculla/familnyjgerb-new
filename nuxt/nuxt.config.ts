@@ -200,119 +200,102 @@ export default defineNuxtConfig({
         to: '/blog_o_geraldike/**',
         statusCode: 301
       },
-      static: true
     },
     '/geraldika-v-zhizni/**': {
       redirect: {
         to: '/blog_o_geraldike/**',
         statusCode: 301
       },
-      static: true
     },
     '/zapisi-geraldista/**': {
       redirect: {
         to: '/blog_o_geraldike/**',
         statusCode: 301
       },
-      static: true
     },
     '/kompetentnoe-mnenie/**': {
       redirect: {
         to: '/blog_o_geraldike/**',
         statusCode: 301
       },
-      static: true
     },
     '/news/**': {
       redirect: {
         to: '/blog_o_geraldike/**',
         statusCode: 301
       },
-      static: true
     },
     '/aktsii/': {
       redirect: {
         to: '/blog_o_geraldike/category/aktsii/',
         statusCode: 301
       },
-      static: true
     },
     '/geraldika-v-zhizni/': {
       redirect: {
         to: '/blog_o_geraldike/category/geraldika-v-zhizni/',
         statusCode: 301
       },
-      static: true
     },
     '/zapisi-geraldista/': {
       redirect: {
         to: '/blog_o_geraldike/category/zapisi-geraldista/',
         statusCode: 301
       },
-      static: true
     },
     '/kompetentnoe-mnenie/': {
       redirect: {
         to: '/blog_o_geraldike/category/kompetentnoe-mnenie/',
         statusCode: 301
       },
-      static: true,
     },
     '/news/': {
       redirect: {
         to: '/blog_o_geraldike/category/news/',
         statusCode: 301
       },
-      static: true
     },
     '/aktsii/page/**': {
       redirect: {
         to: '/blog_o_geraldike/category/aktsii/page/**',
         statusCode: 301
       },
-      static: true
     },
     '/geraldika-v-zhizni/page/**': {
       redirect: {
         to: '/blog_o_geraldike/category/geraldika-v-zhizni/page/**',
         statusCode: 301
       },
-      static: true
     },
     '/zapisi-geraldista/page/**': {
       redirect: {
         to: '/blog_o_geraldike/category/zapisi-geraldista/page/**',
         statusCode: 301
       },
-      static: true
     },
     '/kompetentnoe-mnenie/page/**': {
       redirect: {
         to: '/blog_o_geraldike/category/kompetentnoe-mnenie/page/**',
         statusCode: 301
       },
-      static: true
     },
     '/news/page/**': {
       redirect: {
         to: '/blog_o_geraldike/category/news/page/**',
         statusCode: 301
       },
-      static: true
     },
     '/heraldist-notes/**': {
       redirect: {
         to: '/blog_o_geraldike/**',
         statusCode: 301
       },
-      static: true
     },
     '/portfolio': {
       redirect: {
         to: '/portfolio/gerbs',
         statusCode: 301
       },
-      static: true
     },
     // '/_ipx/**': {
     //   cache: {

@@ -2,6 +2,7 @@
 definePageMeta({
    layout: false
 })
+
 const { data, status, error, refresh } = await useLazyFetch(routesList.api.categories.getAll, {
    getCachedData: (key, nuxtApp) => nuxtApp.payload.data[key] || nuxtApp.static.data[key],
    key: 'categories',

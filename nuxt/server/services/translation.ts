@@ -1,3 +1,13 @@
+// export interface ITranslationService {
+//    createTranslations(post: PostEntity): Promise<void>
+
+//    syncSlugIfNeeded(slug: string, langGroup: number): Promise<void>
+// }
+
+// export class ProjectTranslationService implements ITranslationService { }
+
+// export class PostTranslationService implements ITranslationService { }
+
 export interface ITranslationService {
    createPostTranslations(post: PostEntity): Promise<void>
 

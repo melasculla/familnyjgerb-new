@@ -1,11 +1,11 @@
 <script setup lang="ts">
 const localPath = useLocalePath()
-const { status } = useAuth()
+const { data, status } = useAuth()
 </script>
 
 <template>
    <header>
-      <!-- <TheHeader /> -->
+      <TheHeader />
    </header>
    <main>
       <slot />
