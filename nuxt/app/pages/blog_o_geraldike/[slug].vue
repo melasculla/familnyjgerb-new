@@ -5,7 +5,7 @@ const localPath = useLocalePath()
 
 const slug = computed(() => Array.isArray(route.params.slug) ? route.params.slug[0]! : route.params.slug!)
 
-const { data, status, error } = await useLazyFetch<{ post: Post, category: Category, prev?: string, next?: string }>(
+const { data, status, error } = await useFetch<{ post: Post, category: Category, prev?: string, next?: string }>(
    routesList.api.posts.getSingle(slug.value), {
    query: {
       locale: locale.value,
@@ -19,28 +19,18 @@ const { data, status, error } = await useLazyFetch<{ post: Post, category: Categ
    }
 })
 
-const relatedQuery = computed(() => ({
-   locale: locale.value,
-   category: data.value?.category.slug,
-   perPage: 3,
-   page: 1,
-   options: {
-      random: true,
-      exclude: data.value?.post.id ? [data.value?.post.id] : undefined
-   }
-}))
-const { data: related, execute } = await useLazyFetch<{ posts: PostList, total?: number }>(routesList.api.posts.getAll, {
-   query: relatedQuery,
-   immediate: false
+const { data: related } = await useFetch<{ posts: PostList, total?: number }>(routesList.api.posts.getAll, {
+   query: {
+      locale: locale.value,
+      category: data.value?.category.slug,
+      perPage: 3,
+      page: 1,
+      options: {
+         random: true,
+         exclude: data.value?.post.id ? [data.value?.post.id] : undefined
+      }
+   },
 })
-
-if (import.meta.server)
-   await execute()
-
-watch(data, newPost => {
-   if (newPost && newPost.category.slug && newPost.post.id)
-      execute()
-}, { immediate: true })
 
 useSeoMeta({
    title: () => data.value?.post.title || null
@@ -49,7 +39,7 @@ useSeoMeta({
 
 <template>
    <div>
-      <div class="flex justify-evenly sticky top-0 backdrop-blur-sm backdrop-brightness-125 bg-gray-200/80">
+      <div class="flex justify-evenly sticky top-11 backdrop-blur-sm backdrop-brightness-125 bg-gray-200/80">
          <NuxtLink class="underline text-base text-purple-600 my-5 block text-center" href="/blog_o_geraldike">
             Blog
          </NuxtLink>

@@ -15,7 +15,8 @@ export default defineNuxtConfig({
     '@nuxtjs/google-fonts',
     '@nuxt/scripts',
     '@sidebase/nuxt-auth',
-    '@primevue/nuxt-module'
+    '@primevue/nuxt-module',
+    'vue3-carousel-nuxt'
   ],
 
   auth: {
@@ -29,9 +30,11 @@ export default defineNuxtConfig({
   },
 
   googleFonts: {
+    download: true,
     families: {
       // Inter: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
       // Jost: ['100', '200', '300', '400', '500', '600', '700', '800', '900']
+      'EB Garamond': ['100', '200', '300', '400', '500', '600', '700', '800', '900']
     }
   },
 
@@ -119,6 +122,10 @@ export default defineNuxtConfig({
     alias: {
       fs: `${process.env.NUXT_PUBLIC_BASE_URL}/api/media`
     }
+  },
+
+  carousel: {
+    prefix: 'C'
   },
 
   imports: {

@@ -1,7 +1,26 @@
 body {
-   @apply text-sm;
+   @apply text-base bg-primary-100 text-basic-900 font-primary;
+}
+
+body:has(.modal__window) {
+   overflow: hidden;
 }
 
 .Toastify {
    @apply text-xs;
+}
+
+/* * {
+   outline: 1px solid red;
+} */
+
+.modal-enter-active,
+.modal-leave-active {
+   transition: all 500ms;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+   opacity: 0;
+   translate: -100% 0;
 }

@@ -59,7 +59,7 @@ export default {
          contacts: '/nashi-kontakty',
          services: {
             home: '/o-sajte',
-            gerb: '/o-sajte/razrabotka-gerba-2',
+            gerbs: '/o-sajte/razrabotka-gerba-2',
             korp_gerbs: '/o-sajte/razrabotka-korporativnyih-gerbov',
             ter_gerbs: '/o-sajte/razrabotka-territorialnoy-geraldiki',
             gerb_restore: '/o-sajte/vosstanovlenie-izobrazheniya-gerba',
