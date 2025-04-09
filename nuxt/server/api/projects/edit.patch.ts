@@ -1,6 +1,6 @@
 export default defineEventHandler({
    onRequest: [
-      // AdminAuthHandler.checkAccess
+      AdminAuthHandler.checkAccess,
       event => LocaleHandler.validateLocale(event, true),
       event => ProjectHandler.validateBody(event, true),
    ],

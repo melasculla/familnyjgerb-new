@@ -1,6 +1,6 @@
 export default defineEventHandler({
    onRequest: [
-      // AdminAuthHandler.checkAccess,
+      AdminAuthHandler.checkAccess,
       CategoryHandler.validateBody
    ],
    handler: async event => {

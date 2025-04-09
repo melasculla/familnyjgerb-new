@@ -108,6 +108,7 @@ export default {
 
       gallery: {
          list: '/api/gallery',
+         main: '/api/gallery/main',
          category: {
             list: (gallery: string) => `/api/gallery/${gallery}` as const,
             single: (gallery: string, category: string) => `/api/gallery/${gallery}/${category}` as const

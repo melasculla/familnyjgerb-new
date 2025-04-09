@@ -20,7 +20,7 @@ switch (tunes?.AligmentTune?.alignment) {
 
 <template>
    <div>
-      <p class="text-base" :class="align" v-html="block.text" />
+      <p :class="align" v-html="block.text" />
    </div>
 </template>
 

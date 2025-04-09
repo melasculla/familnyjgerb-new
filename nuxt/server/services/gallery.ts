@@ -1,5 +1,12 @@
+import { GalleryMainFiltersRequest } from '../handlers/gallery'
+
 export interface IGalleryItemService {
-   getItems(galleryCategoryId: number): Promise<GalleryItem[]>
+   getMainItems(filters: GalleryMainFiltersRequest): Promise<{
+      items: Awaited<ReturnType<IGalleryItemRepository['findAllItems']>>
+      total: number
+   }>
+
+   getItems(galleryCategoryId: number): ReturnType<IGalleryItemRepository['findAllItems']>
 
    upsertItems(galleryCategoryId: number, galleryItemObjects: GalleryItem[]): Promise<GalleryItemEntity[]>
 
@@ -7,10 +14,17 @@ export interface IGalleryItemService {
 }
 
 export class GalleryItemService implements IGalleryItemService {
-   private repository: IGalleryItemRepository
+   constructor(
+      private repository: IGalleryItemRepository = new GalleryItemRepository()
+   ) { }
 
-   constructor() {
-      this.repository = new GalleryItemRepository()
+   async getMainItems(filters: GalleryMainFiltersRequest, pagination: { page?: number, perPage?: number } = {}) {
+      const [items, total] = await Promise.all([
+         this.repository.findAllItems(undefined, filters, pagination),
+         this.repository.countItems(filters)
+      ])
+
+      return { items, total }
    }
 
    async getItems(galleryCategoryId: number) {
@@ -18,10 +32,7 @@ export class GalleryItemService implements IGalleryItemService {
    }
 
    async upsertItems(galleryCategoryId: number, galleryItemObjects: NewGalleryItem[]) {
-      const galleryItemEntities = await this.repository.save(
-         galleryCategoryId,
-         galleryItemObjects.map(item => new GalleryItemEntity(item))
-      )
+      const galleryItemEntities = galleryItemObjects.map(item => new GalleryItemEntity(item))
 
       for (const item of galleryItemEntities) {
          if (item.order == undefined || item.image == undefined) {
@@ -32,7 +43,12 @@ export class GalleryItemService implements IGalleryItemService {
          }
       }
 
-      return galleryItemEntities
+      const result = await this.repository.save(
+         galleryCategoryId,
+         galleryItemEntities
+      )
+
+      return result
    }
 
    async deleteItems(ids: number[]) {

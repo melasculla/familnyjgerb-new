@@ -1,4 +1,4 @@
-import { pgTable, text, varchar, integer, timestamp, serial, json, boolean, unique, type AnyPgColumn } from 'drizzle-orm/pg-core';
+import { pgTable, text, varchar, integer, timestamp, serial, json, boolean, unique, type AnyPgColumn, smallint } from 'drizzle-orm/pg-core';
 import { relations, sql } from 'drizzle-orm';
 import type { OutputData } from '@editorjs/editorjs';
 
@@ -186,6 +186,12 @@ export const galleryItemsTable = pgTable('gallery_items', {
    altRu: varchar('alt_ru', { length: 256 }),
    order: integer('order'),
    categoryId: serial('category_id').references(() => galleryCategoriesTable.id).notNull(),
+
+   projectRu: integer('project_ru').references(() => projectsTable.id),
+   projectEn: integer('project_en').references(() => projectsTable.id),
+   type: smallint('type').array(),
+   usage: smallint('usage').array(),
+   info: smallint('info').array(),
 }, (table) => [
    unique().on(table.order, table.categoryId),
    unique().on(table.image, table.categoryId)
@@ -193,6 +199,7 @@ export const galleryItemsTable = pgTable('gallery_items', {
 
 export type GalleryItem = typeof galleryItemsTable.$inferSelect
 export type NewGalleryItem = typeof galleryItemsTable.$inferInsert
+export type GalleryItemCols = typeof galleryItemsTable._.columns
 
 export const galleryItemsRelations = relations(galleryItemsTable, ({ one }) => ({
    category: one(galleryCategoriesTable, {

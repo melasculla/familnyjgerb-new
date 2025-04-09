@@ -16,6 +16,19 @@ definePageMeta({
 
 <template>
    <div>
+      <ClientOnly>
+         <Teleport to="#admin__teleport">
+            <div class="ml-10 flex flex-wrap gap-4">
+               <ButtonsMain :href="routesList.client.admin.projects.list">
+                  All Projects
+               </ButtonsMain>
+               <ButtonsMain :href="routesList.client.admin.projects.create">
+                  New Project
+               </ButtonsMain>
+            </div>
+         </Teleport>
+      </ClientOnly>
+
       <div v-if="status === 'success' && data">
          <ProjectsEditor :project-data="data.project" />
       </div>

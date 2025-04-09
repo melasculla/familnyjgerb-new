@@ -107,8 +107,8 @@ export class ProjectHandler {
          throw createError({ statusCode: 400, message: `Statuses ${statuses.filter(item => !projectsStatusList.includes(item as any)).join(' and ')} not found` })
       }
 
-      // if (validStatuses.includes('hidden') || validStatuses.includes('deleted'))
-      //    AdminAuthHandler.checkAccess(event)
+      if (validStatuses.includes('hidden') || validStatuses.includes('deleted'))
+         AdminAuthHandler.checkAccess(event)
 
       event.context.requestDTO.stasuses = validStatuses
    }

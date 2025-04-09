@@ -21,12 +21,12 @@ export const usePagination = (
 
          return 1
       },
-      set: (page: number) => {
+      set: async (page: number) => {
          if (mode === 'state')
             useState<number>(stateOrQueryName, () => 1).value = page
 
          if (mode === 'query')
-            route.query[stateOrQueryName] = `${page}`
+            await navigateTo({ query: { ...route.query, page: page } })
 
          if (mode === 'page')
             urlBase ?

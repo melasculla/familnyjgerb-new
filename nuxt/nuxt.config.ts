@@ -1,3 +1,4 @@
+import tailwindcss from '@tailwindcss/vite'
 import PrimeTheme from '@primevue/themes/lara';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
@@ -9,7 +10,6 @@ export default defineNuxtConfig({
   css: ['~/assets/css/main.css'],
 
   modules: [
-    '@nuxtjs/tailwindcss',
     '@nuxt/image',
     '@nuxtjs/i18n',
     '@nuxtjs/google-fonts',
@@ -20,36 +20,37 @@ export default defineNuxtConfig({
   ],
 
   auth: {
-    baseURL: `${process.env.NUXT_PUBLIC_BASE_URL}/api/auth` || 'http://patrik.ml:3000/api/auth',
+    // baseURL: process.env.NUXT_PUBLIC_BASE_URL ? `${process.env.NUXT_PUBLIC_BASE_URL}/api/auth` : 'http://patrik.ml:3001/api/auth',
+    originEnvKey: 'NUXT_BASE_URL',
     provider: {
       type: 'authjs',
       trustHost: false,
       defaultProvider: 'google',
-      addDefaultCallbackUrl: true
+      addDefaultCallbackUrl: true,
     }
   },
 
   googleFonts: {
     download: true,
     families: {
-      // Inter: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-      // Jost: ['100', '200', '300', '400', '500', '600', '700', '800', '900']
-      'EB Garamond': ['100', '200', '300', '400', '500', '600', '700', '800', '900']
+      'Lora': ['100', '200', '300', '400', '500', '600', '700', '800', '900']
     }
   },
 
   i18n: {
     lazy: true,
-    langDir: 'locales',
+    // langDir: 'locales',
     strategy: 'prefix_except_default',
     defaultLocale: 'ru',
     locales: [
       {
         code: 'ru',
+        name: 'Russian',
         file: 'ru-RU.json',
       },
       {
         code: 'en',
+        name: 'English',
         file: 'en-US.json'
       }
     ],
@@ -77,14 +78,21 @@ export default defineNuxtConfig({
     }
   },
 
+  vite: {
+    plugins: [
+      tailwindcss(),
+    ]
+  },
+
   postcss: {
     plugins: {
-      tailwindcss: {},
+      '@tailwindcss/postcss': {},
       autoprefixer: {},
     },
   },
 
   runtimeConfig: {
+    baseUrl: '',
     public: {
       mail: '',
       phone: '',
@@ -304,11 +312,12 @@ export default defineNuxtConfig({
         statusCode: 301
       },
     },
-    // '/_ipx/**': {
-    //   cache: {
-    //     maxAge: 2000
-    //   }
-    // }
+    '/portfolio/monogramms': {
+      redirect: {
+        to: '/portfolio/monograms',
+        statusCode: 301
+      },
+    },
   },
 
   future: {

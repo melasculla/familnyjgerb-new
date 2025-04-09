@@ -16,6 +16,19 @@ definePageMeta({
 
 <template>
    <div>
+      <ClientOnly>
+         <Teleport to="#admin__teleport">
+            <div class="ml-10 flex flex-wrap gap-4">
+               <ButtonsMain :href="routesList.client.admin.posts.list">
+                  All Posts
+               </ButtonsMain>
+               <ButtonsMain :href="routesList.client.admin.posts.create">
+                  New Post
+               </ButtonsMain>
+            </div>
+         </Teleport>
+      </ClientOnly>
+
       <div v-if="status === 'success' && data">
          <BlogEditor :post-data="data.post" />
       </div>

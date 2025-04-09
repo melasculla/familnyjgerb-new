@@ -6,7 +6,7 @@ export type FileEntityType = {
 }
 
 export class FileEntity {
-   private allowedSize = 1024 * 1024 * 5 // 5 Mb
+   private allowedSize = 1024 * 1024 * 7 // 7 Mb
    private initialFilename
    private acceptedTypes
    public filename
@@ -31,11 +31,11 @@ export class FileEntity {
 
    private genereateRandomSuffix(): string {
       if (!this.initialFilename)
-         return String(Math.floor(Math.random() * 9e15)) + '.' + this.extenstion
+         return `unnamed__${new Date().getTime()}__${String(Math.floor(Math.random() * 10))}.${this.extenstion}`
 
-      const extension = this.initialFilename.split('.').pop();
-      const name = this.initialFilename.split('.').slice(0, -1).join('.').replaceAll(':', '');
-      const newName = name + '__' + String(Math.floor(Math.random() * 9e15)) + '.' + extension
+      const extension = this.initialFilename.split('.').pop()
+      const name = this.initialFilename.split('.').slice(0, -1).join('.').replaceAll(':', '')
+      const newName = `${name}__${new Date().getTime()}__${String(Math.floor(Math.random() * 10))}.${extension}`
       return newName
    }
 

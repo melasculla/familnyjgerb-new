@@ -40,8 +40,8 @@ const confirm = useConfirm()
                {{ locale.code }}
             </NuxtLink>
          </div>
-         <div class="flex-shrink flex-grow" v-if="$slots.header">
-            <slot name="header" />
+         <div class="flex-shrink flex-grow" id="admin__teleport">
+            <slot v-if="$slots.header" name="header" />
          </div>
          <!-- <ThemeSwitcher :admin="true" /> -->
          <div class="ml-auto flex items-center gap-4" v-if="data?.user">
@@ -61,7 +61,7 @@ const confirm = useConfirm()
             })" />
          </div>
       </div>
-      <div class="grid grid-cols-[1fr,auto] items-start">
+      <div class="grid grid-cols-[1fr_auto] items-start">
          <main class="border-r-[2px] sm:border-r-[5px] border-title pt-4 px-1 sm:px-4 min-h-[92vh]">
             <div class="relative">
                <slot />

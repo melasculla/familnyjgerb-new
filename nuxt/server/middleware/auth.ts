@@ -97,8 +97,8 @@ export default defineEventHandler(async event => {
    if (isAuthorized)
       return
 
-   // if (!session)
-   //    throw createError(errorsList.unauthorized)
+   if (!session)
+      throw createError(errorsList.unauthorized)
 
-   // throw createError(errorsList.forbidden)
+   throw createError(errorsList.forbidden)
 })

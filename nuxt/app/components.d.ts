@@ -12,6 +12,7 @@ declare module 'vue' {
     PrimeDatePicker: typeof import('primevue/datepicker')['default']
     PrimeFloatLabel: typeof import('primevue/floatlabel')['default']
     PrimeInputText: typeof import('primevue/inputtext')['default']
+    PrimeMultiSelect: typeof import('primevue/multiselect')['default']
     PrimeSelect: typeof import('primevue/select')['default']
     PrimeSelectButton: typeof import('primevue/selectbutton')['default']
     RouterLink: typeof import('vue-router')['RouterLink']

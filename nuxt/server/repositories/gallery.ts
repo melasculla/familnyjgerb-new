@@ -1,8 +1,19 @@
-import { CategoryEntity, GalleryCategoryEntity, GalleryItemEntity } from "#imports"
-import { eq, inArray, and } from "drizzle-orm";
+import { CategoryEntity, GalleryCategoryEntity, GalleryItemEntity } from '#imports'
+import { eq, inArray, and, desc, aliasedTable, arrayContains, count } from 'drizzle-orm'
+import { GalleryItemCols } from '../db/schema'
+import { GalleryMainFiltersRequest } from '../handlers/gallery'
 
 export interface IGalleryItemRepository {
-   findAllItems(galleryCategoryId: number): Promise<GalleryItem[]>
+   findAllItems(galleryCategoryId?: number, filters?: GalleryMainFiltersRequest, pagination?: { page?: number, perPage?: number }): Promise<Array<GalleryItem & {
+      projectDetailsRu: {
+         slug: string,
+      } | null
+      projectDetailsEn: {
+         slug: string,
+      } | null
+   }>>
+
+   countItems(filters: GalleryMainFiltersRequest): Promise<number>
 
    save(galleryCategoryId: number, galleryItemEntities: GalleryItemEntity[]): Promise<GalleryItemEntity[]>
 
@@ -10,11 +21,64 @@ export interface IGalleryItemRepository {
 }
 
 export class GalleryItemRepository implements IGalleryItemRepository {
-   async findAllItems(galleryCategoryId: number) {
-      return db.query.galleryItemsTable.findMany({
-         where: eq(galleryItemsTable.categoryId, galleryCategoryId),
-         orderBy: (table, { desc }) => desc(table.order)
-      })
+   async findAllItems(galleryCategoryId?: number, filters?: GalleryMainFiltersRequest, pagination?: { page?: number, perPage?: number }) {
+      const projectEnTable = aliasedTable(projectsTable, 'project_en')
+
+      const query = db
+         .select({
+            ...galleryItemsTable as GalleryItemCols,
+            projectRu: projectsTable.id,
+            projectEn: projectEnTable.id,
+            projectDetailsRu: {
+               slug: projectsTable.slug,
+            },
+            projectDetailsEn: {
+               slug: projectEnTable.slug,
+            },
+         })
+         .from(galleryItemsTable)
+         .where(galleryCategoryId ? eq(galleryItemsTable.categoryId, galleryCategoryId) : undefined,)
+         .leftJoin(projectsTable, eq(projectsTable.id, galleryItemsTable.projectRu))
+         .leftJoin(projectEnTable, eq(projectEnTable.id, galleryItemsTable.projectEn))
+         .orderBy(desc(galleryItemsTable.order))
+         .$dynamic()
+
+      if (filters)
+         query
+            .where(and(
+               filters?.gallery ? eq(galleriesTable.name, filters.gallery) : undefined,
+               (filters?.category && filters.category.length) ? inArray(galleryCategoriesTable.name, filters.category as string[]) : undefined,
+               (filters?.type && filters.type.length) ? arrayContains(galleryItemsTable.type, filters.type) : undefined,
+               (filters?.usage && filters.usage.length) ? arrayContains(galleryItemsTable.usage, filters.usage) : undefined,
+               (filters?.info && filters.info.length) ? arrayContains(galleryItemsTable.info, filters.info) : undefined,
+            ))
+            .innerJoin(galleryCategoriesTable, eq(galleryCategoriesTable.id, galleryItemsTable.categoryId))
+            .innerJoin(galleriesTable, eq(galleriesTable.id, galleryCategoriesTable.galleryId))
+
+      if (pagination && pagination.page && pagination.perPage)
+         query
+            .offset((pagination.page - 1) * pagination.perPage)
+            .limit(pagination.perPage)
+
+      return await query.execute()
+   }
+
+   async countItems(filters: GalleryMainFiltersRequest) {
+      const [result] = await db
+         .select({ count: count() })
+         .from(galleryItemsTable)
+         .leftJoin(projectsTable, eq(projectsTable.id, galleryItemsTable.projectRu))
+         .where(and(
+            filters.gallery ? eq(galleriesTable.name, filters.gallery) : undefined,
+            (filters.category && filters.category.length) ? inArray(galleryCategoriesTable.name, filters.category as string[]) : undefined,
+            (filters.type && filters.type.length) ? arrayContains(galleryItemsTable.type, filters.type) : undefined,
+            (filters.usage && filters.usage.length) ? arrayContains(galleryItemsTable.usage, filters.usage) : undefined,
+            (filters.info && filters.info.length) ? arrayContains(galleryItemsTable.info, filters.info) : undefined,
+         ))
+         .innerJoin(galleryCategoriesTable, eq(galleryCategoriesTable.id, galleryItemsTable.categoryId))
+         .innerJoin(galleriesTable, eq(galleriesTable.id, galleryCategoriesTable.galleryId))
+
+      return result.count
    }
 
    async save(galleryCategoryId: number, galleryItemEntities: GalleryItemEntity[]) {
@@ -48,6 +112,12 @@ export class GalleryItemRepository implements IGalleryItemRepository {
                      altRu: item.altRu,
                      altEn: item.altEn,
                      order: item.order,
+
+                     projectRu: item.projectRu,
+                     projectEn: item.projectEn,
+                     type: item.type,
+                     usage: item.usage,
+                     info: item.info,
                   })
                   .where(eq(galleryItemsTable.id, item.id!))
                   .returning()

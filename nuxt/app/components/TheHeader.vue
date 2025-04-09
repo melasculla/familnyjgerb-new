@@ -5,7 +5,7 @@
 <template>
    <div class="text-base">
       <!-- TODO: make search -->
-      <div class="grid grid-cols-[1fr,4fr,1fr] items-center px-4 pt-4">
+      <div class="grid grid-cols-[1fr_4fr_1fr] items-center px-4 pt-4">
          <div class="flex gap-12 items-center flex-wrap">
             <svg class="size-8" viewBox="0 0 24 24">
                <path fill="currentColor" fill-rule="evenodd"

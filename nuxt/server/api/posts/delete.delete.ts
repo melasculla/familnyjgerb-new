@@ -1,6 +1,6 @@
 export default defineEventHandler({
    onRequest: [
-      // AdminAuthHandler.checkAccess,
+      AdminAuthHandler.checkAccess,
       event => PostHandler.validateBody(event, true),
    ],
    handler: async event => {
@@ -10,7 +10,7 @@ export default defineEventHandler({
          if (err.message.includes('posts_lang_group_posts_id_fk'))
             err.message = 'Cannot delete original post translation'
 
-         throw createError({ statusCode: err.status, message: err.message, statusMessage: err.message })
+         throw createError({ statusCode: err.code, message: err.message, statusMessage: err.message })
       }
    }
 })

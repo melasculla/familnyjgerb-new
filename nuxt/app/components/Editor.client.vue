@@ -181,30 +181,19 @@ defineExpose({ save })
 
 <template>
    <div>
-      <div class="w-full">
+      <div class="w-full [&_.ce-paragraph]:text-sm [&_.ce-paragraph]:md:text-base
+         [&_h2]:text-xl [&_h3]:text-lg">
          <div :id="`${uniqueID}_editorjs`" class="border-4 border-blue-500 bg-white min-h-[500px]"></div>
       </div>
    </div>
 </template>
 
-<style lang="postcss">
+<style>
 .ce-toolbar__actions {
    right: -20px !important;
 }
 
 .ce-editorjsColumns_col {
    border: 1px solid #000;
-}
-
-h2 {
-   @apply text-xl
-}
-
-h3 {
-   @apply text-lg
-}
-
-.ce-paragraph {
-   @apply text-xs md:text-sm
 }
 </style>

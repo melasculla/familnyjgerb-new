@@ -1,6 +1,6 @@
 export default defineEventHandler({
    onRequest: [
-      // AdminAuthHandler.checkAccess
+      AdminAuthHandler.checkAccess,
       event => LocaleHandler.validateLocale(event, true),
       ProjectHandler.validateBody,
    ],
@@ -20,7 +20,7 @@ export default defineEventHandler({
          if (err.message.includes('duplicate'))
             throw createError({ statusCode: 409, message: `Project with this slug and lang already exists` })
 
-         throw createError({ statusCode: err.status, message: err.message })
+         throw createError({ statusCode: err.code, message: err.message })
       }
    }
 })

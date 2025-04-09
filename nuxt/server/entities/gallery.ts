@@ -6,6 +6,11 @@ export class GalleryItemEntity {
    public altRu
    public order
    public categoryId
+   public projectRu
+   public projectEn
+   public type
+   public usage
+   public info
 
    constructor(galleryItem: NewGalleryItem) {
       this.id = galleryItem.id || null
@@ -15,6 +20,12 @@ export class GalleryItemEntity {
       this.altRu = galleryItem.altRu || null
       this.order = galleryItem.order
       this.categoryId = galleryItem.categoryId
+
+      this.projectRu = galleryItem.projectRu
+      this.projectEn = galleryItem.projectEn
+      this.type = galleryItem.type
+      this.usage = galleryItem.usage
+      this.info = galleryItem.info
    }
 }
 

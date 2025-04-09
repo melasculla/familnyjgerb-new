@@ -68,7 +68,7 @@ const selectMultiple = (file: string) => {
 
 <template>
    <div class="py-2">
-      <div class="grid md:grid-cols-[120px,1fr,120px] items-start gap-5 pb-5 px-2">
+      <div class="grid md:grid-cols-[120px_1fr_120px] items-start gap-5 pb-5 px-2">
          <input type="text" pattern="[0-9]" class="text-sm border border-orange-400 rounded-md px-2 py-1 min-w-0"
             @change="(event) => currentPage = parseInt((event.target as HTMLInputElement).value) || 1"
             placeholder="Страница:">
@@ -106,7 +106,7 @@ const selectMultiple = (file: string) => {
          </div>
          <div v-if="status === 'success' && data" v-for="file in data.data" :key="file"
             class="transform hover:scale-105 transition-all cursor-pointer flex items-center"
-            :class="{ 'outline outline-4 outline-sky-600': selectedFiles.find((_file) => _file === file), 'outline outline-1 outline-red-300 p-10': video }"
+            :class="{ 'outline-4 outline-sky-600': selectedFiles.find((_file) => _file === file), 'outline-1 outline-red-300 p-10': video }"
             @click="selectMultiple(file)">
             <NuxtImg v-if="!video" :src="joinURL('/fs/', file)" loading="lazy" class="w-full"
                placeholder="/loader.svg" />

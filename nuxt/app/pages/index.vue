@@ -33,7 +33,7 @@ const toggleMore = () => {
 <template>
    <div>
       <!-- <pre class="mt-[80rem]">{{ routesList.client.static }}</pre> -->
-      <div class="grid grid-cols-[5fr,3fr] items-center overflow-hidden">
+      <div class="grid grid-cols-[5fr_3fr] items-center overflow-hidden">
          <TheSlider :config="carouselConfig" :data="8" v-slot="{ description, index }">
             <div
                class="carousel__item w-full h-[38rem] bg-primary-500 flex items-center justify-center text-6xl text-primary-100">
@@ -42,9 +42,13 @@ const toggleMore = () => {
          </TheSlider>
 
          <div class="grid gap-8">
-            <h2 class="uppercase text-3xl text-balance text-center font-medium">
-               ДОБРО ПОЖАЛОВАТЬ В МИР НАСЛЕДИЯ И ПРЕСТИЖА
+            <h2 class="uppercase text-3xl text-balance text-center font-light">
+               ДОБРО ПОЖАЛОВАТЬ В <span class="text-accent-800 font-medium">МИР НАСЛЕДИЯ</span>
+               И <span class="text-accent-800 font-medium">ПРЕСТИЖА</span>
             </h2>
+
+            <p class="text-center text-lg text-balance">Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+               Consequuntur, commodi?</p>
 
             <ButtonsMain class="mx-auto">
                Получить консультацию
@@ -53,7 +57,7 @@ const toggleMore = () => {
       </div>
 
       <div class="mx-auto w-10/12 text-center border-2 border-primary-300 p-12">
-         <p class="text-balance text-3xl uppercase font-medium">ВЫ ЗДЕСЬ ПОТОМУ ЧТО ИЩИТЕ НЕЧТО ОСОБЕННОЕ?</p>
+         <p class="text-balance text-3xl uppercase font-light">ВЫ ЗДЕСЬ ПОТОМУ ЧТО ИЩИТЕ НЕЧТО ОСОБЕННОЕ?</p>
          <p class="text-balance text-lg mt-3">Вы в правильном месте, так как тут создаються уникальные символы,
             наполненные
             особым смыслом!
@@ -61,18 +65,30 @@ const toggleMore = () => {
       </div>
 
       <div class="overflow-hidden">
-         <p class="text-3xl mb-7 text-center font-medium uppercase">Наши Услуги:</p>
-         <TheSlider :config="carouselServicesConfig" :data="8" v-slot="{ description, index }" nav>
-            <div
-               class="carousel__item w-full h-[35rem] bg-primary-500 flex items-center justify-center text-6xl text-primary-100">
-               {{ index }}
+         <p class="text-3xl mb-7 text-center font-medium uppercase text-accent-800">Наши Услуги:</p>
+         <!-- @vue-skip -->
+         <TheSlider :config="carouselServicesConfig" v-slot="{ description, index, path, sub }" nav :data="[
+            { path: '/img/services/1.webp', sub: '/img/services/1.1.webp' },
+            { path: '/img/services/2.webp', sub: '/img/services/2.1.webp' },
+            { path: '/img/services/3.webp', sub: '/img/services/3.1.webp' },
+            { path: '/img/services/4.webp' },
+            { path: '/img/services/1.webp', sub: '/img/services/1.1.webp' },
+            { path: '/img/services/2.webp', sub: '/img/services/2.1.webp' },
+            { path: '/img/services/3.webp', sub: '/img/services/3.1.webp' },
+            { path: '/img/services/4.webp' },
+         ]">
+            <div class="relative carousel__item w-full flex items-center justify-center text-6xl text-primary-100">
+               <NuxtImg :src="path" alt="" />
+
+               <NuxtImg v-if="sub" class="h-[20rem] absolute bottom-4 left-1/2 -translate-x-1/2" :src="sub" alt="" />
             </div>
          </TheSlider>
       </div>
 
       <div class="overflow-hidden">
          <p class="text-2xl text-center text-balance font-medium">
-            ПЕРСОНАЛЬНЫЙ СИМВОЛ (ГЕРБ, МОНОГРАММА, ЭМБЛЕМА) -ЭТО ВОЗМОЖНОСТЬ РАЗВИТЬ ПЕРСОНАЛЬНЫЙ СТИЛЬ,
+            ПЕРСОНАЛЬНЫЙ СИМВОЛ <span class="text-accent-800">(ГЕРБ, МОНОГРАММА, ЭМБЛЕМА)</span> - ЭТО ВОЗМОЖНОСТЬ
+            РАЗВИТЬ ПЕРСОНАЛЬНЫЙ СТИЛЬ,
             КАК В СОВРЕМЕННЫХ ТРАДИЦИЯХ, ТАК И В ТРАДИЦИЯХ ПРОШЛОГО
          </p>
          <TheSlider class="my-7" :config="carouselShowcaseConfig" :data="12" v-slot="{ description, index }" nav>
@@ -91,12 +107,11 @@ const toggleMore = () => {
          <div class="relative">
             <img src="https://familnyjgerb.com/wp-content/themes/alf_geraldika/new/images/banner.jpg"
                class="image w-full bg-slate-500 absolute inset-0 h-full object-cover" />
-            <div
-               class="w-max lg:max-w-[45%] grid gap-5 min-h-[35rem] px-5 py-28 text-lg relative z-[2] bg-primary-100/85 text-center">
+            <div class="w-max lg:max-w-[45%] grid gap-5 min-h-[35rem] p-20 text-lg relative z-[2] bg-primary-100/90">
                <h3 class="text-3xl uppercase font-medium">МЫ СОЗДАЕМ ГЕРБЫ ДЛЯ:</h3>
                <div>
-                  <p class="font-medium text-2xl mb-1">Частных лиц</p>
-                  <p>Фамильный герб (личный, родовой, семейный)</p>
+                  <p class="font-medium text-3xl mb-1">Частных лиц</p>
+                  <p class="text-accent-800 text-2xl">Фамильный герб (личный, родовой, семейный)</p>
                </div>
                <div>
                   <p class="mb-1">Вы получатете:</p>
@@ -104,8 +119,8 @@ const toggleMore = () => {
                   <p>Начало Вашего персонального стиля, бренда Вашей семь и на многие поколения вперед</p>
                </div>
                <div>
-                  <p class="font-medium text-2xl mb-1">Организаций</p>
-                  <p>Корпоративный герб</p>
+                  <p class="font-medium text-3xl mb-1">Организаций</p>
+                  <p class="text-accent-800 text-2xl">Корпоративный герб</p>
                </div>
                <div>
                   <p class="mb-1">Вы получатете:</p>
@@ -137,7 +152,7 @@ const toggleMore = () => {
          </ButtonsMain>
       </div>
 
-      <div class="grid grid-cols-[5fr,3fr] items-center">
+      <div class="grid grid-cols-[5fr_3fr] items-center">
          <div>
             <ClientOnly>
                <video class="aspect-[16/7] w-full" controls poster="/loader.svg"
@@ -162,22 +177,22 @@ const toggleMore = () => {
             <img src="https://familnyjgerb.com/wp-content/themes/alf_geraldika/new/images/banner.jpg"
                class="image w-full bg-slate-500 absolute inset-0 h-full object-cover" />
             <div
-               class="w-max lg:max-w-[45%] ml-auto grid gap-3 min-h-[35rem] px-5 py-28 text-lg relative z-[2] bg-primary-100/85 text-center">
+               class="w-max lg:max-w-[45%] ml-auto grid gap-3 min-h-[35rem] p-20 text-lg relative z-[2] bg-primary-100/90">
                <h3 class="text-3xl uppercase font-medium">МЫ МОНОГРАММЫ ДЛЯ:</h3>
                <div>
-                  <p class="font-medium text-2xl mb-1">Личная Монограмма и Семейная Монограмма</p>
-                  <p>Демократичный, уникальный личный символ</p>
-                  <p>Высокохудожественная интерпретация Ваших инициалов</p>
+                  <p class="font-medium text-3xl text-accent-800 mb-1">Личная Монограмма и Семейная Монограмма</p>
+                  <p>- Демократичный, уникальный личный символ</p>
+                  <p>- Высокохудожественная интерпретация Ваших инициалов</p>
 
-                  <p>Ваша личность, характер, натура в графике</p>
-                  <p>Основа персонального стиля (бренда)</p>
+                  <p>- Ваша личность, характер, натура в графике</p>
+                  <p>- Основа персонального стиля (бренда)</p>
 
-                  <p>Традиция вашей семьи</p>
-                  <p>Отличительный знак</p>
-                  <p>Ценность, передаваемая детям</p>
+                  <p>- Традиция вашей семьи</p>
+                  <p>- Отличительный знак</p>
+                  <p>- Ценность, передаваемая детям</p>
                </div>
 
-               <p class="mt-3 text-3xl font-medium">Корпоративная Монограмма - Логотип</p>
+               <p class="mt-3 text-3xl text-accent-800 font-medium">Корпоративная Монограмма - Логотип</p>
             </div>
          </div>
 
@@ -223,9 +238,7 @@ const toggleMore = () => {
             </div>
 
             <div class="grid grid-cols-3 gap-4">
-               <div
-                  class="transition-shadow p-6 flex flex-col gap-4
-                  shadow-[0_2px_6px_0_rgba(0,0,0,.12),0_1px_2px_0_rgba(0,0,0,.08)] hover:shadow-[0_8px_24px_0_rgba(0,0,0,.1),0_2px_8px_0_rgba(0,0,0,.08)]"
+               <div class="transition-shadow p-6 flex flex-col gap-4 shadow-main hover:shadow-main-hover"
                   v-for="card in 3" :key="card">
                   <p class="text-xl">Lorem ipsum dolor sit amet consectetur</p>
                   <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Quod unde nostrum animi aspernatur,
@@ -323,7 +336,7 @@ const toggleMore = () => {
    max-height: 70rem;
 }
 
-.read_more-leave-active{
+.read_more-leave-active {
    transition-duration: 300ms;
 }
 

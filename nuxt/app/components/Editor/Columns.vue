@@ -1,14 +1,19 @@
 <script setup lang="ts">
-import { type OutputBlockData } from '@editorjs/editorjs'
+import { ButtonsMain, ButtonsOrder } from '#components'
 
 defineProps<{
-   block: OutputBlockData
+   block: {
+      id?: string | number
+      type: string
+      data: Record<any, any>
+      tunes?: { [name: string]: any }
+   }
    child?: boolean
 }>()
 
 const buttons = {
-   'Main': resolveComponent('ButtonsMain'),
-   'Order': resolveComponent('ButtonsOrder')
+   'Main': ButtonsMain,
+   'Order': ButtonsOrder
 }
 </script>
 

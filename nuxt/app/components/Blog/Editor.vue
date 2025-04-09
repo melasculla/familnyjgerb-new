@@ -154,7 +154,7 @@ useSeoMeta({
 
 <template>
    <div>
-      <div class="grid gap-6 xl:grid-cols-[1fr,minmax(200px,350px)] text-base items-start max-md:px-2">
+      <div class="grid gap-6 xl:grid-cols-[1fr_minmax(200px,350px)] text-base items-start max-md:px-2">
          <div class="grid gap-10">
             <div class="grid gap-6 grid-cols-1 md:grid-cols-2 justify-between">
                <UtilsTitle class="md:contents md:[&_p]:mt-0 [&_input[type='text']]:w-full" provide-key="postErrors"

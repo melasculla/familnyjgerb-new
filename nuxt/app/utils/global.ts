@@ -1,3 +1,4 @@
+import { joinURL } from 'ufo'
 import { type CarouselConfig } from 'vue3-carousel'
 
 export type MyCarouselConfig = Partial<CarouselConfig> & { itemsToShow: number };
@@ -10,4 +11,11 @@ export const deepClone = <T>(data: T): T => {
       console.warn(err)
       return data
    }
+}
+
+export const FS_IMAGE_SRC = (path: string, mode: 'nuxt-image' | 'img' = 'nuxt-image') => {
+   if (mode === 'nuxt-image')
+      return joinURL('/fs', path)
+   else
+      return routesList.api.media.getFile(path)
 }

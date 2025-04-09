@@ -2,7 +2,7 @@ export default defineEventHandler({
    onRequest: [
       event => LocaleHandler.validateLocale(event, true),
       PostHandler.validateBody,
-      // AdminAuthHandler.checkAccess
+      AdminAuthHandler.checkAccess
    ],
    handler: async event => {
       const postService = new PostService()
@@ -20,7 +20,7 @@ export default defineEventHandler({
          if (err.message.includes('duplicate'))
             throw createError({ statusCode: 409, message: `Post with this slug and lang already exists` })
 
-         throw createError({ statusCode: err.status, message: err.message })
+         throw createError({ statusCode: err.code, message: err.message })
       }
    }
 })

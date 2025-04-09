@@ -1,6 +1,6 @@
 export default defineEventHandler({
    onRequest: [
-      // AdminAuthHandler.checkAccess,
+      AdminAuthHandler.checkAccess,
       event => ProjectHandler.validateBody(event, true),
    ],
    handler: async event => {
@@ -10,7 +10,7 @@ export default defineEventHandler({
          if (err.message.includes('projects_lang_group_projects_id_fk'))
             err.message = 'Cannot delete original project translation'
 
-         throw createError({ statusCode: err.status, message: err.message, statusMessage: err.message })
+         throw createError({ statusCode: err.code, message: err.message, statusMessage: err.message })
       }
    }
 })

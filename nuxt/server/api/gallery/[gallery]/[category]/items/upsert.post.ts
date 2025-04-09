@@ -1,6 +1,6 @@
 export default defineEventHandler({
    onRequest: [
-      // AdminAuthHandler.checkAccess,
+      AdminAuthHandler.checkAccess,
       GalleryHandler.validateBody,
       GalleryHandler.validateGallery,
       GalleryHandler.validateCategory,
@@ -21,7 +21,7 @@ export default defineEventHandler({
          if (err.message.includes('duplicate'))
             throw createError({ statusCode: 409, message: `Item with this order or source already exists` })
 
-         throw createError({ statusCode: err.status, message: err.message })
+         throw createError({ statusCode: err.code, message: err.message })
       }
    }
 })

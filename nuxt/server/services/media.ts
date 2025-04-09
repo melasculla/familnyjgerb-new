@@ -76,6 +76,15 @@ export class MediaService implements IMediaService {
             return options?.types?.some(item => item.includes(ext))
          })
          .map(key => joinURL('/', this.storageKey.replaceAll(':', '/'), key.replaceAll(':', '/')))
+         .sort((a, b) => {
+            const timeA = a.split('__')[1]
+            const timeB = b.split('__')[1]
+
+            if (timeB && timeB && parseInt(timeB) && parseInt(timeB))
+               return parseInt(timeB) - parseInt(timeA)
+
+            return 0
+         })
 
       let length = currentDirKeys.length
 

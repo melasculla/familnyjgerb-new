@@ -129,8 +129,8 @@ export class PostHandler {
          throw createError({ statusCode: 400, message: `Statuses ${statuses.filter(item => !postsStatusList.includes(item as any)).join(' and ')} not found` })
       }
 
-      // if (validStatuses.includes('hidden') || validStatuses.includes('deleted'))
-         // AdminAuthHandler.checkAccess(event)
+      if (validStatuses.includes('hidden') || validStatuses.includes('deleted'))
+         AdminAuthHandler.checkAccess(event)
 
       event.context.requestDTO.stasuses = validStatuses
    }
@@ -146,8 +146,8 @@ export class PostHandler {
          })
       }
 
-      // if (query.data.options?.planned !== 'false')
-         // AdminAuthHandler.checkAccess(event)
+      if (query.data.options?.planned !== 'false')
+         AdminAuthHandler.checkAccess(event)
 
       event.context.requestDTO.options = query.data.options || {}
    }
