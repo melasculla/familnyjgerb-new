@@ -11,7 +11,7 @@ const { data, status } = useAuth()
          <TheHeader />
       </header>
 
-      <MenuMain class="my-3 sticky top-0 z-10 bg-primary-100" />
+      <MenuMain class="my-3 sticky top-0 z-10 bg-white" />
 
       <main class="[&>div:not(.custom)]:grid [&>div:not(.custom)]:gap-12 [&>div:not(.custom)]:items-start">
          <slot />

@@ -45,24 +45,24 @@ const proccessMaybeArray = (val?: string | number | null | (string | number | nu
 }
 const GalleryMainFiltersSchema = z.object({
    gallery: z.enum(['gerbs', 'monograms']),
-   category: z.array(z.enum(['standard', 'premium', 'elite', 'individual'])).or(z.enum(['standard', 'premium', 'elite', 'individual']))
-      .optional().nullable().transform(proccessMaybeArray),
+   category: z.preprocess(val => Array.isArray(val) ? val : [val], z.array(z.enum(Object.keys(GALLERY_ENUM.category) as [string])))
+      .optional().nullable().transform(val => proccessMaybeArray(val).map(String)),
 
    type: z.array(
       z.preprocess(val => typeof val === 'number' ? String(val) : val, z.enum(Object.keys(GALLERY_ENUM.type) as [string]))
    ).or(
       z.preprocess(val => typeof val === 'number' ? String(val) : val, z.enum(Object.keys(GALLERY_ENUM.type) as [string]))
-   ).optional().nullable().transform(val => proccessMaybeArray(val).map(item => Number(item))),
+   ).optional().nullable().transform(val => proccessMaybeArray(val).map(Number)),
    usage: z.array(
       z.preprocess(val => typeof val === 'number' ? String(val) : val, z.enum(Object.keys(GALLERY_ENUM.usage) as [string]))
    ).or(
       z.preprocess(val => typeof val === 'number' ? String(val) : val, z.enum(Object.keys(GALLERY_ENUM.usage) as [string]))
-   ).optional().nullable().transform(val => proccessMaybeArray(val).map(item => Number(item))),
+   ).optional().nullable().transform(val => proccessMaybeArray(val).map(Number)),
    info: z.array(
       z.preprocess(val => typeof val === 'number' ? String(val) : val, z.enum(Object.keys(GALLERY_ENUM.info) as [string]))
    ).or(
       z.preprocess(val => typeof val === 'number' ? String(val) : val, z.enum(Object.keys(GALLERY_ENUM.info) as [string]))
-   ).optional().nullable().transform(val => proccessMaybeArray(val).map(item => Number(item))),
+   ).optional().nullable().transform(val => proccessMaybeArray(val).map(Number)),
 })
 
 export type GalleryMainFiltersRequest = z.infer<typeof GalleryMainFiltersSchema>

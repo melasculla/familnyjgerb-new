@@ -5,6 +5,8 @@ const { content } = defineProps<{
    content: OutputData | null
 }>()
 
+const localPath = useLocalePath()
+
 const parseLink = async (e: MouseEvent) => {
    const target = e.target as HTMLAnchorElement
    if (target.nodeName !== 'A')
@@ -12,9 +14,16 @@ const parseLink = async (e: MouseEvent) => {
 
    e.preventDefault()
 
-   const url = new URL(target.href)
-   const isExternal: boolean = useRequestURL().hostname !== url.hostname
-   await navigateTo(url.pathname, { external: isExternal })
+   try {
+      const url = new URL(target.href)
+      const isExternal: boolean = useRequestURL().hostname !== url.hostname
+      await navigateTo(isExternal ? url.href : url.pathname, {
+         external: isExternal,
+         open: { target: '_blank' }
+      })
+   } catch (err: any) {
+      target.href.startsWith('/') ? await navigateTo(localPath(target.href)) : await navigateTo(localPath('/' + target.href))
+   }
 }
 </script>
 

@@ -101,7 +101,7 @@ const hideMenu = () => hideTimeout = setTimeout(() => activeMenu.value = null, 3
                {{ item.label }}
             </MenuLink>
             <MenuChild
-               class="absolute left-0 top-full w-full bg-primary-200 p-5 opacity-0 -translate-y-[9999rem] menu__transition [&_.wrapper]:px-[30rem]"
+               class="absolute left-0 top-full w-full bg-primary-100 p-5 opacity-0 -translate-y-[9999rem] menu__transition [&_.wrapper]:px-[30rem]"
                :class="{ '!opacity-100 !translate-y-0': activeMenu === index }" :list="item.children"
                v-if="item.children" />
          </li>

@@ -14,6 +14,7 @@
   "dependencies": {
     "@calumk/editorjs-columns": "^0.3.2",
     "@editorjs/checklist": "^1.6.0",
+    "@editorjs/delimiter": "^1.4.2",
     "@editorjs/editorjs": "^2.30.7",
     "@editorjs/embed": "^2.7.6",
     "@editorjs/header": "^2.8.8",
@@ -39,6 +40,7 @@
     "editorjs-drag-drop": "^1.1.16",
     "editorjs-text-alignment-blocktune": "^1.0.3",
     "editorjs-text-color-plugin": "git+https://github.com/dariox64/editorjs-text-color-plugin.git",
+    "editorjs-undo": "1.0.1",
     "h3-zod": "^0.5.3",
     "handlebars": "^4.7.8",
     "he": "^1.2.0",

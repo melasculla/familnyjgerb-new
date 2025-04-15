@@ -11,6 +11,7 @@ export const useSelectFilesWindow = (
 ): {
    isOpen: Ref<boolean>,
    open: () => void,
+   close: () => void,
    handleSelected: (fileList: string[]) => void
 } => {
    const isOpen = ref<boolean>(false)
@@ -26,6 +27,11 @@ export const useSelectFilesWindow = (
    const openSelectWindow = () => {
       window.addEventListener('keyup', keyCloseSelectWinwow)
       isOpen.value = true
+   }
+
+   const closeSelectWindow = () => {
+      window.removeEventListener('keyup', keyCloseSelectWinwow)
+      isOpen.value = false
    }
 
    const filesSelectedFromFS = (fileList: string[]) => {
@@ -46,6 +52,7 @@ export const useSelectFilesWindow = (
    return {
       isOpen,
       open: openSelectWindow,
+      close: closeSelectWindow,
       handleSelected: filesSelectedFromFS
    }
 }

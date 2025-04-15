@@ -1,5 +1,5 @@
 import { CategoryEntity, GalleryCategoryEntity, GalleryItemEntity } from '#imports'
-import { eq, inArray, and, desc, aliasedTable, arrayContains, count } from 'drizzle-orm'
+import { eq, inArray, and, desc, aliasedTable, arrayContains, count, arrayOverlaps } from 'drizzle-orm'
 import { GalleryItemCols } from '../db/schema'
 import { GalleryMainFiltersRequest } from '../handlers/gallery'
 
@@ -48,9 +48,9 @@ export class GalleryItemRepository implements IGalleryItemRepository {
             .where(and(
                filters?.gallery ? eq(galleriesTable.name, filters.gallery) : undefined,
                (filters?.category && filters.category.length) ? inArray(galleryCategoriesTable.name, filters.category as string[]) : undefined,
-               (filters?.type && filters.type.length) ? arrayContains(galleryItemsTable.type, filters.type) : undefined,
-               (filters?.usage && filters.usage.length) ? arrayContains(galleryItemsTable.usage, filters.usage) : undefined,
-               (filters?.info && filters.info.length) ? arrayContains(galleryItemsTable.info, filters.info) : undefined,
+               (filters?.type && filters.type.length) ? arrayOverlaps(galleryItemsTable.type, filters.type) : undefined,
+               (filters?.usage && filters.usage.length) ? arrayOverlaps(galleryItemsTable.usage, filters.usage) : undefined,
+               (filters?.info && filters.info.length) ? arrayOverlaps(galleryItemsTable.info, filters.info) : undefined,
             ))
             .innerJoin(galleryCategoriesTable, eq(galleryCategoriesTable.id, galleryItemsTable.categoryId))
             .innerJoin(galleriesTable, eq(galleriesTable.id, galleryCategoriesTable.galleryId))
@@ -71,9 +71,9 @@ export class GalleryItemRepository implements IGalleryItemRepository {
          .where(and(
             filters.gallery ? eq(galleriesTable.name, filters.gallery) : undefined,
             (filters.category && filters.category.length) ? inArray(galleryCategoriesTable.name, filters.category as string[]) : undefined,
-            (filters.type && filters.type.length) ? arrayContains(galleryItemsTable.type, filters.type) : undefined,
-            (filters.usage && filters.usage.length) ? arrayContains(galleryItemsTable.usage, filters.usage) : undefined,
-            (filters.info && filters.info.length) ? arrayContains(galleryItemsTable.info, filters.info) : undefined,
+            (filters.type && filters.type.length) ? arrayOverlaps(galleryItemsTable.type, filters.type) : undefined,
+            (filters.usage && filters.usage.length) ? arrayOverlaps(galleryItemsTable.usage, filters.usage) : undefined,
+            (filters.info && filters.info.length) ? arrayOverlaps(galleryItemsTable.info, filters.info) : undefined,
          ))
          .innerJoin(galleryCategoriesTable, eq(galleryCategoriesTable.id, galleryItemsTable.categoryId))
          .innerJoin(galleriesTable, eq(galleriesTable.id, galleryCategoriesTable.galleryId))

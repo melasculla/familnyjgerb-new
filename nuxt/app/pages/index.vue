@@ -34,7 +34,7 @@ const toggleMore = () => {
    <div>
       <!-- <pre class="mt-[80rem]">{{ routesList.client.static }}</pre> -->
       <div class="grid grid-cols-[5fr_3fr] items-center overflow-hidden">
-         <TheSlider :config="carouselConfig" :data="8" v-slot="{ description, index }">
+         <TheSlider :config="carouselConfig" :data="4" v-slot="{ path, description, index }">
             <div
                class="carousel__item w-full h-[38rem] bg-primary-500 flex items-center justify-center text-6xl text-primary-100">
                {{ index }}
@@ -105,8 +105,7 @@ const toggleMore = () => {
 
       <div>
          <div class="relative">
-            <img src="https://familnyjgerb.com/wp-content/themes/alf_geraldika/new/images/banner.jpg"
-               class="image w-full bg-slate-500 absolute inset-0 h-full object-cover" />
+            <img src="/img/main.webp" class="image w-full bg-slate-500 absolute inset-0 h-full object-cover" />
             <div class="w-max lg:max-w-[45%] grid gap-5 min-h-[35rem] p-20 text-lg relative z-[2] bg-primary-100/90">
                <h3 class="text-3xl uppercase font-medium">МЫ СОЗДАЕМ ГЕРБЫ ДЛЯ:</h3>
                <div>

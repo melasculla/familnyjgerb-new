@@ -2,6 +2,13 @@ export const postsStatusList = ['hidden', 'deleted', 'published'] as const
 export const projectsStatusList = ['hidden', 'deleted', 'published'] as const
 
 export const GALLERY_ENUM = {
+   category: {
+      standard: 'Стандарт',
+      premium: 'Премиум',
+      elite: 'Элит',
+      individual: 'Индивидуальная',
+   },
+
    type: {
       1: 'Корпоративные Гербы',
       2: 'Фамильные Гербы',

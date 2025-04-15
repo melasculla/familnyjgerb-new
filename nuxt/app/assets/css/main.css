@@ -90,14 +90,20 @@
    --gradient-secondary: linear-gradient(45deg, #001A13 14%, #000A08 49%, #000F0C 65%, #000F0C 86%);
 } */
 
-@layer components {}
+@layer components {
+   body {
+      --p-tooltip-background: var(--color-accent-800);
+      /* --p-tooltip-arrow: ;
+      --p-tooltip-text: ; */
+   }
+}
 
 /* @layer theme {
    .dark {}
 } */
 
 body {
-   @apply text-lg bg-primary-100 text-basic-900 font-primary;
+   @apply text-lg bg-white text-basic-900 font-primary min-w-[1000px];
 }
 
 body:has(.modal__window) {
