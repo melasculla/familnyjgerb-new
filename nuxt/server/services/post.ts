@@ -21,7 +21,7 @@ export interface IPostService {
       exclude?: number[]
    ): Promise<number>
 
-   getAdjacents(id: number, langId: number): Promise<{ prev?: string, next?: string }>
+   getAdjacents(createdAt: Date, langId: number): Promise<{ prev?: string, next?: string }>
 
    upsertPost(postObject: NewPost): Promise<PostEntity>
 
@@ -82,8 +82,8 @@ export class PostService implements IPostService {
       return await this.repository.count(lang, categorySlug, searchParam, showPlanned, statuses, exclude)
    }
 
-   async getAdjacents(id: number, langId: number) {
-      const { prev, next } = await this.repository.findNear(id, langId)
+   async getAdjacents(createdAt: Date, langId: number) {
+      const { prev, next } = await this.repository.findNear(createdAt, langId)
       return { prev, next }
    }
 

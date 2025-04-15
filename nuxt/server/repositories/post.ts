@@ -17,7 +17,7 @@ export interface IPostRepository {
 
    findBy(by: 'slug' | 'id', slugOrId: string | number, langId?: number): Promise<PostEntity | null>
 
-   findNear(id: number, langId: number): Promise<{ prev?: string, next?: string }>
+   findNear(createdAt: Date, langId: number): Promise<{ prev?: string, next?: string }>
 
    count(lang?: Langs, categorySlug?: string, searchParam?: string, showPlanned?: 'false' | 'true' | 'only', statuses?: PostStatus[], exclude?: number[]): Promise<number>
 
@@ -115,25 +115,27 @@ export class PostRepository implements IPostRepository {
       return new PostEntity(result)
    }
 
-   async findNear(id: number, langId: number) {
+   async findNear(createdAt: Date, langId: number) {
       const [prev, next] = await Promise.all([
          db.query.postsTable.findFirst({
             columns: { slug: true },
             where: and(
-               gt(postsTable.id, id),
+               // gt(postsTable.id, id),
+               gt(postsTable.createdAt, createdAt),
                eq(postsTable.status, 'published'),
                eq(postsTable.langId, langId)
             ),
-            orderBy: (postsTable, { asc }) => [asc(postsTable.id)]
+            orderBy: (postsTable, { asc }) => [asc(postsTable.createdAt)]
          }),
          db.query.postsTable.findFirst({
             columns: { slug: true },
             where: and(
-               lt(postsTable.id, id),
+               // lt(postsTable.id, id),
+               lt(postsTable.createdAt, createdAt),
                eq(postsTable.status, 'published'),
                eq(postsTable.langId, langId)
             ),
-            orderBy: (postsTable, { desc }) => [desc(postsTable.id)]
+            orderBy: (postsTable, { desc }) => [desc(postsTable.createdAt)]
          })
       ])
 

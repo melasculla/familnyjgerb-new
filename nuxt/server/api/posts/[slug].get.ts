@@ -14,7 +14,7 @@ export default defineEventHandler({
       const category = post.categoryId
          ? await new CategoryService().getCategoryBy('id', post.categoryId).catch(() => { })
          : undefined
-      const adjacents = await postService.getAdjacents(post.id!, event.context.requestDTO.langId).catch(() => { })
+      const adjacents = await postService.getAdjacents(post.createdAt!, event.context.requestDTO.langId).catch(() => { })
 
       return {
          post,
