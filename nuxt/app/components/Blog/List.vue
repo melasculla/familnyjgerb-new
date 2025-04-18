@@ -41,9 +41,7 @@ const { data: posts, status, error, refresh } = await useLazyFetch<{ posts: Post
       if (admin)
          return
 
-      if (error)
-         return showError(error)
-      showError({ statusCode: response.status, message: response.statusText })
+      showError(error || { statusCode: response.status, message: response.statusText })
    },
 })
 
@@ -63,14 +61,18 @@ useSeoMeta({
          <ButtonsMain @click="refresh()">
             Rerfresh
          </ButtonsMain>
+
          <div class="flex flex-wrap gap-4 text-base" v-if="admin">
             <div class="flex items-center justify-center flex-wrap gap-2">
                <span class="capitalize text-slate-500">Status: </span>
+
                <PrimeSelectButton multiple v-model="statuses" :options="(postsStatusList as any)"
                   class="md:*:!text-base" />
             </div>
+
             <div class="flex items-center justify-center flex-wrap gap-2">
                <span class="capitalize text-slate-500">Planned: </span>
+
                <PrimeSelectButton :allowEmpty="false" v-model="showPlanned" :options="[
                   { key: 'No', value: 'false' },
                   { key: 'Yes', value: 'true' },
@@ -78,7 +80,9 @@ useSeoMeta({
                ]" optionValue="value" optionLabel="key" class="md:*:!text-base" />
             </div>
          </div>
+
       </div>
+
       <Pagination v-if="totaItems > perPage" @page-changed="page => currentPage = page"
          :class="{ 'select-none pointer-events-none': (status === 'pending' || status === 'idle') }" v-bind="{
             pages,
@@ -86,16 +90,21 @@ useSeoMeta({
             urlBase: admin ? undefined : pageBase,
             pagesLoading: 11
          }" />
+
       <BlogCategories :current="category" :admin="admin" />
+
       <div v-if="status === 'success' && posts" class="grid grid-cols-2 md:grid-cols-6 gap-4">
          <BlogCard v-for="post in posts.posts" :key="post.id" :post="post" :admin="admin" />
       </div>
+
       <div v-else-if="status === 'pending' || status === 'idle'" class="grid grid-cols-2 md:grid-cols-6 gap-4">
          <BlogSkeletonCard v-for="post in perPage" />
       </div>
+
       <div v-else-if="status === 'error'" class="text-center text-red-500 font-bold text-lg">
          {{ `Error: ${error?.statusMessage || error?.message || error?.data?.message}` }}
       </div>
+
       <Pagination v-if="totaItems > perPage" @page-changed="page => currentPage = page"
          :class="{ 'select-none pointer-events-none': (status === 'pending' || status === 'idle') }" v-bind="{
             pages,

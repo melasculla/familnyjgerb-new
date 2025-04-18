@@ -39,7 +39,7 @@ useSeoMeta({
 
 <template>
    <div>
-      <div class="flex justify-evenly sticky top-11 backdrop-blur-sm backdrop-brightness-125 bg-gray-200/80">
+      <div class="flex justify-evenly sticky top-12 backdrop-blur-sm backdrop-brightness-125 bg-gray-200/80 z-20">
          <NuxtLink class="underline text-base text-purple-600 my-5 block text-center" href="/blog_o_geraldike">
             Blog
          </NuxtLink>

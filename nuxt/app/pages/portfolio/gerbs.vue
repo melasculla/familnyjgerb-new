@@ -1,7 +1,8 @@
 <script setup lang="ts">
 definePageMeta({
    key: 'gallery',
-   scrollToTop: false
+   scrollToTop: false,
+   hideSidebar: true
 })
 </script>
 

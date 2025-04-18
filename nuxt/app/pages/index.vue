@@ -1,4 +1,8 @@
 <script setup lang="ts">
+definePageMeta({
+   hideSidebar: true
+})
+
 const carouselConfig: MyCarouselConfig = {
    itemsToShow: 1,
    // wrapAround: true,
