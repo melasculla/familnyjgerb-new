@@ -3,7 +3,7 @@ import mysql from 'mysql2/promise';
 import he from 'he';
 // @ts-expect-error
 import { JSDOM } from 'jsdom';
-import { count } from 'drizzle-orm/sql'
+import { count, eq } from 'drizzle-orm/sql'
 
 let postID: any;
 let test: any;
@@ -37,6 +37,7 @@ export default defineEventHandler(async event => {
          MAX(pm1.meta_value) AS seo_description,
          MAX(pm2.meta_value) AS seo_keywords,
          MAX(t.guid) AS thumbnail_url,
+         MAX(t.post_title) AS thumbnail_alt,
          GROUP_CONCAT(DISTINCT terms.name SEPARATOR ', ') AS categories
       FROM alf_posts p
       LEFT JOIN alf_postmeta pm1 ON pm1.post_id = p.ID AND pm1.meta_key = '_aioseop_description'
@@ -50,23 +51,24 @@ export default defineEventHandler(async event => {
       GROUP BY p.ID, p.post_name, p.post_title, p.post_content, p.post_date, p.post_modified, p.post_date_gmt;
    `)
 
-   fill && await db.delete(postsTable)
+   // fill && await db.delete(postsTable)
 
    for (const post of result[0] as any[]) {
       postID = post.ID
 
       const slug = `${post.post_name}.html`
 
-      const content = convertHtmlToOutputData(post.post_content, he.decode(post.post_title))
+      // const content = convertHtmlToOutputData(post.post_content, he.decode(post.post_title))
 
       if (postID === 14041) { // 14387 22046 14188 13693 21355 19410 19006 22086 18398 21170
-         test.push(post.post_content)
-         patrik = content
+         // console.log(post)
+         // test.push(post.post_content)
+         // patrik = content
       }
 
       const thumbnail = {
          path: post.thumbnail_url?.replaceAll('https://familnyjgerb.com', '').replaceAll('http://familnyjgerb.com', '') || '',
-         alt: `Thumbnail for ${post.post_title}`,
+         alt: post.thumbnail_alt || post.post_title,
       }
 
       const category: Record<string, number | null> = {
@@ -96,20 +98,24 @@ export default defineEventHandler(async event => {
          'auto-draft': 'hidden',
       }
 
-      fill && await db.insert(postsTable).values({
-         slug,
-         title: he.decode(post.post_title),
-         description: post.seo_description ? he.decode(post.seo_description) : null,
-         content,
-         thumbnail,
-         status: statuses[post.post_status],
-         createdAt: new Date(post.post_date),
-         editedAt: new Date(post.post_modified),
-         plannedAt: post.post_date_gmt ? new Date(post.post_date_gmt) : null,
-         seoKeys: post.seo_keywords || '',
-         categoryId: category[post.categories] ?? 3,
-         langId: 1,
-      });
+      // fill && await db.insert(postsTable).values({
+      //    slug,
+      //    title: he.decode(post.post_title),
+      //    description: post.seo_description ? he.decode(post.seo_description) : null,
+      //    content,
+      //    thumbnail,
+      //    status: statuses[post.post_status],
+      //    createdAt: new Date(post.post_date),
+      //    editedAt: new Date(post.post_modified),
+      //    plannedAt: post.post_date_gmt ? new Date(post.post_date_gmt) : null,
+      //    seoKeys: post.seo_keywords || '',
+      //    categoryId: category[post.categories] ?? 3,
+      //    langId: 1,
+      // });
+
+      // await db.update(postsTable).set({
+      //    thumbnail
+      // }).where(eq(postsTable.slug, slug))
    }
 
    return {

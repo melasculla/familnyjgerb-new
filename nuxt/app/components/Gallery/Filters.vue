@@ -139,13 +139,13 @@ const removeFilter = (_type: string, key: string) => {
                </transition-group>
             </div>
 
-            <GalleryFilter name="category" v-model="category"
+            <GalleryFilter name="category" v-model="category" tooltip="Пример подсказки объяснения"
                :options="translateObject(categoryOptions, 'gallery.enum.category', false)" key="1">
                {{ $t('gallery.titles.category') }}
             </GalleryFilter>
 
-            <GalleryFilter name="type" v-model="type" :options="translateObject(GALLERY_ENUM.type, 'gallery.enum.type')"
-               key="2">
+            <GalleryFilter name="type" v-model="type" tooltip="Пример подсказки объяснения"
+               :options="translateObject(GALLERY_ENUM.type, 'gallery.enum.type')" key="2">
                {{ $t(`gallery.titles.type.${gallery}`) }}
             </GalleryFilter>
 
@@ -164,7 +164,7 @@ const removeFilter = (_type: string, key: string) => {
                transition-colors" :to="{ query: { page: query.page } }" key="5">
                <span>{{ $t('gallery.main.reset') }}</span>
 
-               <svg class="size-6" viewBox="0 0 14 14" fill="none">
+               <svg class="size-4" viewBox="0 0 14 14" fill="none">
                   <path
                      d="M12.7305 14L7.0045 8.26864L1.27846 14L0 12.7224L5.73505 7L0 1.27763L1.27846 0L7.0045 5.73136L12.7305 0.00899763L14 1.27763L8.27396 7L14 12.7224L12.7305 14Z"
                      fill="currentColor" fill-opacity="0.5" />

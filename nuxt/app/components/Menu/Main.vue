@@ -93,17 +93,16 @@ const hideMenu = () => hideTimeout = setTimeout(() => activeMenu.value = null, 3
 
 <template>
    <nav>
-      <ul class="relative flex gap-3 justify-center flex-wrap">
+      <ul class="relative flex gap-5 justify-center flex-wrap">
          <li @mouseenter="showMenu(index)" @mouseleave="hideMenu" v-for="item, index in menu"
             class="group menu__transition__group text-lg">
-            <MenuLink class="inline-block px-3" :class="{ 'before:w-full before:h-1': activeMenu === index }"
+            <MenuLink class="inline-block px-5" :class="{ 'before:w-full before:h-1': activeMenu === index }"
                :route="!!item.link" :to="item.link ? item.link : item.custom!">
                {{ item.label }}
             </MenuLink>
-            <MenuChild
-               class="absolute left-0 top-full w-full bg-primary-100 p-5 opacity-0 -translate-y-[9999rem] menu__transition [&_.wrapper]:px-[30rem]"
-               :class="{ '!opacity-100 !translate-y-0': activeMenu === index }" :list="item.children"
-               v-if="item.children" />
+            <MenuChild v-if="item.children"
+               class="absolute left-0 top-full w-full bg-primary-100 p-5 opacity-0 -translate-y-[9999rem] menu__transition [&_.wrapper]:px-[20rem]"
+               :class="{ '!opacity-100 !translate-y-0': activeMenu === index }" :list="item.children" />
          </li>
       </ul>
    </nav>

@@ -83,7 +83,7 @@ watch(status, () => {
 const projectKey = `projectDetails${locale.value.charAt(0).toUpperCase() + locale.value.slice(1)}` as 'projectDetailsRu'
 const altKey = `alt${locale.value.charAt(0).toUpperCase() + locale.value.slice(1)}` as 'altRu'
 
-const showFilters = ref<boolean>(true)
+const showFilters = useState<boolean>('gallery:filters_state', () => true)
 
 const { isOpen, open, close } = useModalWindow()
 const activeImageRef = ref<typeof items.value[0] | null>(null)
@@ -150,11 +150,9 @@ const prevImage = async () => {
    return item ? item : null
 }
 const nextImage = async () => {
-   const index = items.value?.findIndex(item => item.id === activeImageRef.value!.id)
-
    if (
       status.value !== 'pending'
-      && index >= (items.value.length - 1)
+      && activeImageIndex.value >= (items.value.length - 1)
       && activePages.value[1]
       && activePages.value[1] < pages.value
    ) {
@@ -164,7 +162,7 @@ const nextImage = async () => {
       await waitFetchSuccess()
    }
 
-   const item = items.value[index + 1]
+   const item = items.value[activeImageIndex.value + 1]
    return item ? item : null
 }
 
@@ -193,7 +191,7 @@ const galleryNav = async (e: KeyboardEvent) => {
 
 <template>
    <div class="">
-      <div class="grid gap-8 text-center px-10 py-10">
+      <div class="grid gap-8 text-center px-10 py-10 mb-20">
          <h2 class="text-accent-800 uppercase text-3xl font-semibold">Галерея геральдической мастерской</h2>
 
          <p class="leading-8 text-balance">
@@ -209,13 +207,13 @@ const galleryNav = async (e: KeyboardEvent) => {
          </ButtonsMain>
       </div>
 
-      <div
-         class="grid grid-rows-[var(--_head-h)_auto] px-5 [--_border:var(--color-basic-900)] *:border-[var(--_border)] transition-all [--_head-h:3.1rem]"
-         :class="showFilters ? 'grid-cols-[30rem_1fr]' : 'grid-cols-[0_1fr] [&_.filters]:border-transparent [&_.gallery-head]:border-r-transparent'">
-         <div class="col-[1/1] row-[1/1] content-center flex justify-evenly items-end border-r border-b overflow-hidden
+      <div class="grid grid-cols-[var(--_filters-size)_1fr] grid-rows-[var(--_head-h)_auto] px-5 [--_border:var(--color-basic-900)] *:border-[var(--_border)]
+            transition-all [--_head-h:3.1rem] [--_filters-size:30rem]">
+         <!-- :class="{ 'grid-cols-[0_1fr] [&_.filters]:border-transparent [&_.gallery-head]:border-r-transparent': !showFilters }" -->
+         <div class="col-[1/1] row-[1/1] z-10 content-center flex justify-evenly items-end border-r border-b overflow-hidden
          [&>*:hover]:bg-primary-500 [&>*:hover]:text-white *:duration-300 [&_.router-link-active]:bg-accent-800!
          [&_.router-link-active]:text-white text-accent-800 *:transition-all gallery-head
-         *:p-3 *:block *:leading-none uppercase font-semibold">
+         *:p-3 *:block *:leading-none uppercase font-semibold sticky top-12 bg-white">
             <NuxtLink :to="{
                path: $localePath(routesList.client.gallery.gerbs),
                // query: { ...query, page: 1, category: undefined }
@@ -231,28 +229,36 @@ const galleryNav = async (e: KeyboardEvent) => {
             </NuxtLink>
          </div>
 
-         <GalleryFilters
-            class="col-[1/1] row-[2/-1] sticky top-14 w-full h-[94svh] border-r pt-5 filters [&_.p-scrollpanel-content]:overscroll-contain"
-            :gallery="type" />
+         <transition name="filters_block">
+            <GalleryFilters v-if="showFilters"
+               class="col-[1/1] row-[2/-1] sticky top-24 w-full h-[90svh] border-r pt-5 filters [&_.p-scrollpanel-content]:overscroll-contain"
+               :gallery="type" />
+         </transition>
 
-         <div class="col-[2/-1] row-[1/-1]">
+         <div class="row-[1/-1] transition-all" :class="showFilters ? 'col-[2/-1]' : 'col-[1/-1]'">
             <div class="flex flex-col min-h-full">
                <div v-if="(addMore || unshift) ? true : (status !== 'error' && status !== 'pending')" class="px-5 py-7">
                   <template v-if="items.length">
-                     <div class="grid gap-2 items-start" :class="showFilters
+                     <div class="grid gap-2" :class="showFilters
                         ? 'grid-cols-4'
                         : 'grid-cols-5'">
-                        <div v-for="image in items" :key="image.id" class="break-inside-avoid">
-                           <NuxtImg class="w-full h-full object-cover cursor-pointer" :src="FS_IMAGE_SRC(image.image!)"
-                              densities="x1" width="500"
+                        <div v-for="image in items" :key="image.id" class="break-inside-avoid relative">
+                           <NuxtImg class="size-full object-cover cursor-pointer" :src="FS_IMAGE_SRC(image.image!)"
+                              densities="x1" width="500" @click="openImage(image)"
                               :format="image.image!.split('.').pop() === 'gif' ? undefined : 'webp'"
-                              :alt="image[`alt${locale.charAt(0).toUpperCase() + locale.slice(1)}` as keyof GalleryItem['altRu']] || image.altRu || undefined"
-                              placeholder="/loader.svg" @click="openImage(image)" />
+                              :alt="image[altKey] || image.altRu || undefined" placeholder="/loader.svg" />
 
                            <NuxtLink v-if="image[projectKey]"
                               :to="$localePath(routesList.client.projects.single(image[projectKey]!.slug))"
-                              class="block w-full text-center bg-accent-500 text-white py-2">
-                              Смотреть проект
+                              class="absolute bottom-0 left-0 flex gap-3 w-full
+                                 text-center bg-accent-800 text-white py-2 items-center justify-center gap-3font-semibold leading-none">
+                              <span>Смотреть проект</span>
+
+                              <svg class="size-5" viewBox="0 0 15 16" fill="none">
+                                 <path
+                                    d="M12.2178 7.35L6.67995 1.81408L6.5734 1.70757L6.68038 1.60149L7.39438 0.893487L7.50045 0.788315L7.60607 0.893934L14.6061 7.89393L14.7121 8L14.6061 8.10607L7.60607 15.1061L7.50045 15.2117L7.39438 15.1065L6.68038 14.3985L6.57341 14.2924L6.67994 14.1859L12.2168 8.65H0.5H0.35V8.5V7.5V7.35H0.5H12.2178Z"
+                                    fill="currentColor" stroke="currentColor" stroke-width="0.3" />
+                              </svg>
                            </NuxtLink>
                         </div>
                      </div>
@@ -290,9 +296,22 @@ const galleryNav = async (e: KeyboardEvent) => {
                      <Teleport to="#teleports">
                         <div v-if="isOpen && activeImage"
                            class="fixed z-[200] inset-0 w-full h-full [&:not(.zoomedImage-enter-active)]:backdrop-blur-md transition-all">
-                           <div class="size-full" @click="closeImage()">
+                           <div class="size-full grid grid-rows-[1fr_auto]" @click="closeImage()">
                               <NuxtImg :src="activeImage.image" placeholder="/loader.svg" :key="activeImageKey"
-                                 class="size-full object-contain" />
+                                 class="size-full object-contain"
+                                 :class="activeImage.project ? 'max-h-[95svh]' : 'max-h-screen'" />
+
+                              <NuxtLink v-if="activeImage.project"
+                                 :to="$localePath(routesList.client.projects.single(activeImage.project.slug))"
+                                 class="flex items-center justify-center gap-3 w-full h-[5svh] text-center bg-accent-800 text-white py-2 font-semibold leading-none">
+                                 <span>Смотреть проект</span>
+
+                                 <svg class="size-5" viewBox="0 0 15 16" fill="none">
+                                    <path
+                                       d="M12.2178 7.35L6.67995 1.81408L6.5734 1.70757L6.68038 1.60149L7.39438 0.893487L7.50045 0.788315L7.60607 0.893934L14.6061 7.89393L14.7121 8L14.6061 8.10607L7.60607 15.1061L7.50045 15.2117L7.39438 15.1065L6.68038 14.3985L6.57341 14.2924L6.67994 14.1859L12.2168 8.65H0.5H0.35V8.5V7.5V7.35H0.5H12.2178Z"
+                                       fill="currentColor" stroke="currentColor" stroke-width="0.3" />
+                                 </svg>
+                              </NuxtLink>
                            </div>
 
                            <!-- <p v-if="activeImage.alt" class="fixed top-5 left-1/2 -translate-x-1/2 bg-accent-300 rounded-2xl px-4 py-2
@@ -303,10 +322,11 @@ const galleryNav = async (e: KeyboardEvent) => {
                            <button
                               class="absolute max-xl:bottom-10 xl:top-1/2 xl:-translate-y-1/2 left-2 lg:left-20 bg-accent-800 cursor-pointer">
                               <!-- && activeImage.prev !== null -->
-                              <svg v-if="status !== 'pending'" class="size-14 lg:size-20 text-white" width="32"
-                                 height="32" viewBox="0 0 24 24" @click="openImage(prevImage)">
-                                 <path fill="currentColor"
-                                    d="m7.85 13l2.85 2.85q.3.3.288.7t-.288.7q-.3.3-.712.313t-.713-.288L4.7 12.7q-.3-.3-.3-.7t.3-.7l4.575-4.575q.3-.3.713-.287t.712.312q.275.3.288.7t-.288.7L7.85 11H19q.425 0 .713.288T20 12t-.288.713T19 13z" />
+                              <svg v-if="status !== 'pending'" class="size-14 lg:size-20 text-white p-3" width="32"
+                                 height="32" viewBox="0 0 54 54" @click="openImage(prevImage)">
+                                 <path
+                                    d="M8.49365 24.9929L29.758 3.7358L29.8646 3.62928L29.7576 3.5232L27.1056 0.893487L26.9996 0.788315L26.8939 0.893934L0.893934 26.8939L0.787868 27L0.893934 27.1061L26.8939 53.1061L26.9996 53.2117L27.1056 53.1065L29.7576 50.4768L29.8646 50.3707L29.7581 50.2642L8.49732 29.0071H53H53.15V28.8571V25.1429V24.9929H53H8.49365Z"
+                                    fill="currentColor" stroke="currentColor" stroke-width="0.3" />
                               </svg>
 
                               <img v-else-if="status === 'pending'" class="size-14 lg:size-20 text-white"
@@ -316,10 +336,11 @@ const galleryNav = async (e: KeyboardEvent) => {
                            <button
                               class="absolute max-xl:bottom-10 xl:top-1/2 xl:-translate-y-1/2 right-2 lg:right-20 bg-accent-800 cursor-pointer">
                               <!-- && activeImage.next !== null -->
-                              <svg v-if="status !== 'pending'" class="size-14 lg:size-20 text-white" width="32"
-                                 height="32" viewBox="0 0 24 24" @click="openImage(nextImage)">
-                                 <path fill="currentColor"
-                                    d="M16.15 13H5q-.425 0-.712-.288T4 12t.288-.712T5 11h11.15L13.3 8.15q-.3-.3-.288-.7t.288-.7q.3-.3.713-.312t.712.287L19.3 11.3q.15.15.213.325t.062.375t-.062.375t-.213.325l-4.575 4.575q-.3.3-.712.288t-.713-.313q-.275-.3-.288-.7t.288-.7z" />
+                              <svg v-if="status !== 'pending'" class="size-14 lg:size-20 text-white p-3"
+                                 viewBox="0 0 52 52" @click="openImage(nextImage)">
+                                 <path
+                                    d="M43.7806 24.0643L23.344 3.63466L23.2374 3.52814L23.3444 3.42206L25.8944 0.893487L26.0004 0.788315L26.1061 0.893934L51.1061 25.8939L51.2121 26L51.1061 26.1061L26.1061 51.1061L26.0004 51.2117L25.8944 51.1065L23.3444 48.5779L23.2374 48.4719L23.3439 48.3654L43.7771 27.9357H1H0.849998V27.7857V24.2143V24.0643H1H43.7806Z"
+                                    fill="currentColor" stroke="currentColor" stroke-width="0.3" />
                               </svg>
 
                               <img v-else-if="status === 'pending'" class="size-14 lg:size-20 text-white"
@@ -338,8 +359,12 @@ const galleryNav = async (e: KeyboardEvent) => {
                   {{ error }}
                </div>
 
-               <div v-for="item in 2" :class="item === 1 ? '-order-1 border-b' : 'mt-auto order-1 border-t'"
-                  class="content-center h-(--_head-h) grid grid-cols-[1fr_3fr_1fr] items-center gap-2 overflow-hidden px-5">
+               <!-- sticky top-12 z-20 -->
+               <!-- pagination -->
+               <div v-for="item in 2" :class="[
+                  item === 1 ? '-order-1 border-b bg-white pb-1' : 'mt-auto order-1 border-t pt-1',
+                  { 'pl-[calc(var(--_filters-size)+1.25rem)]': !showFilters && item === 1 }
+               ]" class="content-center h-(--_head-h) grid grid-cols-[1fr_4fr] gap-2 overflow-hidden px-5">
                   <div class="flex items-center gap-2 cursor-pointer" @click="showFilters = !showFilters">
                      <svg class="h-6 transition-all duration-500" :class="{ 'rotate-180': !showFilters }"
                         viewBox="0 0 16 16" fill="none">
@@ -350,19 +375,17 @@ const galleryNav = async (e: KeyboardEvent) => {
 
                      <div class="self-stretch w-[2px] bg-black"></div>
 
-                     <span class="leading-none">{{ $t(`gallery.main.${showFilters ? 'hide' : 'show'}`) }}</span>
+                     <span class="leading-none text-base select-none">
+                        {{ $t(`gallery.main.${showFilters ? 'hide' : 'show'}`) }}
+                     </span>
                   </div>
 
-                  <Pagination v-if="data?.items.length" @page-changed="page => currentPage = page" class="mx-auto"
+                  <Pagination v-if="data?.items.length" @page-changed="page => currentPage = page" class="ml-auto"
                      :class="{ 'select-none pointer-events-none': (status === 'pending' || status === 'idle') }" v-bind="{
                         pages,
                         currentPage,
                         pagesLoading: 12
                      }" />
-
-                  <div class="">
-                     {{ activePages }}
-                  </div>
                </div>
             </div>
          </div>
@@ -381,5 +404,15 @@ const galleryNav = async (e: KeyboardEvent) => {
    opacity: 0;
    transform: scale(0);
    translate: 0 100vh;
+}
+
+.filters_block-enter-active,
+.filters_block-leave-active {
+   transition: all 200ms;
+}
+
+.filters_block-enter-from,
+.filters_block-leave-to {
+   translate: -100% 0;
 }
 </style>

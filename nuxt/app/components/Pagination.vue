@@ -58,22 +58,24 @@ const changePageInput = async (event: Event) => {
          </component>
 
          <div class="flex justify-items-center items-center gap-3">
-            <div class="self-stretch w-[2px] bg-black"></div>
+            <div class="self-stretch mr-2 w-[2px] bg-black"></div>
 
             <span>
                Страница
             </span>
 
-            <input class="min-w-14 max-w-23 px-5 bg-accent-800 text-white font-bold" @change="changePageInput"
+            <input class="min-w-14 max-w-23 py-1 px-5 bg-accent-800 text-white font-bold border border-transparent
+               hover:border-accent-800 hover:bg-white hover:text-accent-800 transition-colors outline-none
+               focus:bg-transparent focus:text-accent-800 focus:border-accent-800" @change="changePageInput"
                :value="currentPage">
 
             <span>из</span>
 
-            <span>
+            <span class="font-bold">
                {{ pages }}
             </span>
 
-            <div class="self-stretch w-[2px] bg-black"></div>
+            <div class="self-stretch ml-2 w-[2px] bg-black"></div>
          </div>
 
          <component :is="urlBase ? NuxtLink : 'button'"

@@ -142,6 +142,12 @@ export default defineNuxtConfig({
     ]
   },
 
+  router: {
+    options: {
+      scrollBehaviorType: 'smooth'
+    }
+  },
+
   nitro: {
     routeRules: {
       '/api/**': { ssr: false },
