@@ -17,7 +17,8 @@
          <TheSidebar />
       </aside>
 
-      <main class="[&>div:not(.custom)]:grid [&>div:not(.custom)]:gap-12 [&>div:not(.custom)]:items-start pr-5">
+      <main class="[&>div:not(.custom)]:grid [&>div:not(.custom)]:gap-12 [&>div:not(.custom)]:items-start pr-5"
+         :class="{ 'col-span-full': $route.meta.hideSidebar }">
          <slot />
       </main>
 

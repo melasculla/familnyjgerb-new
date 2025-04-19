@@ -90,6 +90,12 @@
    --gradient-secondary: linear-gradient(45deg, #001A13 14%, #000A08 49%, #000F0C 65%, #000F0C 86%);
 } */
 
+@utility gradient-primary {
+   @layer base {
+      @apply bg-[linear-gradient(90deg,var(--color-icons-500)_0%,var(--color-accent-2-700)_100%)];
+   }
+}
+
 @layer components {
    body {
       --p-tooltip-background: var(--color-accent-800);
