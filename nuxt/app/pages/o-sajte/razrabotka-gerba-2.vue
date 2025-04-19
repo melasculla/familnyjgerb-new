@@ -4,7 +4,7 @@
 
 <template>
    <div>
-      <Line icon="shield-lily" />
+      <Line icon="shield-lily" wrap />
    </div>
 </template>
 

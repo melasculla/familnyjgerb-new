@@ -34,7 +34,12 @@ const icons: Record<TIcons, Component> = {
    <div class="flex gap-2 justify-center items-center">
       <div class="w-80 h-0.5 bg-accent-800"></div>
 
-      <component class="size-16 text-accent-800" :is="typeof icon === 'object' ? icons[icon.name] : icons[icon]" />
+      <IconsMain v-if="wrap" class="shrink-0 w-50" />
+
+      <component class="shrink-0 size-16 text-accent-800"
+         :is="typeof icon === 'object' ? icons[icon.name] : icons[icon]" />
+
+      <IconsMain v-if="wrap" class="shrink-0 w-50" />
 
       <div class="w-80 h-0.5 bg-accent-800"></div>
    </div>
