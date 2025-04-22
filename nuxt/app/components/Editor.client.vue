@@ -387,4 +387,8 @@ defineExpose({ save })
 .ce-editorjsColumns_col {
    border: 1px solid #000;
 }
+
+.codex-editor .custom-button-tool div:nth-child(2):has(+ div .form:checked) {
+   display: none !important;
+}
 </style>

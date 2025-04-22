@@ -91,13 +91,13 @@ useSeoMeta({
             pagesLoading: 11
          }" />
 
-      <BlogCategories :current="category" :admin="admin" />
+      <!-- <BlogCategories :current="category" :admin="admin" /> -->
 
-      <div v-if="status === 'success' && posts" class="grid grid-cols-2 md:grid-cols-6 gap-4">
+      <div v-if="status === 'success' && posts" class="grid grid-cols-2 md:grid-cols-4 gap-4">
          <BlogCard v-for="post in posts.posts" :key="post.id" :post="post" :admin="admin" />
       </div>
 
-      <div v-else-if="status === 'pending' || status === 'idle'" class="grid grid-cols-2 md:grid-cols-6 gap-4">
+      <div v-else-if="status === 'pending' || status === 'idle'" class="grid grid-cols-2 md:grid-cols-4 gap-4">
          <BlogSkeletonCard v-for="post in perPage" />
       </div>
 

@@ -5,53 +5,75 @@ import {
    IconsMain,
    IconsKeys,
    IconsStars,
-   IconsShieldLily
+   IconsShieldLily,
+   IconsSmallLily,
+
+   IconsMainGold,
+   IconsSmallLilyGold,
+   IconsStarsGold,
 } from '#components'
 
 type TIcons = 'main' | 'stars' | 'keys' | 'shield-lily' | 'lily'
-type TColors = 'accent' | 'black' | 'gold-gradient'
+type TIconsSides = 'stars' | 'lily'
+type TColors = 'accent' | 'black' | 'gradient-gold'
 
-defineProps<{
-   icon: TIcons | {
-      name: TIcons
-      single: boolean
-   }
+const { color } = defineProps<{
+   icon: TIcons
+   size?: 'small'
+   single?: boolean
    wrap?: boolean
-   sides?: 'dots' | 'lily'
+   sides?: TIconsSides
    color?: TColors
    full?: boolean
 }>()
 
+// const resolveIcon = (name: string) => {
+//    if (name)
+//       return `${Icons}`
+// }
+
 const icons: Record<TIcons, Component> = {
-   main: IconsMain,
-   stars: IconsStars,
+   main: color === 'gradient-gold' ? IconsMainGold : IconsMain,
+   stars: color === 'gradient-gold' ? IconsStarsGold : IconsStars,
    keys: IconsKeys,
    'shield-lily': IconsShieldLily,
    lily: IconsBigLily,
 }
 
+const iconsSides: Record<TIconsSides, Component> = {
+   stars: color === 'gradient-gold' ? IconsStarsGold : IconsStars,
+   lily: color === 'gradient-gold' ? IconsSmallLilyGold : IconsSmallLily,
+}
+
 const colors: Record<TColors, string> = {
-   'gold-gradient': 'gradient-primary',
+   'gradient-gold': '[&_.line]:gradient-gold',
    accent: 'text-accent-800',
    black: 'text-basic-900',
 }
 </script>
 
 <template>
-   <div class="flex gap-2 justify-center items-center" :class="[
+   <div class="flex justify-center items-center" :class="[
       colors[color || 'black'],
-      { 'grid! grid-cols-[1fr_auto_auto_auto_1fr] [&_.line]:w-auto': full && wrap },
-      { 'grid! grid-cols-[1fr_auto_1fr] [&_.line]:w-auto': full && !wrap },
    ]">
-      <div class="w-40 h-0.5 bg-current line"></div>
+      <component v-if="sides" :is="iconsSides[sides]" class="w-7 h-auto translate-x-1" />
 
-      <IconsMain v-if="wrap" class="shrink-0 w-auto h-9" />
+      <div class="flex justify-center items-center gap-1" :class="{ 'grow': full }">
+         <div class="h-0.5 bg-current line" :class="full ? 'grow' : 'min-w-40'"></div>
 
-      <component class="shrink-0 size-16" :is="typeof icon === 'object' ? icons[icon.name] : icons[icon]" />
+         <IconsMain v-if="wrap" class="shrink-0 w-auto" :class="size === 'small' ? 'h-6' : 'h-8'" />
 
-      <IconsMain v-if="wrap" class="shrink-0 w-auto h-9" />
+         <component class="shrink-0" :is="icons[icon]" :class="(icon === 'main' || icon === 'stars')
+            ? (size === 'small' ? 'h-6' : 'h-10')
+            : (size === 'small' ? 'h-12' : 'h-20')
+            " />
 
-      <div class="w-40 h-0.5 bg-current line"></div>
+         <IconsMain v-if="wrap" class="shrink-0 w-auto" :class="size === 'small' ? 'h-6' : 'h-8'" />
+
+         <div class="h-0.5 bg-current line" :class="full ? 'grow' : 'min-w-40'"></div>
+      </div>
+
+      <component v-if="sides" :is="iconsSides[sides]" class="w-7 h-auto rotate-180 -translate-x-1" />
    </div>
 </template>
 

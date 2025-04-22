@@ -3,8 +3,8 @@
 </script>
 
 <template>
-   <div>
-      <Line icon="shield-lily" wrap full />
+   <div class="h-[300svh]">
+      <Line icon="shield-lily" color="accent" wrap />
    </div>
 </template>
 

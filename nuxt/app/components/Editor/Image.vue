@@ -38,13 +38,15 @@ const zoom = (e: MouseEvent) => {
 
 <template>
    <div class="image grid items-center">
-      <transition name="zoomedImage">
-         <div v-if="zoomed" class="fixed z-[100] inset-0 w-full h-full backdrop-blur-md transition-all"
-            @click="zoomed = false">
-            <NuxtImg :src="block.file?.url?.includes('http') ? block.file.url : joinURL('/fs/', block.file.url)"
-               placeholder="/loader.svg" class="size-full object-contain" />
-         </div>
-      </transition>
+      <Teleport to="#teleports">
+         <transition name="zoomedImage">
+            <div v-if="zoomed" class="fixed z-[200] inset-0 w-full h-full backdrop-blur-md transition-all"
+               @click="zoomed = false">
+               <NuxtImg :src="block.file?.url?.includes('http') ? block.file.url : joinURL('/fs/', block.file.url)"
+                  placeholder="/loader.svg" class="size-full object-contain" />
+            </div>
+         </transition>
+      </Teleport>
 
       <NuxtImg @click="zoom" v-if="!block.file?.url?.includes('http')" :src="joinURL('/fs/', block.file.url)"
          :alt="block.caption" :title="block.caption" class="cursor-pointer" :class="imageProps"

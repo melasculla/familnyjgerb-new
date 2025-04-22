@@ -14,27 +14,29 @@ const { data: categories, status, error } = await useLazyFetch(routesList.api.ca
 </script>
 
 <template>
-   <div>
-      <div v-if="status === 'success' && categories"
-         class="flex flex-wrap gap-4 justify-between text-center px-5 text-base">
-         <NuxtLink class="text-red-800 hover:text-sky-700" v-if="current"
-            :to="admin ? localPath(routesList.client.admin.posts.list) : localPath(routesList.client.posts.list)">
-            Blog
+   <div v-if="status === 'success' && categories" class="w-full flex flex-wrap gap-4 justify-between">
+      <!-- <NuxtLink class="text-red-800 hover:text-sky-700" v-if="current"
+         :to="admin ? localPath(routesList.client.admin.posts.list) : localPath(routesList.client.posts.list)">
+         Blog
+      </NuxtLink> -->
+
+      <template v-for="category in categories" :key="category.id">
+         <NuxtLink
+            :to="admin ? localPath(routesList.client.admin.posts.category(category.slug)) : localPath(routesList.client.posts.category(category.slug))"
+            class="hover:text-accent-700 font-medium transition-all"
+            :class="current === category.slug ? 'text-accent-800' : 'text-basic-900'">
+            {{
+               category[`name${locale.charAt(0).toUpperCase() + locale.slice(1)}` as keyof Category] || category.nameRu
+            }}
          </NuxtLink>
-         <template v-for="category in categories" :key="category.id">
-            <NuxtLink
-               :to="admin ? localPath(routesList.client.admin.posts.category(category.slug)) : localPath(routesList.client.posts.category(category.slug))"
-               class="text-red-800 hover:text-sky-700" :class="{ 'text-sky-700': current === category.slug }">
-               {{ category[`name${locale.charAt(0).toUpperCase() + locale.slice(1)}` as keyof Category] ||
-                  category.nameRu }}
-            </NuxtLink>
-         </template>
-      </div>
-      <div v-else-if="status === 'pending' || status === 'idle'">
-         Loading
-      </div>
-      <div v-else-if="status === 'error'" class="text-center text-red-500 font-bold text-lg">
-         {{ `Error: ${error?.statusMessage || error?.message || error?.data?.message}` }}
-      </div>
+      </template>
+   </div>
+
+   <div v-else-if="status === 'pending' || status === 'idle'">
+      Loading
+   </div>
+
+   <div v-else-if="status === 'error'" class="text-center text-red-500 font-bold text-lg">
+      {{ `Error: ${error?.statusMessage || error?.message || error?.data?.message}` }}
    </div>
 </template>

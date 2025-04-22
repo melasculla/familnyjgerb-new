@@ -15,6 +15,10 @@ const buttons = {
    'Main': ButtonsMain,
    'Order': ButtonsOrder
 }
+
+const openForm = () => {
+   // TODO: open form
+}
 </script>
 
 <template>
@@ -30,7 +34,8 @@ const buttons = {
       marginTop: block.data.size.replace('size-', ''),
       marginBottom: block.data.size.replace('size-', ''),
    }" />
-   <component class="mx-auto" v-else-if="block.type === 'customButton'" v-bind="block.data.props"
+   <component class="mx-auto" v-else-if="block.type === 'customButton'" @click="block.data.props?.form && openForm()"
+      v-bind="{ to: block.data.props?.form ? undefined : block.data.props?.href }"
       :is="block.data.name ? buttons[block.data.name as keyof typeof buttons] : buttons.Main">
       {{ block.data.props.text }}
    </component>

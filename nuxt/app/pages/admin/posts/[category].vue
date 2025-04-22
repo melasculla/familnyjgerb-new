@@ -8,10 +8,10 @@ const category = computed(() => Array.isArray(route.params.category) ? route.par
       <ClientOnly>
          <Teleport to="#admin__teleport">
             <div class="ml-10 flex flex-wrap gap-4">
-               <ButtonsMain :href="routesList.client.admin.posts.list">
+               <ButtonsMain :to="routesList.client.admin.posts.list">
                   All Posts
                </ButtonsMain>
-               <ButtonsMain :href="routesList.client.admin.posts.create">
+               <ButtonsMain :to="routesList.client.admin.posts.create">
                   New Post
                </ButtonsMain>
             </div>

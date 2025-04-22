@@ -19,6 +19,7 @@ class CustomButtonTool {
    }
 
    render() {
+      this.wrapper.classList.add('custom-button-tool')
       this.wrapper.contentEditable = `false`;
       this.wrapper.style.outline = '2px solid orange'
       this.wrapper.style.outlineOffset = '8px'
@@ -32,31 +33,39 @@ class CustomButtonTool {
 
       this.createField('Текст', 'text', this.data.props.text)
       this.createField('Ссылка', 'link', this.data.props.href)
+      this.createField('Форма заявки', 'form', this.data.props.form, 'checkbox')
 
       return this.wrapper;
    }
 
-   private createField(text: string, customClass: string, value: string) {
+   private createField(text: string, customClass: string, value: string, type: 'input' | 'checkbox' = 'input') {
       const wrapper = document.createElement('div')
       wrapper.style.display = 'flex'
       wrapper.style.gap = '.5rem'
       wrapper.style.justifyContent = 'center'
-      wrapper.style.fontSize = '1.7rem';
-
+      wrapper.style.fontSize = '1.7rem'
 
       const input = document.createElement('input')
-      input.value = value
+      if (type === 'input')
+         input.value = value
+
+      if (type === 'checkbox') {
+         input.type = 'checkbox'
+         // @ts-ignore
+         input.checked = value
+      }
 
       const label = document.createElement('label')
       label.innerHTML = `${text}: `
       wrapper.appendChild(label)
       wrapper.appendChild(input)
-      input.style.padding = '0.2rem 0.5rem';
-      input.style.borderRadius = '0.5rem';
-      input.style.width = '100%';
-      input.style.textAlign = 'center';
-      input.style.border = '2px solid #fca5a5';
+      input.style.padding = '0.2rem 0.5rem'
+      input.style.borderRadius = '0.5rem'
+      input.style.width = type === 'input' ? '100%' : '4rem'
+      input.style.textAlign = 'center'
+      input.style.border = '2px solid #fca5a5'
       input.classList.add(customClass)
+
       this.wrapper.appendChild(wrapper)
    }
 
@@ -113,12 +122,14 @@ class CustomButtonTool {
    save() {
       const text = (this.wrapper.querySelector('input.text') as HTMLInputElement)?.value
       const href = (this.wrapper.querySelector('input.link') as HTMLInputElement)?.value
+      const form = (this.wrapper.querySelector('input.form') as HTMLInputElement)?.checked
 
       return {
          name: this.data.name,
          props: {
             text: text || this.data.props.text,
-            href: href || this.data.props.href
+            href: href || this.data.props.href,
+            form
          }
       }
    }

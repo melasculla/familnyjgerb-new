@@ -243,8 +243,9 @@ const galleryNav = async (e: KeyboardEvent) => {
                         ? 'grid-cols-4'
                         : 'grid-cols-5'">
                         <div v-for="image in items" :key="image.id" class="break-inside-avoid relative">
-                           <NuxtImg class="size-full object-cover cursor-pointer" :src="FS_IMAGE_SRC(image.image!)"
-                              densities="x1" width="500" @click="openImage(image)"
+                           <NuxtImg class="size-full object-cover cursor-pointer aspect-square"
+                              :src="FS_IMAGE_SRC(image.image!)" densities="x1" width="500" height="500"
+                              @click="openImage(image)"
                               :format="image.image!.split('.').pop() === 'gif' ? undefined : 'webp'"
                               :alt="image[altKey] || image.altRu || undefined" placeholder="/loader.svg" />
 

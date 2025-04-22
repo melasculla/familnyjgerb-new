@@ -4,7 +4,7 @@
 </script>
 
 <template>
-   <div class="grid grid-cols-[1fr_5fr]">
+   <div class="grid grid-cols-[3fr_12fr]">
       <NuxtLoadingIndicator class="col-span-full" color="hsl(225, 88%, 36%)" :height="4" data-allow-mismatch />
 
       <header class="col-span-full">

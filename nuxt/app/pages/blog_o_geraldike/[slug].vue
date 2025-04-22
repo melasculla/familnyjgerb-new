@@ -35,6 +35,11 @@ const { data, status, error } = await useLazyFetch<{ post: Post, category: Categ
 useSeoMeta({
    title: () => data.value?.post.title || null
 })
+
+// TODO: fix form /blog_o_geraldike/universalnyj-podarok-v-vide-gerba.html
+// TODO: fix form /blog_o_geraldike/idei-dlya-podarka-na-23-fevralya.html
+// TODO: fix form /blog_o_geraldike/podarki-na-novyj-god-monogramma-ili-gerb.html
+// TODO: fix form /blog_o_geraldike/monogrammy-igra-shtrixov.html
 </script>
 
 <template>
@@ -56,7 +61,7 @@ useSeoMeta({
 
          <NuxtLink v-if="route.params.slug && !Array.isArray(route.params.slug)"
             class="underline text-base text-purple-600 my-5 block text-center"
-            :href="routesList.client.admin.posts.single(route.params.slug, data?.post.id!)">
+            :to="routesList.client.admin.posts.single(route.params.slug, data?.post.id!)">
             Edit
          </NuxtLink>
       </div>

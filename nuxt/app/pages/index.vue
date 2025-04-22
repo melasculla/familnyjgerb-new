@@ -102,7 +102,7 @@ const toggleMore = () => {
             </div>
             <p>{{ description || 'description' }}</p>
          </TheSlider>
-         <ButtonsMain class="mx-auto" :href="routesList.client.gallery.gerbs">
+         <ButtonsMain class="mx-auto" :to="routesList.client.gallery.gerbs">
             Перейти в портфолио
          </ButtonsMain>
       </div>
@@ -136,7 +136,7 @@ const toggleMore = () => {
             </div>
          </div>
 
-         <ButtonsMain class="mt-5 mx-auto" :href="routesList.client.static.services.gerbs">
+         <ButtonsMain class="mt-5 mx-auto" :to="routesList.client.static.services.gerbs">
             Подробнее
          </ButtonsMain>
       </div>
@@ -150,7 +150,7 @@ const toggleMore = () => {
             <p>{{ description || 'description' }}</p>
          </TheSlider>
 
-         <ButtonsMain class="mt-7 mx-auto" :href="routesList.client.gallery.gerbs">
+         <ButtonsMain class="mt-7 mx-auto" :to="routesList.client.gallery.gerbs">
             Перейти в портфолио
          </ButtonsMain>
       </div>
@@ -199,7 +199,7 @@ const toggleMore = () => {
             </div>
          </div>
 
-         <ButtonsMain class="mt-5 mx-auto" :href="routesList.client.static.services.monograms">
+         <ButtonsMain class="mt-5 mx-auto" :to="routesList.client.static.services.monograms">
             Подробнее
          </ButtonsMain>
       </div>
@@ -213,7 +213,7 @@ const toggleMore = () => {
             <p>{{ description || 'description' }}</p>
          </TheSlider>
 
-         <ButtonsMain class="mt-7 mx-auto" :href="routesList.client.gallery.monograms">
+         <ButtonsMain class="mt-7 mx-auto" :to="routesList.client.gallery.monograms">
             Перейти в портфолио
          </ButtonsMain>
       </div>

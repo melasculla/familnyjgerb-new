@@ -7,10 +7,10 @@
       <ClientOnly>
          <Teleport to="#admin__teleport">
             <div class="ml-10 flex flex-wrap gap-4">
-               <ButtonsMain :href="routesList.client.admin.projects.list">
+               <ButtonsMain :to="routesList.client.admin.projects.list">
                   All Projects
                </ButtonsMain>
-               <ButtonsMain :href="routesList.client.admin.projects.create">
+               <ButtonsMain :to="routesList.client.admin.projects.create">
                   New Project
                </ButtonsMain>
             </div>

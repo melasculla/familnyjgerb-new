@@ -16,6 +16,9 @@ const parseLink = async (e: MouseEvent) => {
 
    e.preventDefault()
 
+   if (!target.href)
+      return
+
    // @ts-expect-error
    const href = target.parentNode?.href || target.href
    try {
@@ -58,6 +61,10 @@ const parseLink = async (e: MouseEvent) => {
 :deep(a) {
    text-decoration: underline;
    display: inline-block;
+}
+
+:deep(button a) {
+   text-decoration: none;
 }
 
 :deep(.editor__columns:has(.editor__columns__child .image:only-child)) .image:only-child {

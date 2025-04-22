@@ -19,11 +19,15 @@ definePageMeta({
       <ClientOnly>
          <Teleport to="#admin__teleport">
             <div class="ml-10 flex flex-wrap gap-4">
-               <ButtonsMain :href="routesList.client.admin.posts.list">
+               <ButtonsMain :to="routesList.client.admin.posts.list">
                   All Posts
                </ButtonsMain>
-               <ButtonsMain :href="routesList.client.admin.posts.create">
+               <ButtonsMain :to="routesList.client.admin.posts.create">
                   New Post
+               </ButtonsMain>
+
+               <ButtonsMain v-if="data?.post.slug" :to="routesList.client.posts.single(data.post.slug)">
+                  View
                </ButtonsMain>
             </div>
          </Teleport>
