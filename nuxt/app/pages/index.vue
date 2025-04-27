@@ -38,7 +38,7 @@ const toggleMore = () => {
    <div>
       <!-- <pre class="mt-[80rem]">{{ routesList.client.static }}</pre> -->
       <div class="grid grid-cols-[5fr_3fr] items-center overflow-hidden">
-         <TheSlider :config="carouselConfig" :data="4" v-slot="{ path, description, index }">
+         <TheSlider :config="carouselConfig" :data="4" v-slot="{ path, description, index }" aspect="1/1">
             <div
                class="carousel__item w-full h-[38rem] bg-primary-500 flex items-center justify-center text-6xl text-primary-100">
                {{ index }}
@@ -80,7 +80,7 @@ const toggleMore = () => {
             { path: '/img/services/2.webp', sub: '/img/services/2.1.webp' },
             { path: '/img/services/3.webp', sub: '/img/services/3.1.webp' },
             { path: '/img/services/4.webp' },
-         ]">
+         ]" aspect="1/1">
             <div class="relative carousel__item w-full flex items-center justify-center text-6xl text-primary-100">
                <NuxtImg :src="path" alt="" />
 
@@ -95,7 +95,8 @@ const toggleMore = () => {
             РАЗВИТЬ ПЕРСОНАЛЬНЫЙ СТИЛЬ,
             КАК В СОВРЕМЕННЫХ ТРАДИЦИЯХ, ТАК И В ТРАДИЦИЯХ ПРОШЛОГО
          </p>
-         <TheSlider class="my-7" :config="carouselShowcaseConfig" :data="12" v-slot="{ description, index }" nav>
+         <TheSlider class="my-7" :config="carouselShowcaseConfig" :data="12" v-slot="{ description, index }" nav
+            aspect="1/1">
             <div
                class="image w-full flex items-center justify-center aspect-square bg-primary-500 text-6xl text-primary-100">
                {{ index }}
@@ -142,7 +143,7 @@ const toggleMore = () => {
       </div>
 
       <div class="overflow-hidden">
-         <TheSlider :config="carouselShowcaseConfig" :data="12" v-slot="{ description, index }" nav>
+         <TheSlider :config="carouselShowcaseConfig" :data="12" v-slot="{ description, index }" nav aspect="1/1">
             <div
                class="image w-full flex items-center justify-center aspect-square bg-primary-500 text-6xl text-primary-100">
                {{ index }}
@@ -205,7 +206,7 @@ const toggleMore = () => {
       </div>
 
       <div class="overflow-hidden">
-         <TheSlider :config="carouselShowcaseConfig" :data="12" v-slot="{ description, index }" nav>
+         <TheSlider :config="carouselShowcaseConfig" :data="12" v-slot="{ description, index }" nav aspect="1/1">
             <div
                class="image w-full flex items-center justify-center aspect-square bg-primary-500 text-6xl text-primary-100">
                {{ index }}
@@ -308,7 +309,7 @@ const toggleMore = () => {
 
       <div>
          <p class="text-3xl text-center mb-7 font-medium uppercase">Сфера применения персональной символики</p>
-         <TheSlider :config="carouselServicesConfig" :data="12" v-slot="{ description, index }" nav>
+         <TheSlider :config="carouselServicesConfig" :data="12" v-slot="{ description, index }" nav aspect="1/1">
             <div
                class="image w-full flex items-center justify-center aspect-square bg-primary-500 text-6xl text-primary-100">
                {{ index }}

@@ -1,5 +1,9 @@
 <script setup lang="ts">
 definePageMeta({
+   customTitle: {
+      key: 'blog'
+   },
+
    key: route => `blog: ${route.params.category}`,
    scrollToTop: false
 })

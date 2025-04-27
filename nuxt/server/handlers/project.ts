@@ -21,7 +21,7 @@ const ProjectSchema = z.object({
       .refine(slug => !['list', 'monograms', 'gerbs', 'create',].includes(slug), { message: 'This slug is restricted and cannot be used.' })
       .refine(slug => !slug.includes('__'), { message: 'Slug cannot contain "__".' }),
    title: z.string().min(4).max(256, 'Title must be at least 5 characters long'),
-   description: z.string().min(15, 'Description must be at least 15 characters long').nullable().optional(),
+   description: z.string().min(10, 'Description must be at least 10 characters long').nullable().optional(),
    content: z.object({
       version: z.string().optional(),
       time: z.number().optional(),

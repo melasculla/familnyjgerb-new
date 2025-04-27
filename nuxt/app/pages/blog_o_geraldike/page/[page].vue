@@ -1,7 +1,11 @@
 <script setup lang="ts">
 definePageMeta({
+   customTitle: {
+      key: 'blog'
+   },
+
    key: 'blog',
-   scrollToTop: false
+   scrollToTop: false,
 })
 </script>
 

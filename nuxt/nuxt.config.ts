@@ -54,6 +54,9 @@ export default defineNuxtConfig({
         file: 'en-US.json'
       }
     ],
+    bundle: {
+      optimizeTranslationDirective: false,
+    },
     detectBrowserLanguage: false,
   },
 

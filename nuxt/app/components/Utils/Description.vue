@@ -19,8 +19,8 @@ const validatedDescription = computed<string | null>({
 const validate = (string: string): string => {
    errors!.description = ''
 
-   if (string.length <= 15 && string.length > 0)
-      errors!.description = 'Description must be at least 15 characters long'
+   if (string.length <= 10 && string.length > 0)
+      errors!.description = 'Description must be at least 10 characters long'
 
    return string.replace(/\s+/g, ' ')
 }

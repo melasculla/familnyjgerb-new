@@ -7,28 +7,29 @@ const showCopyright = ref<boolean>(false)
 const { data: posts, status: statusPosts } = await useLazyFetch<{ posts: PostList, total?: number }>(routesList.api.posts.getAll, {
    query: {
       locale: locale,
-      perPage: 4,
+      perPage: 3,
       page: 1,
    },
-   key: 'blog_posts:latest',
+   key: `${locale.value}:blog_posts:latest`,
    getCachedData: (key, nuxtApp) => {
-      const data = nuxtApp.payload.data[key] || nuxtApp.static.data[key]
-      if (!data)
-         return
+      return nuxtApp.payload.data[key] || nuxtApp.static.data[key]
+      // const data = nuxtApp.payload.data[key] || nuxtApp.static.data[key]
+      // if (!data)
+      //    return
 
-      if (!data.lastFetch) {
-         data.lastFetch = new Date()
-      } else {
-         const now = new Date()
-         const lastFetchDate = new Date(data.lastFetch)
-         const diffInMs = now.getTime() - lastFetchDate.getTime()
-         const diffInHours = diffInMs / (1000 * 60 * 60)
+      // if (!data.lastFetch) {
+      //    data.lastFetch = new Date()
+      // } else {
+      //    const now = new Date()
+      //    const lastFetchDate = new Date(data.lastFetch)
+      //    const diffInMs = now.getTime() - lastFetchDate.getTime()
+      //    const diffInHours = diffInMs / (1000 * 60 * 60)
 
-         if (diffInHours >= 5)
-            return
-      }
+      //    if (diffInHours >= 5)
+      //       return
+      // }
 
-      return data
+      // return data
    },
 })
 

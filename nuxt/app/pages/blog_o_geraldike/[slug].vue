@@ -36,10 +36,11 @@ useSeoMeta({
    title: () => data.value?.post.title || null
 })
 
-// TODO: fix form /blog_o_geraldike/universalnyj-podarok-v-vide-gerba.html
-// TODO: fix form /blog_o_geraldike/idei-dlya-podarka-na-23-fevralya.html
-// TODO: fix form /blog_o_geraldike/podarki-na-novyj-god-monogramma-ili-gerb.html
-// TODO: fix form /blog_o_geraldike/monogrammy-igra-shtrixov.html
+// TODO: fix form /universalnyj-podarok-v-vide-gerba.html
+// TODO: fix form /idei-dlya-podarka-na-23-fevralya.html
+// TODO: fix form /podarki-na-novyj-god-monogramma-ili-gerb.html
+// TODO: fix form /monogrammy-igra-shtrixov.html
+// TODO: add socials /stili-monogramm-i-venzeley.html
 </script>
 
 <template>

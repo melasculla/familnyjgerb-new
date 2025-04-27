@@ -97,7 +97,7 @@ const hideMenu = () => hideTimeout = setTimeout(() => activeMenu.value = null, 3
          <li @mouseenter="showMenu(index)" @mouseleave="hideMenu" v-for="item, index in menu"
             class="group menu__transition__group text-lg">
             <MenuLink class="inline-block px-5" :class="{ 'before:w-full before:h-1': activeMenu === index }"
-               :route="!!item.link" :to="item.link ? item.link : item.custom!">
+               :route="!!item.link" :to="item.link || item.custom!">
                {{ item.label }}
             </MenuLink>
             <MenuChild v-if="item.children"

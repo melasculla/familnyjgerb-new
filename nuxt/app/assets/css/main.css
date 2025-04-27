@@ -38,6 +38,9 @@
    --color-accent-700: hsl(225, 88%, 36%);
    --color-accent-800: hsl(225, 88%, 26%);
    --color-accent-900: hsl(225, 88%, 16%);
+   --color-accent-900: hsl(225, 88%, 16%);
+
+   --color-accent-2-950: hsl(0, 75%, 15%);
 
    --color-basic-100: hsl(0, 0%, 90%);
    --color-basic-200: hsl(0, 0%, 80%);
@@ -107,6 +110,12 @@
    }
 }
 
+@utility accent {
+   @layer base {
+      @apply text-accent-800 font-bold underline;
+   }
+}
+
 
 @layer components {
    body {
@@ -121,7 +130,9 @@
 } */
 
 body {
-   @apply text-lg bg-white text-basic-900 font-primary min-w-[1000px];
+   scroll-behavior: smooth;
+   @apply text-base bg-white text-basic-900 font-primary min-w-[1000px];
+   /* text-lg */
 }
 
 body:has(.modal__window) {

@@ -4,7 +4,7 @@
 
 <template>
    <div>
-      Контакты
+      <p>Контакты</p>
    </div>
 </template>
 
