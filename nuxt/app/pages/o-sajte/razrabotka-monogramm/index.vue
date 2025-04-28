@@ -16,13 +16,6 @@ definePageMeta({
    }
 })
 
-const isLoaded = ref(false)
-const isPlaying = ref(false)
-const video = ref()
-const stateChange = (event: YT.OnStateChangeEvent) => {
-   isPlaying.value = event.data === 1
-}
-
 const gallery = {
    standard: [
       ...Array.from({ length: 10 }).map(item => ({ path: '/img/services/2.1.webp', alt: undefined }))
@@ -230,25 +223,10 @@ const gallery = {
 
          <Line icon="main" size="small" class="[&_.line]:min-w-60 mt-2" />
 
-         <div class="flex items-center justify-center p-5">
-            <ScriptYouTubePlayer class="aspect-video! w-full! [&_img]:object-cover! shadow-secondary" ref="video"
-               video-id="YX1RM0sYJ-4" @ready="isLoaded = true" @state-change="stateChange">
-               <template #awaitingLoad>
-                  <div class="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
-                     <svg class="w-auto h-14" viewBox="0 0 68 48">
-                        <path
-                           d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z"
-                           fill="#f00" />
-                        <path d="M 45,24 27,14 27,34" fill="#fff" />
-                     </svg>
-                  </div>
-               </template>
-
-               <template #placeholder="{ placeholder }">
-                  <img class="size-full" :src="placeholder.replace('sddefault', 'hqdefault')" alt="Video Placeholder">
-               </template>
-            </ScriptYouTubePlayer>
-         </div>
+         <EditorEmbed class="shadow-secondary mt-4" :block="{
+            service: 'youtube',
+            embed: 'https://www.youtube.com/embed/YX1RM0sYJ-4'
+         }" full />
       </div>
 
       <div>
@@ -258,16 +236,13 @@ const gallery = {
 
          <Line icon="main" color="gradient-gold" size="small" class="[&_.line]:min-w-60 mt-2 mb-5" />
 
-         <TheSlider :data="12" :config="{ itemsToShow: 4, itemsToScroll: 1, gap: 16 }" v-slot="{ index }" aspect="3/4"
-            :nav="{ type: 'static', size: 'full' }">
+         <TheSlider :data="12" :config="{ itemsToShow: 4, itemsToScroll: 1, gap: 16, snapAlign: 'start' }"
+            v-slot="{ index }" aspect="3/4" :nav="{ type: 'static', size: 'full' }">
             <SliderCard v-bind="{
                path: '/img/services/2.webp',
                alt: 'asd',
                text: 'Описание идеи герба',
             }" />
-            <!-- <div class="w-full aspect-[3/2] bg-basic-200 flex items-center justify-center text-white text-3xl">
-               {{ index }}
-            </div> -->
          </TheSlider>
       </div>
 

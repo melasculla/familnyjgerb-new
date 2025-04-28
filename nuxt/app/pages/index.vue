@@ -38,7 +38,7 @@ const toggleMore = () => {
    <div>
       <!-- <pre class="mt-[80rem]">{{ routesList.client.static }}</pre> -->
       <div class="grid grid-cols-[5fr_3fr] items-center overflow-hidden">
-         <TheSlider :config="carouselConfig" :data="4" v-slot="{ path, description, index }" aspect="1/1">
+         <TheSlider :config="carouselConfig" :data="4" v-slot="{ path, description, index }" aspect="16/9">
             <div
                class="carousel__item w-full h-[38rem] bg-primary-500 flex items-center justify-center text-6xl text-primary-100">
                {{ index }}

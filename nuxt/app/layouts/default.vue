@@ -82,8 +82,8 @@ const headData = computed<{
          <TheSidebar />
       </aside>
 
-      <main class="[&>div:not(.custom)]:grid [&>div:not(.custom)]:gap-12 [&>div:not(.custom)]:items-start pr-10"
-         :class="{ 'col-span-full': $route.meta.hideSidebar }">
+      <main class="[&>div:not(.custom)]:grid [&>div:not(.custom)]:gap-12 [&>div:not(.custom)]:items-start"
+         :class="$route.meta.hideSidebar ? 'col-span-full' : 'pr-10'">
          <slot />
       </main>
 

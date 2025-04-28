@@ -20,11 +20,12 @@ const next = () => carousel.value?.next()
 </script>
 
 <template>
-   <div class="min-w-0 relative group"
+   <div class="min-w-0 relative"
       :class="{ 'grid grid-cols-[1fr_auto]': typeof nav === 'object' && nav.type === 'static' }"
       :style="{ '--_aspect': aspect, gap: typeof nav === 'object' && nav.type === 'static' ? `${config.gap}px` : undefined }">
       <ClientOnly>
-         <CCarousel class="[&>.carousel\_\_viewport]:py-[1px]" v-bind="config" ref="carousel" @init="handleInit()">
+         <CCarousel class="[&>.carousel\_\_viewport]:py-[1px] overflow-x-hidden" v-bind="config" ref="carousel"
+            @init="handleInit()">
             <CSlide v-for="slide, index in data" :key="typeof slide === 'number' ? slide : slide.path" class="">
                <div
                   class="carousel__item w-full grid gap-4 justify-items-stretch *:first:w-full [&_img]:aspect-(--_aspect) [&_img]:object-cover"
@@ -68,9 +69,9 @@ const next = () => carousel.value?.next()
       <div v-if="nav" class="contents *:not-[.static]:z-10 *:px-3 *:py-8 *:bg-primary-500
                *:not-[.static]:absolute *:not-[.static]:top-1/2 *:not-[.static]:-translate-y-1/2 *:text-white [&_svg]:h-9 *:transition-all
                *:cursor-pointer">
-         <!-- nav === 'full' -->
-         <div class="opacity-0 group-hover:opacity-100 left-0" :class="[
+         <div class="opacity-0 hover:opacity-100 left-0" :class="[
             { 'top-0 translate-y-0 h-full flex items-center': typeof nav === 'object' && nav.size === 'full' },
+            { 'cursor-not-allowed! hover:opacity-50!': carousel?.data.currentSlide === 0 },
          ]" @click="prev">
             <svg class="rotate-180" viewBox="0 0 13 22" fill="none">
                <path
@@ -82,6 +83,7 @@ const next = () => carousel.value?.next()
          <div class="right-0" :class="[
             { 'static self-center': typeof nav === 'object' && nav.type === 'static' },
             { 'self-stretch flex items-center': typeof nav === 'object' && nav.size === 'full' },
+            { 'cursor-not-allowed! opacity-50': carousel?.data.maxSlide === carousel?.data.currentSlide },
          ]" @click="next">
             <svg class="" viewBox="0 0 13 22" fill="none">
                <path
