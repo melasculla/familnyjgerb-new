@@ -90,9 +90,9 @@ export class ProjectService implements IProjectService {
          this.translationService
             .syncProjectSlugIfNeeded(upsertedProject.slug, upsertedProject.langGroup!).catch(err => console.warn(`[PROJECTS]: Sync slug failed: ${err}`))
 
-      if (!projectObject.id)
-         this.translationService
-            .createProjectTranslations(upsertedProject).catch(err => console.warn(`[PROJECTS]: Creating translations failed: ${err}`))
+      // if (!projectObject.id)
+      //    this.translationService
+      //       .createProjectTranslations(upsertedProject).catch(err => console.warn(`[PROJECTS]: Creating translations failed: ${err}`))
 
       return upsertedProject
    }

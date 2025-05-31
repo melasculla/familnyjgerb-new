@@ -157,9 +157,9 @@ const toggleMore = () => {
       </div>
 
       <div class="grid grid-cols-[5fr_3fr] items-center">
-         <div>
+         <div class="aspect-[16/7]">
             <ClientOnly>
-               <video class="aspect-[16/7] w-full" controls poster="/loader.svg"
+               <video class="size-full" controls poster="/loader.svg"
                   src="https://heraldry.art-studiott.com/main_ru.webm"></video>
             </ClientOnly>
          </div>

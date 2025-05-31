@@ -98,9 +98,9 @@ export class PostService implements IPostService {
       if (postObject.id)
          this.translationService
             .syncPostSlugIfNeeded(upsertedPost.slug, upsertedPost.langGroup!).catch(err => console.warn(`[POSTS]: Sync slug failed: ${err}`))
-      else
-         this.translationService
-            .createPostTranslations(upsertedPost).catch(err => console.warn(`[POSTS]: Creating translations failed: ${err}`))
+      // else
+      //    this.translationService
+      //       .createPostTranslations(upsertedPost).catch(err => console.warn(`[POSTS]: Creating translations failed: ${err}`))
 
       return upsertedPost
    }

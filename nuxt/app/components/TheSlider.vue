@@ -1,5 +1,5 @@
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
    data: number | { path: string, sub?: string, alt?: string, description?: string }[]
    config: MyCarouselConfig
    aspect: `${number}/${number}`
@@ -17,15 +17,27 @@ const handleInit = () => {
 
 const prev = () => carousel.value?.prev()
 const next = () => carousel.value?.next()
+
+
+const calculateBreakpointWidth = (breakpoint: MyCarouselBreakpoints) => {
+   const items = props.config.breakpoints?.[breakpoint]?.itemsToShow
+   if (!items || items === 'auto')
+      return undefined
+
+   return `${((1 / items) * 100) - (props.config.gap ? 1.35 : 0)}%`
+}
+const isBreakpointExists = (breakpoint: MyCarouselBreakpoints): boolean => !!props.config.breakpoints?.[breakpoint]?.itemsToShow
 </script>
 
 <template>
    <div class="min-w-0 relative"
       :class="{ 'grid grid-cols-[1fr_auto]': typeof nav === 'object' && nav.type === 'static' }"
-      :style="{ '--_aspect': aspect, gap: typeof nav === 'object' && nav.type === 'static' ? `${config.gap}px` : undefined }">
+      :style="{ '--_aspect': aspect, gap: typeof nav === 'object' && nav.type === 'static' && config.gap ? `${config.gap}px` : undefined }">
       <ClientOnly>
-         <CCarousel class="[&>.carousel\_\_viewport]:py-[1px] overflow-x-hidden" v-bind="config" ref="carousel"
-            @init="handleInit()">
+         <CCarousel class="[&>.carousel\_\_viewport]:py-[1px] overflow-x-hidden" v-bind="{
+            ...config,
+            snapAlign: config.snapAlign ? config.snapAlign : 'start'
+         }" ref="carousel" @init="handleInit()">
             <CSlide v-for="slide, index in data" :key="typeof slide === 'number' ? slide : slide.path" class="">
                <div
                   class="carousel__item w-full grid gap-4 justify-items-stretch *:first:w-full [&_img]:aspect-(--_aspect) [&_img]:object-cover"
@@ -38,6 +50,7 @@ const next = () => carousel.value?.next()
                      index: index,
                      sub: slide.sub,
                   }" />
+
                   <slot v-else description="description" :index="index" />
                </div>
             </CSlide>
@@ -45,11 +58,26 @@ const next = () => carousel.value?.next()
 
          <template #fallback>
             <div class="w-full flex overflow-hidden" :style="{
-               '--_width': (((1 / config.itemsToShow) * 100) - (config.gap ? 1 : 0)) + '%',
-               gap: config.gap + 'px'
+               '--_width': (((1 / config.itemsToShow) * 100) - (config.gap ? 1.35 : 0)) + '%',
+               '--_width-xxs': calculateBreakpointWidth(320),
+               '--_width-xs': calculateBreakpointWidth(480),
+               '--_width-sm': calculateBreakpointWidth(640),
+               '--_width-md': calculateBreakpointWidth(768),
+               '--_width-lg': calculateBreakpointWidth(1024),
+               '--_width-xl': calculateBreakpointWidth(1280),
+               '--_width-2xl': calculateBreakpointWidth(1536),
+               gap: config.gap ? `${config.gap}px` : undefined
             }">
                <div v-for="slide, index in data" :key="typeof slide === 'number' ? slide : slide.path"
-                  class="w-(--_width) basis-(--_width) shrink-0 grow">
+                  class="w-(--_width) basis-(--_width) shrink-0 grow" :class="[
+                     { 'xxs:w-(--_width-xxs) xxs:basis-(--_width-xxs)': isBreakpointExists(320) },
+                     { 'xs:w-(--_width-xs) xs:basis-(--_width-xs)': isBreakpointExists(480) },
+                     { 'sm:w-(--_width-sm) sm:basis-(--_width-sm)': isBreakpointExists(640) },
+                     { 'md:w-(--_width-md) md:basis-(--_width-md)': isBreakpointExists(768) },
+                     { 'lg:w-(--_width-lg) lg:basis-(--_width-lg)': isBreakpointExists(1024) },
+                     { 'xl:w-(--_width-xl) xl:basis-(--_width-xl)': isBreakpointExists(1280) },
+                     { '2xl:w-(--_width-2xl) 2xl:basis-(--_width-2xl)': isBreakpointExists(1536) },
+                  ]">
                   <div
                      class="w-full carousel__item grid gap-4 justify-items-stretch [&_img]:aspect-(--_aspect) [&_img]:object-cover">
                      <slot v-if="typeof slide === 'object'" class="w-full object-cover" v-bind="{
@@ -57,8 +85,10 @@ const next = () => carousel.value?.next()
                         path: slide.path,
                         alt: slide.alt,
                         index: index,
+                        sub: slide.sub,
                         ssr: true
                      }" />
+
                      <slot v-else description="description" :index="index" />
                   </div>
                </div>
@@ -66,9 +96,8 @@ const next = () => carousel.value?.next()
          </template>
       </ClientOnly>
 
-      <div v-if="nav" class="contents *:not-[.static]:z-10 *:px-3 *:py-8 *:bg-primary-500
-               *:not-[.static]:absolute *:not-[.static]:top-1/2 *:not-[.static]:-translate-y-1/2 *:text-white [&_svg]:h-9 *:transition-all
-               *:cursor-pointer">
+      <div v-if="nav" class="contents *:not-[.static]:z-10 *:px-3 *:py-8 *:bg-primary-500 *:not-[.static]:absolute *:not-[.static]:top-1/2
+         *:not-[.static]:-translate-y-1/2 *:text-white [&_svg]:h-9 *:transition-all *:cursor-pointer">
          <div class="opacity-0 hover:opacity-100 left-0" :class="[
             { 'top-0 translate-y-0 h-full flex items-center': typeof nav === 'object' && nav.size === 'full' },
             { 'cursor-not-allowed! hover:opacity-50!': carousel?.data.currentSlide === 0 },

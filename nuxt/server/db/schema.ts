@@ -77,9 +77,10 @@ export const postsTable = pgTable('posts', {
 export type PostStatus = typeof postsStatusList[number]
 export type Post = typeof postsTable.$inferSelect
 export type PostList = Array<
-   Pick<Post, 'id' | 'slug' | 'title' | 'thumbnail' | 'status' | 'createdAt'> & {
+   Pick<Post, 'id' | 'slug' | 'title' | 'thumbnail' | 'status' | 'plannedAt' | 'createdAt'> & {
       lang: Lang | null
       category: Category | null
+      excerpt?: string
    }
 >
 export type NewPost = typeof postsTable.$inferInsert

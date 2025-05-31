@@ -40,13 +40,15 @@ export class PostRepository implements IPostRepository {
       const isPaginationSetted = pagination.page && pagination.perPage
       const offset = isPaginationSetted && (pagination.page! - 1) * pagination.perPage!
 
-      return db
+      const result = await db
          .select({
             id: postsTable.id,
             slug: postsTable.slug,
             title: postsTable.title,
             thumbnail: postsTable.thumbnail,
+            content: postsTable.content,
             status: postsTable.status,
+            plannedAt: postsTable.plannedAt,
             createdAt: postsTable.createdAt,
             lang: {
                id: langsTable.id,
@@ -89,9 +91,31 @@ export class PostRepository implements IPostRepository {
                exclude ? notInArray(postsTable.id, exclude) : undefined
             )
          )
-         .offset(offset ?? 0)
-         .limit(pagination.perPage ?? 9999)
-         .orderBy(random ? sql`RANDOM()` : desc(postsTable.createdAt))
+         .offset(offset || 0)
+         .limit(pagination.perPage || 9999)
+         .orderBy(random
+            ? sql`RANDOM()`
+            : sql`COALESCE(${postsTable.plannedAt}, ${postsTable.createdAt}) DESC`
+         )
+
+      return result.map(item => {
+         if (!item.content?.blocks)
+            return item
+
+         let excerpt = ''
+
+         for (const block of item.content.blocks) {
+            if (block.type === 'paragraph') {
+               excerpt = block.data?.text
+               break
+            }
+         }
+
+         return {
+            ...item,
+            excerpt
+         }
+      })
    }
 
    async findAllTranslations(langGroup: number) {

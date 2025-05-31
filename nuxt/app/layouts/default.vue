@@ -55,8 +55,8 @@ const headData = computed<{
 
             <div v-if="headData.info" class="grid grid-cols-[7fr_8fr] items-center shadow-main mt-10 bg-primary-100">
                <div>
-                  <NuxtImg class="size-full object-cover" :src="headData.info.image.path" :alt="headData.info.image.alt"
-                     preload />
+                  <NuxtImg class="size-full object-cover aspect-[3/2]" :src="headData.info.image.path"
+                     :alt="headData.info.image.alt" preload />
                </div>
 
                <div class="px-10 py-20 text-lg leading-7">

@@ -1,8 +1,5 @@
 import { joinURL } from 'ufo'
-import { type CarouselConfig } from 'vue3-carousel'
 import { type LocationQueryValue } from '#vue-router'
-
-export type MyCarouselConfig = Partial<CarouselConfig> & { itemsToShow: number };
 
 export const deepClone = <T>(data: T): T => {
    try {
